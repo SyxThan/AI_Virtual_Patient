@@ -1,0 +1,6 @@
+{
+  "schema_version": "1",
+  "id": "case-99-broken",
+  "title": { "vi": "Ca hỏng để test", "en": "Broken fixture" },
+  "comment": "Intentionally invalid: missing required fields (patient, presentation, history, ...) and a duplicate history id, so validate_cases.py must report errors."
+}
