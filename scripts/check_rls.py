@@ -10,8 +10,11 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
 import psycopg
+
+ENV_FILE = Path(__file__).resolve().parents[1] / "apps" / "api" / ".env"
 
 RLS_OFF = """
 select c.relname
@@ -29,10 +32,25 @@ order by table_name, grantee
 """
 
 
+def _from_env_file() -> str | None:
+    """Read DATABASE_URL from apps/api/.env (same file the app uses). No secrets logged."""
+    if not ENV_FILE.exists():
+        return None
+    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line.startswith("DATABASE_URL="):
+            return line.split("=", 1)[1].strip().strip('"').strip("'") or None
+    return None
+
+
 def _dsn() -> str:
-    url = os.environ.get("DATABASE_URL")
+    url = os.environ.get("DATABASE_URL") or _from_env_file()
     if not url:
-        print("DATABASE_URL is not set", file=sys.stderr)
+        print(
+            "DATABASE_URL is not set. Set the env var, or put it in apps/api/.env "
+            "(see .env.example).",
+            file=sys.stderr,
+        )
         raise SystemExit(2)
     # psycopg wants a plain libpq URL, not the SQLAlchemy +psycopg driver suffix.
     return url.replace("postgresql+psycopg://", "postgresql://")
