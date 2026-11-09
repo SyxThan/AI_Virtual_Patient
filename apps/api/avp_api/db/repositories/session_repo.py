@@ -33,6 +33,8 @@ class SessionRecord:
 class SessionRepository(Protocol):
     def active_case_version(self, case_id: str) -> int | None: ...
 
+    def get_case_content(self, case_id: str, version: int) -> dict | None: ...
+
     def create(
         self,
         *,
@@ -71,6 +73,12 @@ class SqlSessionRepository:
     def active_case_version(self, case_id: str) -> int | None:
         stmt = select(models.Case.version).where(
             models.Case.id == case_id, models.Case.is_active.is_(True)
+        )
+        return self.db.execute(stmt).scalar_one_or_none()
+
+    def get_case_content(self, case_id: str, version: int) -> dict | None:
+        stmt = select(models.Case.content).where(
+            models.Case.id == case_id, models.Case.version == version
         )
         return self.db.execute(stmt).scalar_one_or_none()
 
