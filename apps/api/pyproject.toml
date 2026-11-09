@@ -15,6 +15,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Installed only when using the Gemini LLM provider; tests/CI use the fake.
+llm = ["google-genai>=1.0"]
 dev = [
     "pytest>=8.2",
     "httpx>=0.27",

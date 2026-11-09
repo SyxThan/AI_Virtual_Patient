@@ -14,8 +14,11 @@ Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-003 | Ca HFMD mẫu (`case-01-hfmd.json`, độ 2b, draft) | ✅ Merged | PR #4 | `review.status=draft`, cần bác sĩ duyệt (AVP-016) |
 | AVP-035 | `validate_cases.py` + typed API client (`gen-client`) | ✅ Merged | PR #7 | Slice 1 |
 | AVP-007 | Alembic migration 11 bảng + ORM models + RLS baseline | ✅ Merged | PR #7 | Verify Docker + **Supabase thật** (RLS OK) |
-| AVP-008 | Session API (`POST/GET /sessions`, guest token, ownership) + `load-cases` | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #8** | Slice 2; mode `guided/exam`, status `active`, role trong `state` |
-| AVP-010 (pt1) | Màn hình Setup (case card, role, mode, consent, điều hướng) | ✅ Code xong & verify, 🟡 chờ merge | **PR #8** | Slice 2 frontend |
+| AVP-008 | Session API (`POST/GET /sessions`, guest token, ownership) + `load-cases` | ✅ Merged | PR #8 | Slice 2 |
+| AVP-010 (pt1) | Màn hình Setup (case card, role, mode, consent, điều hướng) | ✅ Merged | PR #8 | Slice 2 frontend |
+| AVP-009 | Patient Agent (prompt cache-friendly) + **guardrail 3 tầng** + LLM adapter (Fake/Gemini) | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #9** | Slice 3; Hard Rule 1 |
+| AVP-012 | Turn loop `POST/GET /sessions/{id}/turns` + lưu transcript | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #9** | Slice 3 |
+| AVP-010 (pt2) | Clinical Workspace chat (TranscriptBox, ChatInput) | ✅ Code xong & verify, 🟡 chờ merge | **PR #9** | Slice 3 frontend |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -37,10 +40,16 @@ Session API + guest token + ownership + `load-cases`, và màn hình Setup. **Re
   - `make db-check-rls` (`scripts/check_rls.py`) → OK (RLS bật mọi bảng, không có quyền `anon`/`authenticated`).
   - Round-trip `alembic downgrade base` → `upgrade head` → OK.
 
+## Slice 3 (Clinical Workspace — hội thoại) — hoàn tất về mặt code (PR #9)
+Patient Agent đóng vai người mẹ + **guardrail 3 tầng** (tier-1 chỉ nói fact trong case; tier-3 unknown ≠ "không"; hot-path chặn từ cấm & con số lạ, regenerate 1 lần rồi fallback), LLM adapter (`FakeLLMProvider` offline + `GeminiProvider` lazy, optional extra), turn loop `POST/GET /sessions/{id}/turns` lưu transcript, và UI chat (TranscriptBox + ChatInput).
+
+### Kiểm thử Slice 3 (exit 0)
+- apps/api: `pytest` 17 passed (6 guardrail + 3 turn API + Slice 1/2); `ruff` sạch.
+- Docker Postgres thật: tạo session → `POST /turns` lưu 2 turn (student idx 0, patient idx 1) đúng thứ tự, guardrail jsonb lưu, ownership 404 khi sai token.
+- apps/web: `lint` sạch; `build` OK (route `/session/[id]` động).
+
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #4** — ca HFMD (base `main`)
-2. **PR #5** — housekeeping + scope-gate docs (base `main`)
-3. **PR #6** — Slice 1 code (stacked trên #5; merge #5 trước, GitHub tự chuyển base về `main`)
+- **PR #9** — Slice 3 (base `main`). Merge sau khi CI xanh.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.

@@ -38,7 +38,23 @@
     }
   },
   "session": {
-    "title": "Phiên hỏi bệnh"
+    "title": "Phiên hỏi bệnh",
+    "patientName": "Bệnh nhi 18 tháng tuổi — Tay chân miệng",
+    "modeLabel": "Chế độ",
+    "mode": { "guided": "Luyện tập", "exam": "Thi thử" },
+    "finish": "Kết thúc buổi khám",
+    "patientCard": {
+      "title": "Người mẹ bế bé",
+      "desc": "Bé 18 tháng tuổi, mẹ bế đến khám. (Khu vực này sẽ hiển thị avatar 3D ở giai đoạn sau.)"
+    },
+    "you": "Bác sĩ",
+    "mother": "Người mẹ",
+    "inputPlaceholder": "Nhập câu hỏi cho người mẹ…",
+    "send": "Gửi",
+    "sending": "Mẹ bé đang trả lời…",
+    "empty": "Hãy bắt đầu hỏi bệnh. Ví dụ: “Chào chị, bé nhà mình bị sao ạ?”",
+    "loadError": "Không tải được hội thoại.",
+    "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
   "debrief": {
     "title": "Kết quả và phản hồi"
