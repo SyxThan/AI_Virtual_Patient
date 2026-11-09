@@ -1,0 +1,21 @@
+{
+  "app": {
+    "title": "Bệnh nhân ảo AI",
+    "description": "Luyện hỏi bệnh bằng tiếng Việt với bệnh nhân mô phỏng, chấm điểm theo bảng kiểm OSCE kèm phản hồi học tập."
+  },
+  "home": {
+    "start": "Bắt đầu luyện tập"
+  },
+  "setup": {
+    "title": "Chuẩn bị phiên luyện tập"
+  },
+  "session": {
+    "title": "Phiên hỏi bệnh"
+  },
+  "debrief": {
+    "title": "Kết quả và phản hồi"
+  },
+  "common": {
+    "placeholder": "Màn hình này sẽ được hoàn thiện ở các task sau."
+  }
+}
