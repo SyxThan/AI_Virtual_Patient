@@ -1,6 +1,6 @@
 # Báo cáo tiến độ — nhiệm vụ đã hoàn thành
 
-Cập nhật: 2026-11-09. Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
+Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
 
 ## Bảng trạng thái
 
@@ -10,13 +10,23 @@ Cập nhật: 2026-11-09. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-005 | ADRs + OpenAPI contract skeleton | ✅ Merged | PR #1 → `068519c` | 11 ADR + `docs/specs/openapi.yaml` |
 | AVP-006 | Scaffold FastAPI + Next.js, Makefile, CI, README | ✅ Merged | PR #2 → `3a81b86`; **CI xanh trên GitHub Actions** | — |
 | AVP-039 | Claude skills (MVP stack) | ✅ Merged | PR #3 → `279283e` | 6 skill grounded theo repo |
-| AVP-040 + AVP-041 | Gitignore skill cài sẵn + **scope-gate docs** (vertical slices, Layer 2) | 🟡 Chờ merge | **PR #5** | Merge = phê duyệt mở Layer 2 (avatar/voice/vitals/PDF+QR practice) |
-| AVP-003 | Ca HFMD mẫu (`case-01-hfmd.json`, độ 2b, draft) | 🟡 Chờ merge | **PR #4** | `review.status=draft`, cần bác sĩ duyệt (AVP-016) |
-| AVP-035 | `validate_cases.py` + typed API client (`gen-client`) | ✅ Code xong & verify, 🟡 chờ merge | **PR #6** (`7a47373`) | Xem "Kiểm thử" |
-| AVP-007 | Alembic migration 11 bảng + ORM models + RLS baseline | ✅ Code xong & **verify bằng Docker**, 🟡 chờ merge | **PR #6** (commit `feat(db): ... [AVP-007]`) | Xem "Kiểm thử" |
+| AVP-040 + AVP-041 | Gitignore skill cài sẵn + **scope-gate docs** (vertical slices, Layer 2) | ✅ Merged | PR #5 | Đã phê duyệt mở Layer 2 |
+| AVP-003 | Ca HFMD mẫu (`case-01-hfmd.json`, độ 2b, draft) | ✅ Merged | PR #4 | `review.status=draft`, cần bác sĩ duyệt (AVP-016) |
+| AVP-035 | `validate_cases.py` + typed API client (`gen-client`) | ✅ Merged | PR #7 | Slice 1 |
+| AVP-007 | Alembic migration 11 bảng + ORM models + RLS baseline | ✅ Merged | PR #7 | Verify Docker + **Supabase thật** (RLS OK) |
+| AVP-008 | Session API (`POST/GET /sessions`, guest token, ownership) + `load-cases` | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #8** | Slice 2; mode `guided/exam`, status `active`, role trong `state` |
+| AVP-010 (pt1) | Màn hình Setup (case card, role, mode, consent, điều hướng) | ✅ Code xong & verify, 🟡 chờ merge | **PR #8** | Slice 2 frontend |
 
-## Slice 1 (Foundation) — hoàn tất về mặt code
-PR #6 (nhánh `feat/avp-035-slice1-foundation`, stacked trên PR #5) chứa AVP-035 + AVP-007. `.env.example` đã đầy đủ sẵn (backend + frontend), không cần sửa.
+## Slice 1 (Foundation) — ✅ đã lên `main`
+AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
+
+## Slice 2 (Setup & Session) — hoàn tất về mặt code (PR #8)
+Session API + guest token + ownership + `load-cases`, và màn hình Setup. **Reconcile theo DB thật** (không theo literal spec): `mode` guided/exam, `status` active, `role` lưu trong `sessions.state`, `case_id`=`case-01-hfmd`, card hiển thị độ 2b (ca thật). FK tới `auth.users` chỉ ở migration (không ở ORM — schema ngoài của Supabase).
+
+### Kiểm thử Slice 2 (exit 0)
+- apps/api: `pytest` 9 passed; `ruff` sạch.
+- Docker Postgres 16 + pgvector: `alembic upgrade head` → `load-cases` (v1, chạy lại = unchanged) → tạo session (guided/active/guest), GET đúng, sai token → 404, case lạ → 404.
+- apps/web: `lint` sạch; `build` OK (4 route gồm `/setup`).
 
 ## Kiểm thử đã chạy (exit 0)
 - **Validator:** `python scripts/validate_cases.py data/cases/_example_hfmd.draft.json` → `VALID`; fixture hỏng → `INVALID` (exit 1).
