@@ -38,13 +38,13 @@ validate-cases:
 gen-client:
 > cd $(WEB_DIR) && npm run gen-client
 
-# --- Targets implemented by later tasks. Fail loudly (no false success). ---
-
 db-migrate:
-> @echo "db-migrate: not implemented yet - see task AVP-007"; exit 1
+> cd $(API_DIR) && python -m alembic upgrade head
 
 db-check-rls:
-> @echo "db-check-rls: not implemented yet - see task AVP-007"; exit 1
+> python scripts/check_rls.py
+
+# --- Targets implemented by later tasks. Fail loudly (no false success). ---
 
 load-cases:
 > @echo "load-cases: not implemented yet - see task AVP-008"; exit 1
