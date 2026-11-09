@@ -39,5 +39,5 @@ data/cases/  schemas/  evals/  docs/{specs,adr,research}  scripts/
 
 ## Pitfalls
 - Don't hard-code model ids or keys — read from env (ADR-0006).
-- Don't add Layer 2 features (3D avatar, full-duplex voice, vitals, exam/lab, certificate PDF) without a written scope-gate decision (product-scope.md, R-07).
+- Follow the approved MVP scope in `docs/specs/product-scope.md` (1 HFMD case, 3 screens, 3D avatar with raycasting, vitals state machine, voice-to-voice, Auto-OSCE, RAG debrief, practice-report PDF+QR). Do not add payment, LMS, or unreviewed extra cases without authorization.
 - Don't present unreviewed clinical content as verified; keep it `draft` / `author_added`.

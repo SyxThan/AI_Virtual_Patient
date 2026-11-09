@@ -5,15 +5,17 @@ Vietnamese voice-first virtual-patient simulator for medical students. A *Patien
 ## Read only what the task needs
 | Doing | Read |
 |---|---|
-| Anything that produces patient replies | docs/specs/guardrails.md |
+| Anything that produces patient replies | docs/specs/guardrails.md, docs/specs/agents-and-rag.md |
 | Case data, schema, conversion | docs/specs/case-schema.md, schemas/case.schema.json |
-| Stack, repo layout, env vars, API/WebSocket conventions | docs/specs/tech-stack.md |
+| Stack, repo layout, env vars, API/WebSocket conventions | docs/specs/tech-stack.md, docs/specs/openapi.yaml |
 | Database tables, migrations, Supabase connection, RLS | docs/specs/database.md |
+| Vitals state machine and clinical grades | docs/specs/vitals-state-machine.md |
 | "Is this in the MVP?", priorities, done criteria, claims allowed | docs/specs/product-scope.md |
 | Evaluator, scoring, evidence | docs/specs/evaluation.md |
 | Tests, release gate | docs/specs/quality-gates.md |
 | Risks | docs/risks.md |
-| Choosing the next task | docs/tasks.md |
+| Choosing the next task (Vertical Slices) | docs/TASKS.md, docs/tasks.md |
+| Clean-room competitive analysis | docs/research/RECON_cyberpatient.md |
 | Starting, committing, pushing, opening a PR | docs/git-workflow.md |
 | Delegating to agy | docs/agy-delegation.md |
 
@@ -47,7 +49,7 @@ Created by task AVP-006. Until it is done they do not exist; do not invent other
 - Never commit secrets, `.env`, `data/source/`, dumps or student data. The script blocks the obvious cases; you are still responsible.
 
 ## Scope
-The 30-day MVP (docs/specs/product-scope.md): one case, text first, evidence-based OSCE, cited debrief, history, turn-based voice (P2). 3D avatar, exam/lab ordering, vitals, streaming voice and PDF reports are Layer 2: not started without the human's written scope-gate decision. Task ids are `AVP-nnn` from docs/tasks.md.
+The approved MVP (docs/specs/product-scope.md): 1 pediatric Hand, Foot, and Mouth Disease case (mother holding child), 3 core screens (Setup, Clinical Workspace, Debriefing). Includes 3D avatar with raycasting exam, vitals state machine, voice-to-voice communication, Auto-OSCE scoring, cited RAG debrief, and practice-feedback PDF+QR export. Multiple cases, payments, and LMS are excluded. Tasks are mapped to vertical slices in `docs/TASKS.md`.
 
 ## Working agreements
 - One task = one small, reviewable change. Run `make test` and `make lint` before saying done.
@@ -59,13 +61,14 @@ The 30-day MVP (docs/specs/product-scope.md): one case, text first, evidence-bas
 ## Skills (`.claude/skills/`)
 Load the matching skill before working in its area; each is grounded in this repo's real stack and specs (not generic).
 - `project-conventions` — stack, layout, naming, build/lint/test, git workflow (read first).
-- `api-backend` — FastAPI routes, Pydantic, SQLAlchemy/Alembic, RLS, jobs worker.
-- `agent-orchestration` — Patient/Evaluator/Debriefing agents, guardrail tiers, provider adapters.
-- `osce-scoring` — rubric, LLM-proposes/code-scores, evidence verifier, practice-feedback only.
-- `rag-citation` — pgvector ingest/retrieval, cited-or-unverified debrief (cold path only).
 - `frontend-ui` — Next.js App Router, three screens, generated client, vi.json i18n.
-
-Layer 2 skills (`avatar-3d`, `voice-pipeline`, `vitals-state-machine`) are created only after a scope-gate decision.
+- `avatar-3d` — Three.js avatar canvas, mesh colliders, raycasting exam, basic lip-sync.
+- `voice-pipeline` — STT/TTS provider adapters, WebSocket audio duplex stream, VAD/buffering.
+- `agent-orchestration` — Patient/Evaluator/Debriefing agents, prompt caching, guardrail tiers.
+- `vitals-state-machine` — pediatric clinical grades, transition events, monitor display.
+- `rag-citation` — pgvector ingest/retrieval, Ministry of Health guideline citation contract.
+- `osce-scoring` — rubric, LLM-proposes/code-scores, evidence verifier, PDF+QR export.
+- `api-backend` — FastAPI routes, Pydantic v2, SQLAlchemy 2, Alembic, RLS, jobs worker.
 
 ## Delegating to agy (Antigravity CLI)
 Goal: spend fewer Claude tokens on routine work. Delegate only if **all** hold:

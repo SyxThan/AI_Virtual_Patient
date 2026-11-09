@@ -1,95 +1,210 @@
-# Task list
+# Danh mục Nhiệm vụ Kỹ thuật theo Vertical Slices (TASKS.md)
 
-Mirror of the team's workbook `AI_Virtual_Patient_MVP_30_Day_Plan` (Backlog AVP-001..030, Daily Plan). IDs AVP-031..038 and AVP-101+ are **added by this repo**, not in the workbook. The workbook stays the human source for status; this file is what agents read. Do not edit the workbook from here.
+> **Phương pháp quản lý:** Chia nhỏ công việc theo **9 Vertical Slices** khép kín (từ Data/Backend tới UI/UX Frontend).
+> **Nguyên tắc triển khai:** Mỗi slice thực hiện trên branch `feat/<task-id>`, vượt qua build/typecheck/lint và được **Reviewer** độc lập kiểm duyệt trước khi merge vào `main`.
 
-Every code task starts with `python scripts/git_task.py preflight AVP-xxx` (docs/git-workflow.md) and ends with a pushed branch and a PR whose squash commit carries `[AVP-xxx]`. A dependency counts as done when that tag is on `origin/main` (human tasks: confirmed by a person).
+---
 
-Owner: **C** = Claude Code, **A** = delegate to agy (docs/agy-delegation.md), **H** = human or clinician, "A*" = agy writes code, Claude writes the content it consumes. Pri = P0..P3 from the workbook. Day = planned day. Each task is done only when its acceptance passes and the Definition of Done in product-scope.md holds.
+## Bảng Ánh Xạ Mã Workbook (`AVP-xxx`) $\leftrightarrow$ Vertical Slices (`TASK-Sx-xx`)
 
-Stack note: the workbook says React; this repo uses Next.js (decided by the team). Branch names follow the workbook: `<type>/avp-NNN-slug` where type is feat, fix, test, docs, chore (research tasks use docs).
+Bảng dưới đây đồng bộ hóa 1:1 giữa danh mục công việc trong Workbook 30 ngày của nhóm (`AVP-xxx`) và các Vertical Slice tasks:
 
-## Scope & research
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-001 | 1 | P0 | MVP scope and out-of-scope list (product-scope.md) agreed by all | H | | Team agrees; every task has owner and acceptance; decision D-1 (avatar) answered |
-| AVP-002 | 2 | P1 | Interview 3-5 students and a lecturer or doctor | H | AVP-001 | At least 5 concrete insights; review dates booked |
-| AVP-033 | 1 | P0 | Find a clinician reviewer and two raters | H | | Names and dates recorded (risk R-02) |
-| AVP-031 | 1 | P0 | Git setup per docs/git-workflow.md: private remote, first commit, protect `main` (PR, at least 1 reviewer, no force-push, squash only), identities | H | | `git_task.py preflight AVP-006` passes setup checks |
+| Mã Workbook | Thuộc Vertical Slice | Tên Task & Nội dung | Độ ưu tiên | Trạng thái |
+| :--- | :--- | :--- | :---: | :---: |
+| **AVP-006, AVP-031** | **Slice 1** (`TASK-S1-01`) | Khung Monorepo, `.env.example`, Next.js 16 + FastAPI scaffold | **P0** | 🟡 Đã scaffold |
+| **AVP-007, AVP-034** | **Slice 1** (`TASK-S1-02`) | Alembic migration 11 bảng, Postgres RLS, test RLS | **P0** | ❌ Chưa làm |
+| **AVP-003, AVP-035** | **Slice 1** (`TASK-S1-03`) | Ca mẫu Nhi khoa Tay chân miệng (`hfmd_pediatric_01.json`), validate script | **P0** | 🟡 Có bản draft |
+| **AVP-008** | **Slice 2** (`TASK-S2-01`) | Session API (`POST /sessions`), quản lý guest token | **P0** | ❌ Chưa làm |
+| **AVP-010 (Part 1)** | **Slice 2** (`TASK-S2-02`) | Giao diện Setup Screen (`/setup`), consent checkbox | **P0** | ❌ Chưa làm |
+| **AVP-009, AVP-011** | **Slice 3** (`TASK-S3-01`) | Patient Agent service, 3-tier guardrails, prompt cache | **P0** | ❌ Chưa làm |
+| **AVP-010, AVP-012** | **Slice 3** (`TASK-S3-02`) | Transcript Box, text turn loop (`POST /sessions/{id}/turns`) | **P0** | ❌ Chưa làm |
+| **AVP-102** | **Slice 4** (`TASK-S4-01`) | Vitals State Machine engine backend (5 trạng thái HFMD) | **P0** | ❌ Chưa làm |
+| **AVP-102** | **Slice 4** (`TASK-S4-02`) | Monitor sinh hiệu thời gian thực frontend (`VitalsMonitor.tsx`) | **P0** | ❌ Chưa làm |
+| **AVP-104** | **Slice 5** (`TASK-S5-01`) | Three.js canvas, nạp avatar 3D người mẹ bế bé | **P0** | ❌ Chưa làm |
+| **AVP-101, AVP-104** | **Slice 5** (`TASK-S5-02`) | Raycasting 4 vùng khám (Bàn tay, Chân, Miệng, Mông/Gối) | **P0** | ❌ Chưa làm |
+| **AVP-104** | **Slice 5** (`TASK-S5-03`) | Cử động môi (Lip-sync) cơ bản theo biên độ audio | **P1** | ❌ Chưa làm |
+| **AVP-020, AVP-021** | **Slice 6** (`TASK-S6-01`) | STT / TTS provider adapters + MockVoiceAdapter offline | **P1** | ❌ Chưa làm |
+| **AVP-022, AVP-103** | **Slice 6** (`TASK-S6-02`) | WebSocket duplex stream voice loop (`/ws/sessions/{id}`) | **P1** | ❌ Chưa làm |
+| **AVP-004, AVP-014** | **Slice 7** (`TASK-S7-01`) | Evaluator Agent, phân tích transcript theo Rubric 7 domains | **P0** | ❌ Chưa làm |
+| **AVP-013** | **Slice 7** (`TASK-S7-02`) | Code Evidence Verifier (xác minh quote), deterministic scoring | **P0** | ❌ Chưa làm |
+| **AVP-017, AVP-018** | **Slice 8** (`TASK-S8-01`) | Ingest tài liệu QĐ 1003/QĐ-BYT Bộ Y tế, pgvector embedding | **P1** | ❌ Chưa làm |
+| **AVP-019** | **Slice 8** (`TASK-S8-02`) | Debriefing Agent: Khung phản hồi 5 tầng & RAG citations | **P1** | ❌ Chưa làm |
+| **AVP-015, AVP-023** | **Slice 9** (`TASK-S9-01`) | Giao diện Debriefing Screen (`/debrief/[id]`), cảnh báo Red Flags | **P0** | ❌ Chưa làm |
+| **AVP-105** | **Slice 9** (`TASK-S9-02`) | Generator xuất báo cáo PDF chuẩn A4 kèm mã QR xác thực | **P0** | ❌ Chưa làm |
 
-## Clinical scenario
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-003 | 3 | P0 | case-001 JSON with known/unknown/disclosure, schema validate | C + H | AVP-001 | `make validate-cases` passes; unknown never turned into negative |
-| AVP-004 | 3 | P0 | Versioned OSCE rubric with anchors, expected_questions, evidence requirement | C + H | AVP-003 | Every criterion has anchors 0/1/2 and expected questions |
-| AVP-016 | 15 | P0 | Clinician review of case and rubric (Clinical review days 3, 15, 25) | H | AVP-003, AVP-004, AVP-033 | `review.status` set, or clearly shown unreviewed |
+---
 
-## Architecture and foundation
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-005 | 4 | P0 | Architecture decisions and API contract (ADRs, OpenAPI skeleton) | C + H | AVP-001 | Module boundaries and OpenAPI agreed |
-| AVP-034 | 4 | P0 | Supabase projects `avp-dev` and `avp-demo`; session-mode pooler URL; IPv6 test; plan limits (pausing, backups); enable `vector` | H | | `psql "$DATABASE_URL" -c "select 1"` works; answers recorded in database.md |
-| AVP-006 | 5 | P0 | Repo scaffold: FastAPI, Next.js, Makefile targets, CI, env example, PR template, README | C | AVP-005 | Fresh clone runs per README; CI passes |
-| AVP-007 | 6 | P0 | Alembic setup + initial migration from `docs/specs/schema.sql` (RLS, revokes); `make db-check-rls` | C | AVP-005, AVP-034 | Migration applies on `avp-dev` and clean local Postgres; RLS check returns zero rows |
-| AVP-037 | 6 | P0 | Walking skeleton on staging: health endpoint + web page deployed, env and CORS working (risk R-08) | C + H | AVP-006, AVP-034 | Another person opens the staging URL |
-| AVP-035 | 5 | P1 | `scripts/validate_cases.py` + tests; `make gen-client` OpenAPI to TS client | A | AVP-006 | Passes on case-001, fails on a broken fixture; client regenerates without diff |
-| AVP-039 | 5 | P2 | Claude skills for the MVP stack (`.claude/skills/`); link from CLAUDE.md | C | AVP-006 | Each skill specific to the real stack/specs; build/lint unaffected (added by this repo) |
-| AVP-040 | 5 | P3 | Gitignore locally-installed agent skills (`.agents/`, installed skill dirs, `skills-lock.json`) | C | AVP-006 | Working tree clean; installed skills not committed (added by this repo) |
+## Bảng tổng hợp Tiến độ Vertical Slices
 
-## Patient, session, chat
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-008 | 7 | P0 | Scenario loader (`make load-cases`, versions, hash) + session API incl. guest token | A* | AVP-003, AVP-007 | Unchanged file is a no-op; changed file creates new version; ownership check on session routes from day one |
-| AVP-009 | 8 | P0 | Text Patient Agent: prompt builder, unknown policy, disclosure rules, hot-path checks | C | AVP-003, AVP-008 | No invented unknowns; consistent across turns |
-| AVP-010 | 9 | P0 | Chat UI vertical slice (Next.js, generated client) | A | AVP-008, AVP-009, AVP-035 | 5 complete turns locally; API errors shown |
-| AVP-011 | 10 | P0 | Regression and red-team suite (20+ cases, T-PAT-01..07), result file | C | AVP-009 | `make redteam` writes `evals/results/redteam-*.json`; no Critical failure |
-| AVP-012 | 11 | P0 | Transcript persistence and session lifecycle (finish, idempotent turns) | A | AVP-007, AVP-010 | Refresh keeps order and content (T-SESSION-01) |
+| Slice | Tên phân đoạn (Vertical Slice) | Mức ưu tiên | Trạng thái |
+| :--- | :--- | :--- | :--- |
+| **Slice 1** | Khung dự án, Routing 3 màn hình & Data Model nền tảng | **P0** | 🟡 Một phần (Đã scaffold, cần hoàn thiện typegen) |
+| **Slice 2** | Setup Screen: Chọn ca, vai trò & Khởi tạo phiên | **P0** | ❌ Chưa làm |
+| **Slice 3** | Clinical Workspace — Hội thoại văn bản với Patient Agent | **P0** | ❌ Chưa làm |
+| **Slice 4** | Clinical Workspace — Máy trạng thái Sinh hiệu (Vitals State Machine) | **P0** | ❌ Chưa làm |
+| **Slice 5** | Clinical Workspace — Avatar 3D & Khám Thực Thể Raycasting | **P0** | ❌ Chưa làm |
+| **Slice 6** | Tích hợp Đàm thoại Giọng nói (Voice-to-voice STT / TTS) | **P1** | ❌ Chưa làm |
+| **Slice 7** | Evaluator Agent & Bộ chấm điểm Auto-OSCE Chuẩn Bộ Y tế | **P0** | ❌ Chưa làm |
+| **Slice 8** | Phân hệ RAG Y tế & Trích dẫn Văn bản Pháp quy Bộ Y tế | **P1** | ❌ Chưa làm |
+| **Slice 9** | Debriefing Screen: Phản hồi, Cảnh báo Red Flags & Xuất PDF + QR | **P0** | ❌ Chưa làm |
 
-## Evaluation
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-013 | 12 | P0 | Deterministic rubric engine and scoring code (evaluation.md) | C | AVP-004, AVP-012 | Re-score reproduces total; no evidence means not met |
-| AVP-014 | 13 | P0 | Evaluator agent, structured output, evidence verifier, job worker (`for update skip locked`) | C (agent), A (verifier, worker) | AVP-013 | T-OSCE-01, 02, 05 pass; two workers process each job once |
-| AVP-015 | 14 | P0 | OSCE result UI with evidence links and learning-feedback notice | A | AVP-014 | Evidence points at the right turn |
-| AVP-026 | 25 | P0 | Evaluator vs reviewer comparison on 10-20 transcripts; agreement script | A* | AVP-014, AVP-016 | `evals/results/agreement-*.json` with n and limits |
+---
 
-## Debrief and RAG
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-017 | 16 | P1 | Source registry and permission check (`rights_checked`) | C | AVP-016 | Each source has metadata and rights status |
-| AVP-018 | 17 | P1 | Embedding model choice + migration, ingest, retrieval, citation payload | C, then A | AVP-017 | T-RAG-01, 02 pass; vector index added |
-| AVP-019 | 18 | P1 | Debriefing agent: every claim cited or marked unverified; debrief UI | C, A | AVP-015, AVP-018 | Each recommendation has source id and section |
+## Chi tiết từng Nhiệm vụ theo Slice
 
-## Voice
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-020 | 19 | P2 | STT provider adapter and audio upload limits | A | AVP-009 | Editable Vietnamese transcript; provider failure keeps session |
-| AVP-021 | 20 | P2 | TTS adapter with text fallback; turn latency logging | A | AVP-020 | Reply audio plays; TTS error falls back to text |
-| AVP-022 | 21 | P2 | Voice UI states, transcript correction, mic permission handling | C | AVP-020, AVP-021 | 10 voice turns on target machine; text fallback |
+### Slice 1: Khung Dự Án & Nền Tảng Kỹ Thuật (Foundation & Core Routing)
 
-## History, security, QA, release
-| ID | Day | Pri | Task | Owner | Depends | Acceptance |
-|---|---|---|---|---|---|---|
-| AVP-023 | 22 | P1 | Practice history and score summary | A | AVP-012, AVP-015 | Correct per account or guest token |
-| AVP-024 | 23 | P0 | Privacy and access-control baseline: consent notice, retention, delete-my-data, rate limit, RLS check, no secrets or audio in logs | C | AVP-007, AVP-022 | T-SEC-01, T-SEC-02 pass |
-| AVP-025 | 24 | P0 | E2E integration suite with mock providers (T-E2E-01) | C | AVP-019, AVP-022, AVP-023 | Flow repeats without manual fixes |
-| AVP-027 | 26 | P0 | Dockerfile, staging deploy, health check, migration guide | C | AVP-025 | Staging URL; secrets not in image or repo |
-| AVP-036 | 27 | P1 | UX polish: loading, retry, empty states, accessibility basics | A, C | AVP-027 | No known blocker; no false success states |
-| AVP-038 | 14 | P1 | Recruit 5-10 pilot participants (book by Day 14; risk R-10) | H | AVP-002 | Names and dates; else internal-test fallback recorded |
-| AVP-028 | 28 | P1 | Pilot usability test | H | AVP-027, AVP-038 | Notes, or the reason it did not happen |
-| AVP-029 | 29 | P0 | README, demo script, release notes, known limitations | C | AVP-027 | Demo runs 3 times in a row; no certificate claim |
-| AVP-030 | 30 | P0 | Tag `release/mvp-v0-1`, release gate (quality-gates.md), retrospective | H + C | AVP-028, AVP-029 | Gate table filled with evidence |
+#### `TASK-S1-01` [P0]: Khung cấu trúc Monorepo & Môi trường mẫu
+* **Mô tả:** Đồng bộ cấu trúc `apps/api` (FastAPI) và `apps/web` (Next.js App Router). Khởi tạo file cấu hình biến môi trường mẫu `.env.example` với đầy đủ placeholder cho LLM, STT, TTS, Supabase URL/Key.
+* **Phụ thuộc:** Không.
+* **File liên quan:** `.env.example`, `apps/api/avp_api/config.py`, `apps/web/package.json`, `Makefile`.
+* **Tiêu chí hoàn thành (Given/When/Then):**
+  * **Given:** Developer clone dự án mới và copy `.env.example` thành `.env`.
+  * **When:** Chạy lệnh `make lint` và `make build` (hoặc test tương ứng).
+  * **Then:** Hệ thống không báo lỗi cú pháp hoặc thiếu biến môi trường bắt buộc.
 
-## Layer 2 (v0.2, starts only after the release gate or by scope-gate decision)
-| ID | Task | Owner | Depends |
-|---|---|---|---|
-| AVP-101 | Exam and lab ordering, mock results, overuse penalty | A | AVP-030 |
-| AVP-102 | Vitals state machine | A | AVP-101 |
-| AVP-103 | Streaming voice pipeline and latency benchmark (p50/p95) | C, A | AVP-022 |
-| AVP-104 | 3D avatar, viseme lip-sync, click-to-examine bound to `exam[].action` | C, A | AVP-101, AVP-103 |
-| AVP-105 | Practice-report PDF with QR (practice wording only) | A | AVP-019 |
-| AVP-106 | Convert more of the 53 source cases | A* | AVP-030 |
+#### `TASK-S1-02` [P0]: Database Migration & RLS Baseline
+* **Mô tả:** Thiết lập migration Alembic cho toàn bộ 11 bảng cơ sở dữ liệu từ `docs/specs/schema.sql`, bật RLS và thu hồi quyền `anon`/`authenticated` Data API.
+* **Phụ thuộc:** `TASK-S1-01`.
+* **File liên quan:** `apps/api/alembic/*`, `apps/api/avp_api/db/models.py`.
+* **Tiêu chí hoàn thành:** Chạy `alembic upgrade head` trên local Postgres hoặc Supabase dev thành công 100%.
 
-## Rituals (from the workbook)
-Daily sync 10-15 min; PR review for every PR; integration checkpoints Days 5, 10, 15, 20, 24, 27; clinical review Days 3, 15, 25; scope gate end of Days 7, 14, 21; release rehearsal Days 29-30.
+#### `TASK-S1-03` [P0]: Biên soạn Dữ liệu Ca lâm sàng Mẫu (HFMD Pediatric Case)
+* **Mô tả:** Hoàn thiện file dữ liệu `data/cases/hfmd_pediatric_01.json` mô tả ca bệnh Tay chân miệng Nhi khoa độ 2a theo chuẩn `schemas/case.schema.json`. Gắn nhãn `[CẦN BÁC SĨ DUYỆT]`.
+* **Phụ thuộc:** `TASK-S1-01`.
+* **File liên quan:** `data/cases/hfmd_pediatric_01.json`, `schemas/case.schema.json`, `scripts/validate_cases.py`.
+* **Tiêu chí hoàn thành:** Script `python scripts/validate_cases.py` xác thực schema thành công, không thiếu trường bắt buộc.
 
-First sessions: AVP-031, AVP-033 and AVP-034 are people tasks, start now. Then AVP-006, AVP-007; try agy on AVP-035 and record the result in the delegation log.
+---
+
+### Slice 2: Màn hình Setup (Setup Screen)
+
+#### `TASK-S2-01` [P0]: API Khởi tạo Phiên Khám (`POST /api/v1/sessions`)
+* **Mô tả:** Xây dựng router FastAPI tiếp nhận yêu cầu tạo phiên: mã ca bệnh, vai trò, chế độ luyện tập, cờ chấp thuận điều khoản bảo mật dữ liệu (`consent`). Trả về `sessionId` và `X-Guest-Token` nếu là khách.
+* **Phụ thuộc:** `TASK-S1-02`.
+* **File liên quan:** `apps/api/avp_api/routers/sessions.py`, `apps/api/avp_api/services/session_service.py`.
+* **Tiêu chí hoàn thành:** Endpoint trả về HTTP 201 kèm payload phiên hợp lệ; từ chối khi chưa có `consent`.
+
+#### `TASK-S2-02` [P0]: Giao diện Setup Screen (`/setup`)
+* **Mô tả:** Xây dựng màn hình Next.js cho phép sinh viên chọn ca bệnh Tay chân miệng, vai trò, chế độ thi/luyện tập, hộp thoại cam kết bảo mật và nút chuyển hướng sang Clinical Workspace.
+* **Phụ thuộc:** `TASK-S2-01`.
+* **File liên quan:** `apps/web/src/app/setup/page.tsx`, `apps/web/src/components/setup/*`.
+* **Tiêu chí hoàn thành:** Sinh viên bấm nút "Bắt đầu khám", hệ thống gọi API và điều hướng người dùng sang `/session/[id]` trong dưới 1 giây.
+
+---
+
+### Slice 3: Clinical Workspace — Hội thoại với Patient Agent
+
+#### `TASK-S3-01` [P0]: Patient Agent Service & 3-Tier Guardrails
+* **Mô tả:** Triển khai core prompt builder đóng vai người mẹ của bé, tích hợp hàng rào bảo vệ 3 tầng (Tier 1 Clinical Facts, Tier 2 Social Persona, Tier 3 Unknown Policy). Thêm hàm kiểm tra Hot-path (kiểm tra con số và thuật ngữ cấm).
+* **Phụ thuộc:** `TASK-S1-03`, `TASK-S2-01`.
+* **File liên quan:** `apps/api/avp_api/services/patient_agent.py`, `apps/api/avp_api/providers/llm.py`.
+* **Tiêu chí hoàn thành:** Chạy bộ test prompt; mẹ bé trả lời đúng thông tin sốt/giật mình và trả lời từ chối khéo léo khi gặp câu hỏi ngoài hồ sơ bệnh án.
+
+#### `TASK-S3-02` [P0]: Transcript Box & Đàm thoại Văn bản (Text Turn Loop)
+* **Mô tả:** Cổng API `POST /api/v1/sessions/{id}/turns` và giao diện khung chat hiển thị tin nhắn bác sĩ - người mẹ, thanh cuộn tự động và lưu trữ lịch sử lượt thoại.
+* **Phụ thuộc:** `TASK-S3-01`.
+* **File liên quan:** `apps/web/src/app/session/[id]/page.tsx`, `apps/web/src/components/chat/TranscriptBox.tsx`.
+* **Tiêu chí hoàn thành:** Thực hiện 5 lượt chat liên tiếp mượt mà, tải lại trang vẫn giữ nguyên thứ tự tin nhắn.
+
+---
+
+### Slice 4: Clinical Workspace — Máy Trạng Thái Sinh Hiệu (Vitals State Machine)
+
+#### `TASK-S4-01` [P0]: Vitals State Machine Engine Backend
+* **Mô tả:** Hiện thực hóa logic chuyển trạng thái sinh hiệu (Grade 1 $\rightarrow$ Grade 2a baseline $\rightarrow$ High fever $\rightarrow$ Grade 2b progression $\rightarrow$ Stabilized) dựa trên thời gian và can thiệp y lệnh.
+* **Phụ thuộc:** `TASK-S2-01`.
+* **File liên quan:** `apps/api/avp_api/services/vitals_service.py`, `apps/api/avp_api/routers/vitals.py`.
+* **Tiêu chí hoàn thành:** Endpoint `GET /api/v1/sessions/{id}/vitals` phản hồi đúng ma trận sinh hiệu của trạng thái hiện thời.
+
+#### `TASK-S4-02` [P0]: Monitor Sinh hiệu Thời Gian Thực Frontend
+* **Mô tả:** Component hiển thị đồng hồ và monitor sinh hiệu (Mạch, Nhịp thở, Nhiệt độ màu cảnh báo, SpO2) ở góc phải Clinical Workspace, tự động cập nhật khi trạng thái thay đổi.
+* **Phụ thuộc:** `TASK-S4-01`.
+* **File liên quan:** `apps/web/src/components/workspace/VitalsMonitor.tsx`.
+* **Tiêu chí hoàn thành:** Khi sốt trên 39°C, chỉ số nhiệt độ nhấp nháy đỏ kèm âm cảnh báo nhịp tim nhanh.
+
+---
+
+### Slice 5: Clinical Workspace — Avatar 3D & Khám Raycasting
+
+#### `TASK-S5-01` [P0]: Tích hợp Three.js Canvas & Render Mô hình 3D
+* **Mô tả:** Component client-only `dynamic(..., { ssr: false })` nạp mô hình 3D người mẹ bế bé (định dạng GLB/GLTF hoặc procedural rig fallback), hỗ trợ xoay camera (OrbitControls) mượt mà.
+* **Phụ thuộc:** `TASK-S1-01`.
+* **File liên quan:** `apps/web/src/components/avatar/AvatarCanvas.tsx`.
+* **Tiêu chí hoàn thành:** Mô hình hiển thị ổn định 60fps trên trình duyệt thông dụng, không crash khi resize.
+
+#### `TASK-S5-02` [P0]: Raycasting Vùng Khám & API Kết Quả Thực Thể
+* **Mô tả:** Gắn Mesh Collider vào các vùng giải phẫu của trẻ (Lòng bàn tay, Bàn chân, Vòm họng, Mông/Gối). Bắt sự kiện click chuột, gửi `POST /sessions/{id}/actions` và hiển thị ảnh/mô tả nốt ban bóng nước.
+* **Phụ thuộc:** `TASK-S5-01`, `TASK-S1-03`.
+* **File liên quan:** `apps/web/src/components/avatar/RaycastExam.tsx`, `apps/api/avp_api/routers/actions.py`.
+* **Tiêu chí hoàn thành:** Click trúng bàn tay trẻ $\rightarrow$ modal phóng to ảnh nốt ban bóng nước hiện ra và ghi nhận 1 lượt khám thực thể vào transcript.
+
+#### `TASK-S5-03` [P1]: Cử động môi (Lip-sync) cơ bản khi nói
+* **Mô tả:** Đồng bộ biên độ âm thanh giọng nói (Audio Analyser) với morph target hàm dưới của avatar mẹ để tạo chuyển động mấp máy môi khi phát âm thanh.
+* **Phụ thuộc:** `TASK-S5-01`.
+* **File liên quan:** `apps/web/src/components/avatar/LipSyncController.ts`.
+* **Tiêu chí hoàn thành:** Khi audio nói phát ra, miệng avatar mở và khép nhịp nhàng theo biên độ giọng nói.
+
+---
+
+### Slice 6: Đàm Thoại Giọng Nói (Voice-to-Voice Pipeline)
+
+#### `TASK-S6-01` [P1]: STT & TTS Provider Adapters
+* **Mô tả:** Viết adapter kết nối dịch vụ Speech-to-Text (STT: Whisper / Google Cloud Speech / FPT.AI) và Text-to-Speech (TTS: ElevenLabs / Kokoro / Viettel AI) kèm bản `FakeVoiceAdapter` phục vụ test offline.
+* **Phụ thuộc:** `TASK-S1-01`.
+* **File liên quan:** `apps/api/avp_api/providers/stt.py`, `apps/api/avp_api/providers/tts.py`.
+* **Tiêu chí hoàn thành:** Chuyển đổi audio sang text và ngược lại thông qua mock adapter với độ trễ ghi nhận minh bạch.
+
+#### `TASK-S6-02` [P1]: WebSocket Duplex Stream Voice Loop
+* **Mô tả:** Triển khai endpoint `/ws/sessions/{id}` cho phép truyền trực tiếp voice chunks từ microphone người học và trả về audio stream giọng nói người mẹ.
+* **Phụ thuộc:** `TASK-S6-01`, `TASK-S3-01`.
+* **File liên quan:** `apps/api/avp_api/routers/websocket.py`, `apps/web/src/hooks/useVoiceSession.ts`.
+* **Tiêu chí hoàn thành:** Sinh viên nói qua micro, nhận được phản hồi âm thanh phát qua loa trong vòng dưới 2.5 giây.
+
+---
+
+### Slice 7: Evaluator Agent & Bộ Chấm Điểm Auto-OSCE
+
+#### `TASK-S7-01` [P0]: Evaluator Agent & Structured Output Extraction
+* **Mô tả:** Triển khai Evaluator Agent phân tích transcript theo Rubric 7 domains bệnh Tay chân miệng (Khai thác sốt, giật mình, khám ban, phân độ, kê đơn hạ sốt, an thần).
+* **Phụ thuộc:** `TASK-S1-03`, `TASK-S3-02`.
+* **File liên quan:** `apps/api/avp_api/services/evaluator_agent.py`.
+* **Tiêu chí hoàn thành:** Trả về danh sách tiêu chí dạng structured JSON có đầy đủ `level` và `evidence: [{turn_idx, quote}]`.
+
+#### `TASK-S7-02` [P0]: Deterministic Code Evidence Verifier & Scoring Engine
+* **Mô tả:** Thuật toán độc lập xác minh từng đoạn trích dẫn của LLM trong transcript gốc (chuẩn hóa Unicode, khoảng trắng). Tính toán điểm số học tổng thể và gắn cờ `critical_missed` nếu bỏ sót dấu hiệu báo động.
+* **Phụ thuộc:** `TASK-S7-01`.
+* **File liên quan:** `apps/api/avp_api/services/evidence_verifier.py`, `apps/api/avp_api/services/scoring_engine.py`.
+* **Tiêu chí hoàn thành:** Đoạn trích sai lệch hoặc giả mạo lập tức bị hạ về 0 điểm; điểm số tính lại 5 lần cho cùng 1 kết quả nhất quán 100%.
+
+---
+
+### Slice 8: Phân Hệ RAG Y Tế & Trích Dẫn Văn Bản Bộ Y Tế
+
+#### `TASK-S8-01` [P1]: Ingestion Pipeline Hướng Dẫn Bộ Y Tế & pgvector
+* **Mô tả:** Ingest tài liệu Quyết định 1003/QĐ-BYT vào bảng `source_documents` và chia đoạn thành `source_chunks`, tính toán vector embedding và lưu vào cột pgvector.
+* **Phụ thuộc:** `TASK-S1-02`.
+* **File liên quan:** `apps/api/avp_api/services/rag_service.py`, `scripts/ingest_guideline.py`.
+* **Tiêu chí hoàn thành:** Truy vấn tìm kiếm ngữ nghĩa theo cụm từ "giật mình độ 2a 2b" trả về chính xác đoạn quy định phân độ trong QĐ 1003.
+
+#### `TASK-S8-02` [P1]: Debriefing Agent với Khung Phản Hồi 5 Tầng & Trích Dẫn
+* **Mô tả:** Debriefing Agent tổng hợp bài học theo 5 phần: *Expected Approach, Rationale, Learning Points, Acceptable Alternatives, Important Errors*, gắn kèm liên kết trích dẫn `citations`.
+* **Phụ thuộc:** `TASK-S7-02`, `TASK-S8-01`.
+* **File liên quan:** `apps/api/avp_api/services/debrief_agent.py`.
+* **Tiêu chí hoàn thành:** Endpoint `GET /api/v1/sessions/{id}/debrief` trả về khuyến nghị điều trị có trích dẫn rõ ràng số trang và tên quyết định Bộ Y tế.
+
+---
+
+### Slice 9: Debriefing Screen & Xuất Báo Cáo PDF + QR
+
+#### `TASK-S9-01` [P0]: Giao diện Báo cáo Debriefing (`/debrief/[id]`)
+* **Mô tả:** Xây dựng màn hình tổng kết: hiển thị điểm tổng Auto-OSCE, danh sách tiêu chí đạt/chưa đạt kèm dẫn chứng câu thoại, banner cảnh báo Red Flags nổi bật và khối lý giải y khoa.
+* **Phụ thuộc:** `TASK-S7-02`, `TASK-S8-02`.
+* **File liên quan:** `apps/web/src/app/debrief/[id]/page.tsx`, `apps/web/src/components/debrief/*`.
+* **Tiêu chí hoàn thành:** Sinh viên bấm vào từng tiêu chí có thể xem ngay câu nói của mình được trích dẫn; banner đỏ cảnh báo xuất hiện nếu bỏ sót giật mình.
+
+#### `TASK-S9-02` [P0]: Generator Xuất Báo Cáo PDF & Mã QR Tra Cứu
+* **Mô tả:** Triển khai endpoint `GET /api/v1/sessions/{id}/debrief/pdf` sinh file PDF khổ A4 trình bày trang trọng bảng điểm, nhận xét, disclaimer học tập và mã QR liên kết tới URL xác thực trực tuyến.
+* **Phụ thuộc:** `TASK-S9-01`.
+* **File liên quan:** `apps/api/avp_api/services/pdf_service.py`, `apps/web/src/components/debrief/ExportPdfButton.tsx`.
+* **Tiêu chí hoàn thành:** Bấm nút xuất tải về file PDF mở được bình thường, dùng camera điện thoại quét mã QR mở đúng trang phiên thực hành.

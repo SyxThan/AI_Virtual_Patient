@@ -23,9 +23,9 @@ Output is **practice feedback, never a certificate or official assessment** (ADR
 ## Determinism / reproducibility
 - Re-scoring a stored Evaluator output must reproduce the same total (pure function of rubric version + verified evidence). Measure and record LLM variance separately; never let it change a stored score silently.
 
-## Output / UI (AVP-015)
+## Output / UI & Practice Report PDF (AVP-015, Slice 9)
 - Show each criterion with its evidence link pointing to the exact turn. Include a learning-feedback notice. Never render the word "certificate" or claim to replace instructors.
-- A practice-report PDF (if any) is **Layer 2** and uses practice wording only, no certificate/QR-as-credential.
+- Practice-report PDF (`/sessions/{id}/debrief/pdf`): Generated on demand with standard disclaimer ("Báo cáo phản hồi thực hành lâm sàng, không có giá trị thay thế chứng chỉ chính thức"). Embedded QR code points directly to the online practice session URL for verification.
 
 ## Pitfalls
 - Don't let the LLM output the final score. Don't mark `met` without a verified quote. Don't invent criteria not in the versioned rubric.
