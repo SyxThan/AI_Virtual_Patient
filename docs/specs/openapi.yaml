@@ -184,6 +184,66 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
 
+  /sessions/{id}/debrief/pdf:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+      - $ref: "#/components/parameters/GuestToken"
+    get:
+      tags: [debrief]
+      summary: Download practice report PDF with QR verification code.
+      description: >
+        Generates and returns an A4 PDF document containing the student score breakdown,
+        verified citations, red flag alerts, and a QR code linking to online verification.
+      responses:
+        "200":
+          description: PDF document stream.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "202":
+          description: Report not ready yet.
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /sessions/{id}/actions:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+      - $ref: "#/components/parameters/GuestToken"
+    post:
+      tags: [sessions]
+      summary: Perform an examination action (raycasting on 3D avatar) or clinical intervention.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClinicalActionCreate" }
+      responses:
+        "200":
+          description: Action performed and findings returned.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClinicalActionResult" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
+  /sessions/{id}/vitals:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+      - $ref: "#/components/parameters/GuestToken"
+    get:
+      tags: [sessions]
+      summary: Get the current vitals snapshot from the state machine.
+      responses:
+        "200":
+          description: Current vitals state.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VitalsSnapshot" }
+        "403": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
 # WebSocket is not expressible in OpenAPI; documented here as the agreed contract.
 x-websocket:
   /ws/sessions/{id}:
@@ -340,3 +400,42 @@ components:
                   properties:
                     source_id: { type: string }
                     section: { type: string }
+
+    ClinicalActionCreate:
+      type: object
+      required: [action_type, target_region]
+      properties:
+        action_type:
+          type: string
+          enum: [examine, palpate, auscultate, measure_vitals, order_medication]
+        target_region:
+          type: string
+          description: Anatomy region id (e.g. palm_hands, feet, mouth_throat, buttocks_knees).
+        parameters:
+          type: object
+          additionalProperties: true
+
+    ClinicalActionResult:
+      type: object
+      required: [action_id, findings]
+      properties:
+        action_id: { type: string }
+        findings: { type: string, description: Description of physical findings. }
+        image_url: { type: string, nullable: true }
+        audio_url: { type: string, nullable: true }
+        turn_recorded: { type: integer, description: Associated turn index. }
+
+    VitalsSnapshot:
+      type: object
+      required: [temperature_c, heart_rate_bpm, respiratory_rate_bpm, blood_pressure_sys, blood_pressure_dia, spo2_percent, clinical_state]
+      properties:
+        temperature_c: { type: number, example: 39.2 }
+        heart_rate_bpm: { type: integer, example: 142 }
+        respiratory_rate_bpm: { type: integer, example: 32 }
+        blood_pressure_sys: { type: integer, example: 95 }
+        blood_pressure_dia: { type: integer, example: 65 }
+        spo2_percent: { type: integer, example: 97 }
+        clinical_state:
+          type: string
+          enum: [GRADE_1, GRADE_2A_BASELINE, GRADE_2A_HIGH_FEVER, GRADE_2B_PROGRESSION, STABILIZED]
+        updated_at: { type: string, format: date-time }

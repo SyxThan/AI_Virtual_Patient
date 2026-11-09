@@ -31,8 +31,27 @@ Rules:
 | `avp-demo` | What judges see | Migrations only with the human's OK; seed from `make load-cases`; check the plan's backup and pause policy and wake the project before demos (free-tier projects may pause when inactive) |
 Never point tests at `avp-demo`. Tests that need a database use `avp-dev` or a local Postgres, with synthetic data.
 
-## Tables
+## Tables & Entity-Relationship Diagram (ERD)
+
 See `schema.sql` for columns and constraints.
+
+```mermaid
+erDiagram
+    PROFILES ||--o{ SESSIONS : "creates"
+    CASES ||--o{ SESSIONS : "pinned_by"
+    
+    SESSIONS ||--o{ TURNS : "contains"
+    SESSIONS ||--o{ EVALUATIONS : "evaluated_by"
+    SESSIONS ||--o{ DEBRIEFS : "debriefed_by"
+    SESSIONS ||--o{ FALLBACK_HITS : "logs"
+    
+    EVALUATIONS ||--o{ EVALUATION_ITEMS : "has_rubric_items"
+    
+    SOURCE_DOCUMENTS ||--o{ SOURCE_CHUNKS : "chunked_into"
+    SOURCE_CHUNKS }o--o{ DEBRIEFS : "cited_by"
+    
+    JOBS }o--|| SESSIONS : "processes"
+```
 
 | Table | Purpose | Notes |
 |---|---|---|
