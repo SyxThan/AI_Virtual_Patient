@@ -56,6 +56,17 @@ The 30-day MVP (docs/specs/product-scope.md): one case, text first, evidence-bas
 - Vietnamese UI strings go in `apps/web/messages/vi.json`; identifiers and comments are English.
 - The FastAPI OpenAPI schema is the API contract. After changing an endpoint, run `make gen-client` so the typed client in `apps/web` stays in sync.
 
+## Skills (`.claude/skills/`)
+Load the matching skill before working in its area; each is grounded in this repo's real stack and specs (not generic).
+- `project-conventions` — stack, layout, naming, build/lint/test, git workflow (read first).
+- `api-backend` — FastAPI routes, Pydantic, SQLAlchemy/Alembic, RLS, jobs worker.
+- `agent-orchestration` — Patient/Evaluator/Debriefing agents, guardrail tiers, provider adapters.
+- `osce-scoring` — rubric, LLM-proposes/code-scores, evidence verifier, practice-feedback only.
+- `rag-citation` — pgvector ingest/retrieval, cited-or-unverified debrief (cold path only).
+- `frontend-ui` — Next.js App Router, three screens, generated client, vi.json i18n.
+
+Layer 2 skills (`avatar-3d`, `voice-pipeline`, `vitals-state-machine`) are created only after a scope-gate decision.
+
 ## Delegating to agy (Antigravity CLI)
 Goal: spend fewer Claude tokens on routine work. Delegate only if **all** hold:
 1. The brief fits in ~40 lines and names the files it may touch (about 5 at most).

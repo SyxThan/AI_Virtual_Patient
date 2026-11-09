@@ -32,6 +32,7 @@ Stack note: the workbook says React; this repo uses Next.js (decided by the team
 | AVP-007 | 6 | P0 | Alembic setup + initial migration from `docs/specs/schema.sql` (RLS, revokes); `make db-check-rls` | C | AVP-005, AVP-034 | Migration applies on `avp-dev` and clean local Postgres; RLS check returns zero rows |
 | AVP-037 | 6 | P0 | Walking skeleton on staging: health endpoint + web page deployed, env and CORS working (risk R-08) | C + H | AVP-006, AVP-034 | Another person opens the staging URL |
 | AVP-035 | 5 | P1 | `scripts/validate_cases.py` + tests; `make gen-client` OpenAPI to TS client | A | AVP-006 | Passes on case-001, fails on a broken fixture; client regenerates without diff |
+| AVP-039 | 5 | P2 | Claude skills for the MVP stack (`.claude/skills/`); link from CLAUDE.md | C | AVP-006 | Each skill specific to the real stack/specs; build/lint unaffected (added by this repo) |
 
 ## Patient, session, chat
 | ID | Day | Pri | Task | Owner | Depends | Acceptance |
