@@ -32,9 +32,13 @@ lint:
 > cd $(API_DIR) && python -m ruff check .
 > cd $(WEB_DIR) && npm run lint
 
-# --- Targets implemented by later tasks. Fail loudly (no false success). ---
 validate-cases:
-> @echo "validate-cases: not implemented yet - see task AVP-035"; exit 1
+> python scripts/validate_cases.py
+
+gen-client:
+> cd $(WEB_DIR) && npm run gen-client
+
+# --- Targets implemented by later tasks. Fail loudly (no false success). ---
 
 db-migrate:
 > @echo "db-migrate: not implemented yet - see task AVP-007"; exit 1
@@ -44,9 +48,6 @@ db-check-rls:
 
 load-cases:
 > @echo "load-cases: not implemented yet - see task AVP-008"; exit 1
-
-gen-client:
-> @echo "gen-client: not implemented yet - see task AVP-035"; exit 1
 
 redteam:
 > @echo "redteam: not implemented yet - see task AVP-011"; exit 1
