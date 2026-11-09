@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from avp_api.config import get_settings
-from avp_api.routers import health
+from avp_api.routers import health, sessions
 
 
 def _error_body(code: str, message: str) -> dict:
@@ -36,8 +36,15 @@ def create_app() -> FastAPI:
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(_: Request, exc: StarletteHTTPException):
         # Covers both FastAPI and Starlette HTTPExceptions (incl. unmatched 404s).
-        message = exc.detail if isinstance(exc.detail, str) else "HTTP error"
-        code = message.lower().replace(" ", "_")
+        detail = exc.detail
+        if isinstance(detail, dict) and "code" in detail:
+            code = str(detail["code"])
+            message = str(detail.get("message", code))
+        elif isinstance(detail, str):
+            message = detail
+            code = message.lower().replace(" ", "_")
+        else:
+            code, message = "http_error", "HTTP error"
         return JSONResponse(status_code=exc.status_code, content=_error_body(code, message))
 
     @app.exception_handler(RequestValidationError)
@@ -48,6 +55,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(health.router, prefix=settings.api_prefix)
+    app.include_router(sessions.router, prefix=settings.api_prefix)
     return app
 
 

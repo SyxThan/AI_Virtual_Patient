@@ -7,7 +7,35 @@
     "start": "Bắt đầu luyện tập"
   },
   "setup": {
-    "title": "Chuẩn bị phiên luyện tập"
+    "title": "Chuẩn bị phiên luyện tập",
+    "case": {
+      "label": "Ca lâm sàng",
+      "title": "Nhi khoa: Bệnh Tay chân miệng (HFMD)",
+      "summary": "Bệnh nhi 18 tháng tuổi, mẹ bế đến khám vì sốt cao 39.2°C khó hạ ba ngày, quấy khóc, bỏ ăn và có cơn giật mình nảy người khi nằm yên.",
+      "draftNotice": "Nội dung lâm sàng đang ở trạng thái nháp, chưa được bác sĩ thẩm định."
+    },
+    "role": {
+      "label": "Vai trò của bạn",
+      "student": "Sinh viên Y đa khoa",
+      "resident": "Bác sĩ nội trú",
+      "practitioner": "Bác sĩ thực hành"
+    },
+    "mode": {
+      "label": "Chế độ",
+      "guided": "Luyện tập",
+      "guidedDesc": "Hiển thị gợi ý khám và phản hồi sư phạm ngay khi xử trí.",
+      "exam": "Thi thử (OSCE)",
+      "examDesc": "Giới hạn thời gian 15 phút, ẩn gợi ý, chấm điểm chặt chẽ."
+    },
+    "consent": {
+      "label": "Tôi đồng ý ẩn danh lưu trữ lịch sử hỏi bệnh phục vụ mục đích đào tạo và chấm điểm OSCE."
+    },
+    "start": "Bắt đầu khám bệnh",
+    "starting": "Đang khởi tạo phiên…",
+    "error": {
+      "generic": "Không tạo được phiên. Vui lòng thử lại.",
+      "dismiss": "Đóng"
+    }
   },
   "session": {
     "title": "Phiên hỏi bệnh"

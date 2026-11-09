@@ -48,9 +48,9 @@ def _uuid_pk() -> Mapped[uuid.UUID]:
 class Profile(Base):
     __tablename__ = "profiles"
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE"), primary_key=True
-    )
+    # FK -> auth.users is created by the migration (auth is Supabase's schema,
+    # not an ORM-mapped table), so it is not declared here.
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True)
     display_name: Mapped[str | None] = mapped_column(Text)
     role: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'student'"))
     created_at: Mapped[datetime.datetime] = mapped_column(
@@ -91,9 +91,8 @@ class Session(Base):
     __tablename__ = "sessions"
 
     id: Mapped[uuid.UUID] = _uuid_pk()
-    user_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE")
-    )
+    # FK -> auth.users is created by the migration (Supabase's external schema).
+    user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     guest_token_hash: Mapped[str | None] = mapped_column(Text)
     case_id: Mapped[str] = mapped_column(Text, nullable=False)
     case_version: Mapped[int] = mapped_column(Integer, nullable=False)
