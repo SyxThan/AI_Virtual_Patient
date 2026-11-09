@@ -14,7 +14,9 @@ from pathlib import Path
 
 import psycopg
 
-ENV_FILE = Path(__file__).resolve().parents[1] / "apps" / "api" / ".env"
+_ROOT = Path(__file__).resolve().parents[1]
+# Same precedence the app config uses: apps/api/.env first, then the repo-root .env.
+ENV_FILES = [_ROOT / "apps" / "api" / ".env", _ROOT / ".env"]
 
 RLS_OFF = """
 select c.relname
@@ -33,13 +35,14 @@ order by table_name, grantee
 
 
 def _from_env_file() -> str | None:
-    """Read DATABASE_URL from apps/api/.env (same file the app uses). No secrets logged."""
-    if not ENV_FILE.exists():
-        return None
-    for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if line.startswith("DATABASE_URL="):
-            return line.split("=", 1)[1].strip().strip('"').strip("'") or None
+    """Read DATABASE_URL from apps/api/.env or the repo-root .env. No secrets logged."""
+    for env_file in ENV_FILES:
+        if not env_file.exists():
+            continue
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith("DATABASE_URL="):
+                return line.split("=", 1)[1].strip().strip('"').strip("'") or None
     return None
 
 
