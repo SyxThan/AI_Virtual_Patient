@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+node_modules/
+.next/
+dist/
+.agy/runs/
+supabase/.temp/
+# raw source documents: third-party guideline text, keep out of git until usage rights are checked
+data/source/

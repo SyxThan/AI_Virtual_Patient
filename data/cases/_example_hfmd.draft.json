@@ -1,0 +1,359 @@
+{
+  "schema_version": "1",
+  "id": "case-20-hfmd",
+  "title": {
+    "vi": "Bệnh Tay - Chân - Miệng",
+    "en": "Hand, foot and mouth disease"
+  },
+  "specialty": "Nhi - Truyền nhiễm",
+  "source": {
+    "document": "Hướng dẫn chẩn đoán và điều trị 2023 - BV Bệnh Nhiệt đới TP.HCM",
+    "year": 2023,
+    "section": "Bài 20. Bệnh Tay - Chân - Miệng",
+    "case_number": 20
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "ILLUSTRATIVE EXAMPLE of the schema. Not clinically reviewed; do not use in a demo as verified.",
+      "Lay-language replies are drafts written for this example; every line needs clinician review.",
+      "Severity: station vitals (pulse 150, myoclonic jerk while lying still) suggest grade 2b group 1, but this is unconfirmed (severity_state.confirmed=false).",
+      "Source lists glucose twice with different values and ranges (9.8 mmol/L vs 8.9 mmol/L); omitted here until a clinician decides.",
+      "Overuse orders in the source apply to grades 1 and 2a only; kept with applies_to_grades so they do not penalise a 2b case.",
+      "Rubric items beyond the source diagnosis row are author_added and need review."
+    ]
+  },
+  "patient": {
+    "name": "Bé Trần Hoàng B.",
+    "age": {
+      "value": 18,
+      "unit": "months"
+    },
+    "sex": "male",
+    "occupation": "N/A",
+    "informant": {
+      "role": "mother"
+    },
+    "persona": {
+      "personality": "lo lắng, nói nhanh",
+      "dialect": "neutral",
+      "emotional_state": "hoang mang vì con sốt không hạ",
+      "speech_style": "xưng em, gọi bác sĩ"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Con em sốt cao ba ngày rồi không hạ, bỏ ăn, quấy khóc, ngủ cứ giật mình.",
+    "triage_note": "Mạch 150 l/ph, thân nhiệt 39.2°C, nhịp thở 32 l/ph. Chảy nhiều dãi, quấy khóc liên tục, có cơn giật mình nảy người khi nằm yên.",
+    "severity_state": {
+      "label": "2b-group-1",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 150,
+      "temp_c": 39.2,
+      "resp_rate": 32
+    }
+  },
+  "history": [
+    {
+      "id": "h-fever",
+      "topic": "Sốt",
+      "polarity": "positive",
+      "lay_response": "Dạ cháu sốt ba ngày rồi, cho uống thuốc hạ sốt thì bớt một chút rồi lại sốt lên.",
+      "clinical_note": "Sốt kéo dài trên 2 ngày, khó hạ với paracetamol: dấu hiệu cảnh báo theo nguồn.",
+      "intents": [
+        "sốt bao lâu",
+        "đã dùng thuốc hạ sốt chưa",
+        "sốt có hạ không"
+      ],
+      "red_flag": true,
+      "origin": "station"
+    },
+    {
+      "id": "h-startle",
+      "topic": "Giật mình",
+      "polarity": "positive",
+      "lay_response": "Cháu nằm yên mà tự nhiên giật nảy cả người, lúc ngủ cũng hay giật mình.",
+      "clinical_note": "Giật mình chới với (myoclonic jerk): dấu hiệu biến chứng thần kinh quan trọng. Tần suất chưa quy định, cần bác sĩ xác nhận.",
+      "intents": [
+        "có giật mình không",
+        "ngủ có giật không",
+        "có run tay chân không"
+      ],
+      "red_flag": true,
+      "origin": "station"
+    },
+    {
+      "id": "h-mouth",
+      "topic": "Ăn uống, chảy dãi",
+      "polarity": "positive",
+      "lay_response": "Cháu chảy nước dãi nhiều lắm, đút gì cũng khóc, không chịu ăn.",
+      "clinical_note": "Loét miệng gây đau, chảy dãi, bỏ ăn bỏ bú.",
+      "intents": [
+        "ăn uống thế nào",
+        "có chảy dãi không",
+        "bú có được không"
+      ],
+      "red_flag": false,
+      "origin": "station"
+    },
+    {
+      "id": "h-contact",
+      "topic": "Tiếp xúc dịch tễ",
+      "polarity": "positive",
+      "lay_response": "Cháu đi nhà trẻ, em nghe nói trong lớp có bạn bị bệnh.",
+      "clinical_note": "Tiếp xúc trẻ mắc bệnh ở nhà trẻ/mẫu giáo. Chi tiết cụ thể do tác giả thêm.",
+      "intents": [
+        "đi nhà trẻ không",
+        "có ai xung quanh bị bệnh không",
+        "tiếp xúc người bệnh"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-seizure",
+      "topic": "Co giật",
+      "polarity": "negative",
+      "lay_response": "Dạ cháu chưa bị co giật, chỉ giật mình thôi ạ.",
+      "clinical_note": "Phân biệt giật mình chới với và co giật. Ca này chưa có co giật (cần bác sĩ xác nhận).",
+      "intents": [
+        "có co giật không",
+        "có lên cơn giật không",
+        "có trợn mắt không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-mouth",
+      "region": "mouth",
+      "action": "Khám niêm mạc miệng",
+      "finding": "Vết loét đỏ hoặc bóng nước 2-3 mm ở niêm mạc má, lợi, vòm miệng, lưỡi.",
+      "red_flag": false,
+      "origin": "source_table"
+    },
+    {
+      "id": "e-skin",
+      "region": "skin",
+      "action": "Khám da lòng bàn tay, bàn chân, mông, đầu gối",
+      "finding": "Nốt phỏng nước 2-10 mm, hình bầu dục, ấn không đau, không ngứa.",
+      "red_flag": false,
+      "origin": "source_table"
+    },
+    {
+      "id": "e-jerk",
+      "region": "general",
+      "action": "Quan sát trẻ nằm yên trong lúc khám",
+      "finding": "Có cơn giật mình nảy người khi nằm yên.",
+      "red_flag": true,
+      "origin": "station"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-rtpcr",
+      "name": "RT-PCR dịch phết họng / bóng nước da",
+      "aliases": [
+        "PCR enterovirus",
+        "RT-PCR"
+      ],
+      "result_text": "DƯƠNG TÍNH với Enterovirus 71 (EV71).",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "positive",
+      "origin": "source_table"
+    },
+    {
+      "id": "l-cbc",
+      "name": "Tổng phân tích tế bào máu",
+      "aliases": [
+        "CTM",
+        "công thức máu",
+        "CBC"
+      ],
+      "result_text": "WBC 16.5 x 10^9/L [5.0 - 12.0]: tăng. Bạch cầu > 16 x 10^9/L là dấu hiệu cảnh báo độ 2b.",
+      "value": 16.5,
+      "unit": "x10^9/L",
+      "ref_range": "5.0 - 12.0",
+      "flag": "high",
+      "origin": "source_table"
+    },
+    {
+      "id": "l-crp",
+      "name": "CRP định lượng",
+      "aliases": [
+        "CRP"
+      ],
+      "result_text": "8.5 mg/L [< 5.0]: tăng nhẹ.",
+      "value": 8.5,
+      "unit": "mg/L",
+      "ref_range": "< 5.0",
+      "flag": "high",
+      "origin": "source_table"
+    }
+  ],
+  "overuse_orders": [
+    {
+      "name": "Chọc dò tủy sống (dịch não tủy)",
+      "aliases": [
+        "chọc dò tuỷ sống",
+        "lumbar puncture",
+        "LP"
+      ],
+      "penalty": 2,
+      "reason": "Xâm lấn không cần thiết ở độ 1 hoặc 2a vì chưa có tổn thương viêm não - màng não sâu.",
+      "applies_to_grades": [
+        "1",
+        "2a"
+      ]
+    },
+    {
+      "name": "Chụp CT Scanner sọ não",
+      "aliases": [
+        "CT sọ não",
+        "CT scan não"
+      ],
+      "penalty": 2,
+      "reason": "Lạm dụng khi trẻ chỉ giật mình nhẹ, chưa có dấu hiệu thần kinh khu trú.",
+      "applies_to_grades": [
+        "1",
+        "2a"
+      ]
+    }
+  ],
+  "diagnosis": {
+    "primary": "Bệnh Tay - Chân - Miệng",
+    "severity_grade": "2b-group-1",
+    "differentials": [
+      "Thủy đậu",
+      "Loét miệng aphthe",
+      "Sốt phát ban dị ứng",
+      "Viêm da mủ",
+      "Viêm màng não mủ"
+    ],
+    "acceptable_alternatives": []
+  },
+  "rubric": {
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-fever-hx",
+        "domain": "history",
+        "criterion": "Khai thác sốt: thời gian, mức độ, đáp ứng thuốc hạ sốt",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi về sốt",
+          "1": "Hỏi sốt nhưng thiếu thời gian hoặc đáp ứng thuốc",
+          "2": "Hỏi đủ thời gian, mức độ và đáp ứng thuốc hạ sốt"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khai thác sốt: thời gian, mức độ, đáp ứng thuốc hạ sốt"
+        ]
+      },
+      {
+        "id": "r-startle-hx",
+        "domain": "history",
+        "criterion": "Hỏi giật mình / dấu hiệu thần kinh (dấu hiệu cảnh báo)",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không hỏi giật mình hoặc dấu hiệu thần kinh",
+          "1": "Hỏi giật mình nhưng không làm rõ khi nằm yên hoặc khi ngủ",
+          "2": "Hỏi giật mình, bối cảnh xuất hiện và phân biệt với co giật"
+        },
+        "origin": "source_table",
+        "expected_questions": [
+          "Hỏi giật mình / dấu hiệu thần kinh (dấu hiệu cảnh báo)"
+        ]
+      },
+      {
+        "id": "r-contact-epi",
+        "domain": "epidemiology",
+        "criterion": "Hỏi tiếp xúc nguồn bệnh (nhà trẻ, người xung quanh)",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi dịch tễ",
+          "1": "Hỏi chung chung, không hỏi nhà trẻ hoặc người bệnh xung quanh",
+          "2": "Hỏi nhà trẻ/lớp học và tiếp xúc người bệnh"
+        },
+        "origin": "source_table",
+        "expected_questions": [
+          "Hỏi tiếp xúc nguồn bệnh (nhà trẻ, người xung quanh)"
+        ]
+      },
+      {
+        "id": "r-exam-skin-mouth",
+        "domain": "physical_exam",
+        "criterion": "Khám niêm mạc miệng và da lòng bàn tay, bàn chân, mông, đầu gối",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám miệng hay da",
+          "1": "Chỉ khám miệng hoặc chỉ khám da",
+          "2": "Khám cả miệng và các vùng da điển hình"
+        },
+        "origin": "source_table",
+        "expected_questions": [
+          "Khám niêm mạc miệng và da lòng bàn tay, bàn chân, mông, đầu gối"
+        ]
+      },
+      {
+        "id": "r-dx-grade",
+        "domain": "diagnosis",
+        "criterion": "Chẩn đoán Tay - Chân - Miệng và nêu phân độ",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Chẩn đoán sai hoặc không chẩn đoán",
+          "1": "Đúng bệnh nhưng không phân độ hoặc phân độ sai",
+          "2": "Đúng bệnh và phân độ theo Bộ Y tế, có nêu chẩn đoán phân biệt"
+        },
+        "origin": "source_table",
+        "expected_questions": [
+          "Chẩn đoán Tay - Chân - Miệng và nêu phân độ"
+        ]
+      }
+    ],
+    "version": 1
+  },
+  "citations": [
+    {
+      "document": "Hướng dẫn chẩn đoán và điều trị 2023 - BV Bệnh Nhiệt đới TP.HCM",
+      "section": "Bài 20. Bệnh Tay - Chân - Miệng"
+    }
+  ],
+  "forbidden_terms": [
+    "tay chân miệng",
+    "tay - chân - miệng",
+    "enterovirus",
+    "EV71",
+    "độ 2b",
+    "độ 3",
+    "myoclonic"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Dạ em không rõ ạ.",
+      "Dạ cái đó em chưa để ý, em không chắc ạ."
+    ],
+    "not_ordered_lab": [
+      "Bác sĩ chưa cho cháu làm xét nghiệm đó ạ."
+    ],
+    "out_of_scope": [
+      "Em chỉ biết con em bị sao thôi ạ, bác sĩ giải thích giúp em."
+    ]
+  }
+}

@@ -1,0 +1,724 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avp.local/schemas/case.schema.json",
+  "title": "AVP clinical case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "specialty",
+    "source",
+    "review",
+    "patient",
+    "presentation",
+    "history",
+    "exam",
+    "labs",
+    "overuse_orders",
+    "diagnosis",
+    "rubric",
+    "citations",
+    "forbidden_terms",
+    "fallback_lines"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^case-[0-9]{2}-[a-z0-9-]+$"
+    },
+    "title": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "vi",
+        "en"
+      ],
+      "properties": {
+        "vi": {
+          "type": "string",
+          "minLength": 1
+        },
+        "en": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "specialty": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "year",
+        "section",
+        "case_number"
+      ],
+      "properties": {
+        "document": {
+          "type": "string",
+          "minLength": 1
+        },
+        "year": {
+          "type": "integer"
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 53
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reviewer",
+        "date",
+        "notes"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "draft",
+            "clinician_reviewed"
+          ]
+        },
+        "reviewer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Open questions for the clinician, source conflicts."
+        }
+      },
+      "if": {
+        "properties": {
+          "status": {
+            "const": "clinician_reviewed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "reviewer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "patient": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "age",
+        "sex",
+        "occupation",
+        "informant",
+        "persona"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "age": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unit": {
+              "enum": [
+                "days",
+                "months",
+                "years"
+              ]
+            }
+          }
+        },
+        "sex": {
+          "enum": [
+            "male",
+            "female"
+          ]
+        },
+        "occupation": {
+          "type": "string"
+        },
+        "informant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role"
+          ],
+          "properties": {
+            "role": {
+              "enum": [
+                "self",
+                "mother",
+                "father",
+                "relative"
+              ]
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "persona": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "personality",
+            "dialect",
+            "emotional_state"
+          ],
+          "properties": {
+            "personality": {
+              "type": "string"
+            },
+            "dialect": {
+              "enum": [
+                "north",
+                "central",
+                "south",
+                "neutral"
+              ]
+            },
+            "emotional_state": {
+              "type": "string"
+            },
+            "speech_style": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chief_complaint",
+        "triage_note",
+        "vitals",
+        "severity_state"
+      ],
+      "properties": {
+        "chief_complaint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "In the patient's or informant's own words."
+        },
+        "triage_note": {
+          "type": "string"
+        },
+        "severity_state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "confirmed"
+          ],
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "confirmed": {
+              "type": "boolean"
+            }
+          }
+        },
+        "vitals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pulse",
+            "temp_c",
+            "resp_rate"
+          ],
+          "properties": {
+            "pulse": {
+              "type": "number",
+              "minimum": 0
+            },
+            "temp_c": {
+              "type": "number",
+              "minimum": 30,
+              "maximum": 45
+            },
+            "resp_rate": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bp_systolic": {
+              "type": "number",
+              "minimum": 0
+            },
+            "bp_diastolic": {
+              "type": "number",
+              "minimum": 0
+            },
+            "spo2": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        }
+      }
+    },
+    "history": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "topic",
+          "polarity",
+          "lay_response",
+          "clinical_note",
+          "intents",
+          "red_flag",
+          "origin"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^h-[a-z0-9-]+$"
+          },
+          "topic": {
+            "type": "string"
+          },
+          "polarity": {
+            "enum": [
+              "positive",
+              "negative",
+              "unknown"
+            ],
+            "description": "unknown = the scenario deliberately leaves this open; patient neither confirms nor denies."
+          },
+          "lay_response": {
+            "type": "string",
+            "minLength": 1
+          },
+          "clinical_note": {
+            "type": "string"
+          },
+          "intents": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "red_flag": {
+            "type": "boolean"
+          },
+          "origin": {
+            "enum": [
+              "station",
+              "source_table",
+              "author_added"
+            ]
+          }
+        }
+      }
+    },
+    "exam": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "region",
+          "action",
+          "finding",
+          "red_flag",
+          "origin"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^e-[a-z0-9-]+$"
+          },
+          "region": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "finding": {
+            "type": "string",
+            "minLength": 1
+          },
+          "red_flag": {
+            "type": "boolean"
+          },
+          "origin": {
+            "enum": [
+              "station",
+              "source_table",
+              "author_added"
+            ]
+          }
+        }
+      }
+    },
+    "labs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "aliases",
+          "result_text",
+          "flag",
+          "origin"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^l-[a-z0-9-]+$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "result_text": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ref_range": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "flag": {
+            "enum": [
+              "normal",
+              "high",
+              "low",
+              "positive",
+              "negative",
+              "abnormal"
+            ]
+          },
+          "origin": {
+            "enum": [
+              "station",
+              "source_table",
+              "author_added"
+            ]
+          }
+        }
+      }
+    },
+    "overuse_orders": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "aliases",
+          "penalty",
+          "reason"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "penalty": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "reason": {
+            "type": "string"
+          },
+          "applies_to_grades": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "diagnosis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary",
+        "severity_grade",
+        "differentials",
+        "acceptable_alternatives"
+      ],
+      "properties": {
+        "primary": {
+          "type": "string"
+        },
+        "severity_grade": {
+          "type": "string"
+        },
+        "differentials": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "acceptable_alternatives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "management": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "scale",
+        "items"
+      ],
+      "properties": {
+        "scale": {
+          "const": [
+            0,
+            1,
+            2
+          ]
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "domain",
+              "criterion",
+              "weight",
+              "critical",
+              "anchors",
+              "origin",
+              "expected_questions"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^r-[a-z0-9-]+$"
+              },
+              "domain": {
+                "enum": [
+                  "history",
+                  "epidemiology",
+                  "physical_exam",
+                  "investigations",
+                  "diagnosis",
+                  "management",
+                  "communication"
+                ]
+              },
+              "criterion": {
+                "type": "string",
+                "minLength": 1
+              },
+              "weight": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "critical": {
+                "type": "boolean"
+              },
+              "anchors": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "0",
+                  "1",
+                  "2"
+                ],
+                "properties": {
+                  "0": {
+                    "type": "string"
+                  },
+                  "1": {
+                    "type": "string"
+                  },
+                  "2": {
+                    "type": "string"
+                  }
+                }
+              },
+              "origin": {
+                "enum": [
+                  "station",
+                  "source_table",
+                  "author_added"
+                ]
+              },
+              "expected_questions": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                },
+                "description": "Topics and sample phrasings the evaluator matches by meaning; not an exact-match list."
+              },
+              "reliability": {
+                "enum": [
+                  "normal",
+                  "low"
+                ],
+                "description": "low for communication criteria"
+              }
+            }
+          }
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "citations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document",
+          "section"
+        ],
+        "properties": {
+          "document": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "forbidden_terms": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fallback_lines": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unknown_symptom",
+        "not_ordered_lab",
+        "out_of_scope"
+      ],
+      "properties": {
+        "unknown_symptom": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Unknown policy: neither confirm nor deny (e.g. 'Dạ em không rõ ạ'). Never an invented negative."
+        },
+        "not_ordered_lab": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "out_of_scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
