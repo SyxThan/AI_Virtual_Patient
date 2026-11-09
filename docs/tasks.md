@@ -33,6 +33,7 @@ Stack note: the workbook says React; this repo uses Next.js (decided by the team
 | AVP-037 | 6 | P0 | Walking skeleton on staging: health endpoint + web page deployed, env and CORS working (risk R-08) | C + H | AVP-006, AVP-034 | Another person opens the staging URL |
 | AVP-035 | 5 | P1 | `scripts/validate_cases.py` + tests; `make gen-client` OpenAPI to TS client | A | AVP-006 | Passes on case-001, fails on a broken fixture; client regenerates without diff |
 | AVP-039 | 5 | P2 | Claude skills for the MVP stack (`.claude/skills/`); link from CLAUDE.md | C | AVP-006 | Each skill specific to the real stack/specs; build/lint unaffected (added by this repo) |
+| AVP-040 | 5 | P3 | Gitignore locally-installed agent skills (`.agents/`, installed skill dirs, `skills-lock.json`) | C | AVP-006 | Working tree clean; installed skills not committed (added by this repo) |
 
 ## Patient, session, chat
 | ID | Day | Pri | Task | Owner | Depends | Acceptance |

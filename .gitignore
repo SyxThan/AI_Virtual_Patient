@@ -16,3 +16,7 @@ build/
 supabase/.temp/
 # raw source documents: third-party guideline text, keep out of git until usage rights are checked
 data/source/
+# locally-installed agent skills (reinstallable tooling, not project source)
+.agents/
+.claude/skills/supabase-postgres-best-practices/
+skills-lock.json
