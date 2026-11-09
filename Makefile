@@ -47,7 +47,7 @@ db-check-rls:
 # --- Targets implemented by later tasks. Fail loudly (no false success). ---
 
 load-cases:
-> @echo "load-cases: not implemented yet - see task AVP-008"; exit 1
+> python scripts/load_cases.py
 
 redteam:
 > @echo "redteam: not implemented yet - see task AVP-011"; exit 1
