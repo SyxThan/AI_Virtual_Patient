@@ -16,9 +16,12 @@ Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-007 | Alembic migration 11 bảng + ORM models + RLS baseline | ✅ Merged | PR #7 | Verify Docker + **Supabase thật** (RLS OK) |
 | AVP-008 | Session API (`POST/GET /sessions`, guest token, ownership) + `load-cases` | ✅ Merged | PR #8 | Slice 2 |
 | AVP-010 (pt1) | Màn hình Setup (case card, role, mode, consent, điều hướng) | ✅ Merged | PR #8 | Slice 2 frontend |
-| AVP-009 | Patient Agent (prompt cache-friendly) + **guardrail 3 tầng** + LLM adapter (Fake/Gemini) | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #9** | Slice 3; Hard Rule 1 |
-| AVP-012 | Turn loop `POST/GET /sessions/{id}/turns` + lưu transcript | ✅ Code xong & **verify SQL thật**, 🟡 chờ merge | **PR #9** | Slice 3 |
-| AVP-010 (pt2) | Clinical Workspace chat (TranscriptBox, ChatInput) | ✅ Code xong & verify, 🟡 chờ merge | **PR #9** | Slice 3 frontend |
+| AVP-009 | Patient Agent + **guardrail 3 tầng** + LLM adapter (Fake/Gemini) | ✅ Merged | PR #9 | Slice 3; Hard Rule 1 |
+| AVP-012 | Turn loop `POST/GET /sessions/{id}/turns` + lưu transcript | ✅ Merged | PR #9 | Slice 3 |
+| AVP-010 (pt2) | Clinical Workspace chat (TranscriptBox, ChatInput) | ✅ Merged | PR #9 | Slice 3 frontend |
+| AVP-012 (fix) | Sửa 500 turn loop (async→sync, tránh pool xuyên thread) | ✅ Merged | PR #10 | — |
+| AVP-009 (fix) | Retry lỗi Gemini tạm thời (503/429) + `make check-llm` | ✅ Merged | PR #11 | — |
+| AVP-102 | **Vitals State Machine** (5 trạng thái HFMD) + Patient Monitor UI | ✅ Code xong & verify (fake), 🟡 chờ merge | **PR #12** | Slice 4; draft lâm sàng |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -48,8 +51,16 @@ Patient Agent đóng vai người mẹ + **guardrail 3 tầng** (tier-1 chỉ n�
 - Docker Postgres thật: tạo session → `POST /turns` lưu 2 turn (student idx 0, patient idx 1) đúng thứ tự, guardrail jsonb lưu, ownership 404 khi sai token.
 - apps/web: `lint` sạch; `build` OK (route `/session/[id]` động).
 
+## Slice 4 (Vitals State Machine & Monitor) — hoàn tất về mặt code (PR #12)
+Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao → 2b → STABILIZED) theo `vitals-state-machine.md`, chuyển trạng thái deterministic theo y lệnh/thời gian, lưu trong `sessions.state["vitals"]` (không bảng mới). `GET /sessions/{id}/vitals` + `POST /sessions/{id}/vitals/events`. UI Patient Monitor (HR/Temp/RR/BP/SpO2, cảnh báo sốt cao, badge phân độ, nút Đo / Cho hạ sốt) ở cột trái workspace. **Số liệu lâm sàng là draft, cần bác sĩ duyệt.**
+
+### Kiểm thử Slice 4 (exit 0)
+- apps/api: `pytest` 21 passed (4 vitals + các slice trước); `ruff` sạch.
+- apps/web: `lint` sạch; `build` OK.
+- ⚠️ Chưa chạy verify DB thật (Docker đang tắt); routes vitals là `def` đồng bộ nên không dính lỗi pool.
+
 ## Thứ tự merge (bạn thực hiện)
-- **PR #9** — Slice 3 (base `main`). Merge sau khi CI xanh.
+- **PR #12** — Slice 4 (base `main`). Merge sau khi CI xanh.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.

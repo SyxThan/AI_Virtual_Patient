@@ -56,6 +56,21 @@
     "loadError": "Không tải được hội thoại.",
     "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
+  "monitor": {
+    "title": "Theo dõi sinh hiệu",
+    "hr": "Nhịp tim",
+    "temp": "Nhiệt độ",
+    "rr": "Nhịp thở",
+    "bp": "Huyết áp",
+    "spo2": "SpO₂",
+    "unitBpm": "l/ph",
+    "symptoms": "Biểu hiện lâm sàng",
+    "measure": "Đo sinh hiệu",
+    "antipyretic": "Cho hạ sốt (Paracetamol)",
+    "feverWarning": "Sốt cao",
+    "loading": "Đang đo…",
+    "error": "Không lấy được sinh hiệu."
+  },
   "debrief": {
     "title": "Kết quả và phản hồi"
   },

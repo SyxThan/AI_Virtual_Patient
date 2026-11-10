@@ -50,6 +50,8 @@ class SessionRepository(Protocol):
 
     def get(self, session_id: str) -> SessionRecord | None: ...
 
+    def update_state(self, session_id: str, state: dict) -> None: ...
+
 
 def _to_record(row: models.Session) -> SessionRecord:
     return SessionRecord(
@@ -96,3 +98,9 @@ class SqlSessionRepository:
             return None
         row = self.db.get(models.Session, pk)
         return _to_record(row) if row else None
+
+    def update_state(self, session_id: str, state: dict) -> None:
+        row = self.db.get(models.Session, uuid.UUID(session_id))
+        if row is not None:
+            row.state = state
+            self.db.commit()
