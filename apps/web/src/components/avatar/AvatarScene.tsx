@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { buildProceduralRig, type ExamRegionId } from "./AnatomyColliders";
+import { jawScaleFor, patientLipSync } from "./LipSyncController";
 
 export type AvatarSceneProps = {
   /** Called when the student clicks (not drags) an exam collider. */
@@ -122,6 +123,8 @@ export default function AvatarScene({ onExamineRegion }: AvatarSceneProps) {
 
     renderer.setAnimationLoop(() => {
       controls.update();
+      // Lip-sync: closed (scale 1) unless patient audio is attached and playing.
+      rig.jaw.scale.y = jawScaleFor(patientLipSync.level());
       renderer.render(scene, camera);
     });
 
