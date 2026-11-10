@@ -21,7 +21,10 @@ Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-010 (pt2) | Clinical Workspace chat (TranscriptBox, ChatInput) | ✅ Merged | PR #9 | Slice 3 frontend |
 | AVP-012 (fix) | Sửa 500 turn loop (async→sync, tránh pool xuyên thread) | ✅ Merged | PR #10 | — |
 | AVP-009 (fix) | Retry lỗi Gemini tạm thời (503/429) + `make check-llm` | ✅ Merged | PR #11 | — |
-| AVP-102 | **Vitals State Machine** (5 trạng thái HFMD) + Patient Monitor UI | ✅ Code xong & verify (fake), 🟡 chờ merge | **PR #12** | Slice 4; draft lâm sàng |
+| AVP-102 | **Vitals State Machine** (5 trạng thái HFMD) + Patient Monitor UI | ✅ Merged | PR #12 | Slice 4; draft lâm sàng; jsonb verify DB thật (cùng PR #14) |
+| AVP-104 (S5-01) | Avatar 3D SSR-safe (rig procedural mẹ bế bé, OrbitControls) | ✅ Code xong & verify, 🟡 chờ merge | **PR #13** | Slice 5 |
+| AVP-104 (S5-02) | Raycasting khám 4 vùng → `POST /sessions/{id}/actions` → ghi turn → panel kết quả | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #14** | Mapping vùng + ảnh minh hoạ cần duyệt |
+| AVP-104 (S5-03) | Lip-sync theo biên độ audio (no-op khi chưa có voice) | ✅ Code xong & verify logic, 🟡 chờ merge | **PR #15** | P1; nối với Slice 6 |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -59,8 +62,21 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - apps/web: `lint` sạch; `build` OK.
 - ⚠️ Chưa chạy verify DB thật (Docker đang tắt); routes vitals là `def` đồng bộ nên không dính lỗi pool.
 
+## Slice 5 (Avatar 3D & khám raycasting) — hoàn tất về mặt code (PR #13, #14, #15)
+- **S5-01 (#13):** `three@0.170.0`; rig low-poly procedural "mẹ bế bé" (chưa có `.glb`), `next/dynamic` ssr:false, OrbitControls giới hạn trước/bên, resize, dispose đầy đủ. Nhãn "Mô hình minh hoạ".
+- **S5-02 (#14):** raycasting theo khung canvas (phân biệt click/kéo), hover highlight, nút "Quan sát trẻ nằm yên". `POST /sessions/{id}/actions` lấy finding **nguyên văn** từ `exam[]` của case; vùng không có ghi nhận → "không có ghi nhận" (không bịa âm tính). Ghi 2 turn (student + system); turn system **không** đưa vào prompt người mẹ. `gen-client` giờ sinh từ schema FastAPI thật.
+- **S5-03 (#15):** `LipSyncController` (AnalyserNode → RMS → độ mở miệng); không có audio thì miệng đóng (no-op) — chờ Slice 6 nối voice.
+- ⚠ Cần duyệt: mapping `mouth_throat→mouth`, `palm_hands/feet/buttocks_knees→skin`; red flag giật mình hiển thị qua thao tác "quan sát"; chưa có ảnh lâm sàng thật (chỉ SVG minh hoạ, `TODO(clinician)`).
+
+### Kiểm thử Slice 5 (exit 0)
+- apps/api: `pytest` 28 passed (7 test actions mới); `ruff` sạch.
+- apps/web: `tsc` sạch, eslint sạch, build OK; SSR smoke `GET /session/...` = 200.
+- Postgres thật (TestClient): khám miệng (finding nguyên văn) → quan sát (red flag) → chat → vitals hạ sốt (STABILIZED được lưu) → transcript đúng thứ tự.
+- Lip-sync: kiểm logic với AnalyserNode giả (đóng → mở → đóng).
+- Mục tiêu "60fps", "<1s" trong tasks là **mục tiêu thiết kế, chưa đo**.
+
 ## Thứ tự merge (bạn thực hiện)
-- **PR #12** — Slice 4 (base `main`). Merge sau khi CI xanh.
+1. **PR #13** (S5-01) → 2. **PR #14** (S5-02) → 3. **PR #15** (S5-03). Tất cả base `main`; merge theo thứ tự thì mỗi diff tự gọn lại.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.
