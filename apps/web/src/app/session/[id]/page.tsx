@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
 import vi from "../../../../messages/vi.json";
+import AvatarCanvas from "@/components/avatar/AvatarCanvas";
 import ChatInput from "@/components/workspace/ChatInput";
 import TranscriptBox, { type Turn } from "@/components/workspace/TranscriptBox";
 import VitalsMonitor from "@/components/workspace/VitalsMonitor";
@@ -91,11 +92,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       <div className="flex flex-1 overflow-hidden">
         {/* Patient visual area (avatar 3D arrives in a later slice) */}
         <aside className="hidden w-1/3 flex-col gap-4 overflow-y-auto border-r border-gray-200 p-4 md:flex">
-          <div className="flex flex-col items-center rounded-lg bg-gray-50 p-5 text-center">
-            <div className="mb-2 text-5xl">👩‍🍼</div>
-            <h2 className="font-medium">{vi.session.patientCard.title}</h2>
-            <p className="mt-1 text-sm text-gray-500">{vi.session.patientCard.desc}</p>
-          </div>
+          <AvatarCanvas />
           <VitalsMonitor sessionId={id} />
         </aside>
 

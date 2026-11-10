@@ -56,6 +56,12 @@
     "loadError": "Không tải được hội thoại.",
     "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
+  "avatar": {
+    "title": "Người mẹ bế bé",
+    "loading": "Đang tải mô hình 3D…",
+    "illustrative": "Mô hình minh hoạ",
+    "hint": "Kéo để xoay góc nhìn. Mô hình 3D chỉ để minh hoạ, không phải hình ảnh lâm sàng."
+  },
   "monitor": {
     "title": "Theo dõi sinh hiệu",
     "hr": "Nhịp tim",
