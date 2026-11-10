@@ -26,7 +26,7 @@ def _to_response(rec: TurnRecord) -> TurnResponse:
     )
 
 
-async def submit_turn(
+def submit_turn(
     session_id: str,
     text: str,
     session_repo: SessionRepository,
@@ -56,8 +56,21 @@ async def submit_turn(
     transcript = [
         {"speaker": t.speaker, "text": t.text} for t in turn_repo.list_for_session(session_id)
     ]
-    t_start = _elapsed_ms(sess.created_at)
 
+    # Generate first; if the provider fails, persist nothing so the student can retry
+    # without an orphaned turn, and never leak the raw error (ADR-0011).
+    try:
+        reply, guardrail = patient_agent.respond(case, transcript, text, provider)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail={
+                "code": "PATIENT_UNAVAILABLE",
+                "message": "Người bệnh tạm thời không phản hồi được, vui lòng thử lại.",
+            },
+        ) from exc
+
+    t_start = _elapsed_ms(sess.created_at)
     idx = turn_repo.next_idx(session_id)
     turn_repo.add(
         session_id=session_id,
@@ -67,9 +80,6 @@ async def submit_turn(
         t_start_ms=t_start,
         guardrail=None,
     )
-
-    reply, guardrail = await patient_agent.respond(case, transcript, text, provider)
-
     patient_turn = turn_repo.add(
         session_id=session_id,
         idx=idx + 1,
