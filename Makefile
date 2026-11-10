@@ -7,7 +7,7 @@
 API_DIR := apps/api
 WEB_DIR := apps/web
 
-.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client redteam
+.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client check-llm redteam
 
 help:
 > @echo "AVP make targets:"
@@ -19,6 +19,7 @@ help:
 > @echo "  db-check-rls   assert RLS on every table                (AVP-007)"
 > @echo "  load-cases     load cases into the database             (AVP-008)"
 > @echo "  gen-client     regenerate the TS client from OpenAPI    (AVP-035)"
+> @echo "  check-llm      diagnose the configured LLM provider"
 > @echo "  redteam        run the red-team suite                   (AVP-011)"
 
 dev:
@@ -37,6 +38,9 @@ validate-cases:
 
 gen-client:
 > cd $(WEB_DIR) && npm run gen-client
+
+check-llm:
+> python scripts/check_llm.py
 
 db-migrate:
 > cd $(API_DIR) && python -m alembic upgrade head
