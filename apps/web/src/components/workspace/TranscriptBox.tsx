@@ -16,6 +16,18 @@ export default function TranscriptBox({ turns }: { turns: Turn[] }) {
     <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
       {turns.length === 0 && <p className="m-auto text-center text-gray-500">{vi.session.empty}</p>}
       {turns.map((t) => {
+        if (t.speaker === "system") {
+          // Recorded exam finding — not something the mother said.
+          return (
+            <div
+              key={`${t.turn_idx}-${t.speaker}`}
+              className="max-w-[90%] self-center whitespace-pre-line rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900"
+            >
+              <span className="mb-0.5 block font-medium">{vi.exam.systemLabel}</span>
+              {t.text}
+            </div>
+          );
+        }
         const mine = t.speaker === "student";
         return (
           <div

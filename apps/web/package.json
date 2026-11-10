@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "gen-client": "openapi-typescript ../../docs/specs/openapi.yaml -o src/lib/api-client/schema.ts"
+    "gen-client": "python ../../scripts/export_openapi.py src/lib/api-client/openapi.json && openapi-typescript src/lib/api-client/openapi.json -o src/lib/api-client/schema.ts"
   },
   "dependencies": {
     "next": "^16.4.0",

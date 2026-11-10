@@ -4,37 +4,15 @@
  */
 
 export interface paths {
-    "/health": {
+    "/api/v1/health": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Liveness/readiness probe (AVP-037). No auth. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Service is up. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            /** @enum {string} */
-                            status: "ok";
-                        };
-                    };
-                };
-            };
-        };
+        /** Health */
+        get: operations["health_api_v1_health_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -43,117 +21,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sessions": {
+    "/api/v1/sessions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * List the caller's sessions (history).
-         * @description Signed-in users see their own sessions; guests pass X-Guest-Token to see theirs. Ownership is enforced server-side (ADR-0007, ADR-0008).
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Session list. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["SessionSummary"][];
-                    };
-                };
-                401: components["responses"]["Error"];
-            };
-        };
+        get?: never;
         put?: never;
-        /** Create a practice session for one case. */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SessionCreate"];
-                };
-            };
-            responses: {
-                /** @description Session created. */
-                201: {
-                    headers: {
-                        /** @description Returned only for guest sessions; the client must send it back as the X-Guest-Token header to access this session later. */
-                        "X-Guest-Token"?: string;
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Session"];
-                    };
-                };
-                400: components["responses"]["Error"];
-                401: components["responses"]["Error"];
-            };
-        };
+        /** Create Session */
+        post: operations["create_session_api_v1_sessions_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sessions/{id}": {
+    "/api/v1/sessions/{session_id}": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
-        /** Get one session (metadata + transcript). */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Session detail. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Session"];
-                    };
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
+        /** Get Session */
+        get: operations["get_session_api_v1_sessions__session_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -162,381 +55,69 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sessions/{id}/turns": {
+    "/api/v1/sessions/{session_id}/turns": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Turns */
+        get: operations["list_turns_api_v1_sessions__session_id__turns_get"];
+        put?: never;
+        /** Create Turn */
+        post: operations["create_turn_api_v1_sessions__session_id__turns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/vitals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Vitals */
+        get: operations["get_vitals_api_v1_sessions__session_id__vitals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/vitals/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         get?: never;
         put?: never;
-        /**
-         * Submit one student turn, get the patient reply (hot path).
-         * @description Text turn loop. The hot path uses one cached system prompt per case, no RAG, no blocking DB write before the reply (ADR-0002). Voice turns go over the WebSocket; see the x-websocket note below.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["TurnCreate"];
-                };
-            };
-            responses: {
-                /** @description Patient reply. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Turn"];
-                    };
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-                429: components["responses"]["Error"];
-            };
-        };
+        /** Post Vitals Event */
+        post: operations["post_vitals_event_api_v1_sessions__session_id__vitals_events_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/sessions/{id}/finish": {
+    "/api/v1/sessions/{session_id}/actions": {
         parameters: {
             query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         get?: never;
         put?: never;
-        /**
-         * End the interview and enqueue cold-path evaluation + debrief.
-         * @description Idempotent. Enqueues `jobs` rows for the Evaluator then Debriefing agents (ADR-0002, ADR-0004). Requires consent to have been given at creation.
-         */
-        post: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Session finished (or already finished). */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Session"];
-                    };
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sessions/{id}/evaluation": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Get the OSCE evaluation result (practice feedback only).
-         * @description LLM proposes, code scores (ADR-0009). Every met criterion cites a turn and a verbatim quote. Output is learning feedback, never a certificate (ADR-0010). 202 while the cold-path job is still running.
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Evaluation ready. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Evaluation"];
-                    };
-                };
-                /** @description Evaluation not ready yet (job pending). */
-                202: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sessions/{id}/debrief": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Get the debrief with citations (cold path, RAG).
-         * @description Every claim is cited or marked unverified (ADR-0005). 202 while pending.
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Debrief ready. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["Debrief"];
-                    };
-                };
-                /** @description Debrief not ready yet (job pending). */
-                202: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sessions/{id}/debrief/pdf": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
-            cookie?: never;
-        };
-        /**
-         * Download practice report PDF with QR verification code.
-         * @description Generates and returns an A4 PDF document containing the student score breakdown, verified citations, red flag alerts, and a QR code linking to online verification.
-         */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description PDF document stream. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/pdf": string;
-                    };
-                };
-                /** @description Report not ready yet. */
-                202: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sessions/{id}/actions": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Perform an examination action (raycasting on 3D avatar) or clinical intervention. */
-        post: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["ClinicalActionCreate"];
-                };
-            };
-            responses: {
-                /** @description Action performed and findings returned. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["ClinicalActionResult"];
-                    };
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/sessions/{id}/vitals": {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                "X-Guest-Token"?: components["parameters"]["GuestToken"];
-            };
-            path: {
-                id: components["parameters"]["SessionId"];
-            };
-            cookie?: never;
-        };
-        /** Get the current vitals snapshot from the state machine. */
-        get: {
-            parameters: {
-                query?: never;
-                header?: {
-                    /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-                    "X-Guest-Token"?: components["parameters"]["GuestToken"];
-                };
-                path: {
-                    id: components["parameters"]["SessionId"];
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Current vitals state. */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["VitalsSnapshot"];
-                    };
-                };
-                403: components["responses"]["Error"];
-                404: components["responses"]["Error"];
-            };
-        };
-        put?: never;
-        post?: never;
+        /** Post Action */
+        post: operations["post_action_api_v1_sessions__session_id__actions_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -547,151 +128,443 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        Error: {
-            error: {
-                /** @example session_not_found */
-                code: string;
-                message: string;
-            };
-        };
-        SessionCreate: {
-            /** @description Case id in data/cases/. */
-            case_id: string;
+        /** ExamActionRequest */
+        ExamActionRequest: {
             /**
-             * @description voice is Layer P2.
+             * Action
              * @enum {string}
              */
-            mode: "text" | "voice";
-            /** @description Student consent to store/use the transcript (CLAUDE.md rule 6). Must be true to evaluate the session. */
+            action: "examine_region" | "observe_child";
+            /** Region */
+            region?: ("palm_hands" | "feet" | "mouth_throat" | "buttocks_knees") | null;
+        };
+        /** ExamActionResponse */
+        ExamActionResponse: {
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "examine_region" | "observe_child";
+            /** Region */
+            region: ("palm_hands" | "feet" | "mouth_throat" | "buttocks_knees") | null;
+            /** Case Region */
+            case_region: string | null;
+            /** Documented */
+            documented: boolean;
+            /** Finding */
+            finding: string | null;
+            /** Case Action */
+            case_action: string | null;
+            /** Red Flag */
+            red_flag: boolean;
+            /** Review Status */
+            review_status: string;
+            /** Turn Idx */
+            turn_idx: number;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HealthResponse */
+        HealthResponse: {
+            /** Status */
+            status: string;
+        };
+        /** SessionCreate */
+        SessionCreate: {
+            /**
+             * Case Id
+             * @default case-01-hfmd
+             */
+            case_id: string;
+            /**
+             * Mode
+             * @default guided
+             * @enum {string}
+             */
+            mode: "guided" | "exam";
+            /**
+             * Role
+             * @default student
+             * @enum {string}
+             */
+            role: "student" | "resident" | "practitioner";
+            /** Consent */
             consent: boolean;
         };
-        Session: {
-            /** Format: uuid */
+        /** SessionResponse */
+        SessionResponse: {
+            /** Id */
             id: string;
+            /** Case Id */
             case_id: string;
-            /** @enum {string} */
-            mode: "text" | "voice";
-            /** @enum {string} */
-            status: "active" | "finished";
-            /** Format: date-time */
+            /** Case Version */
+            case_version: number;
+            /** Mode */
+            mode: string;
+            /** Role */
+            role: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
             created_at: string;
-            /** Format: date-time */
-            consented_at?: string | null;
-            turns: components["schemas"]["Turn"][];
+            /** Guest Token */
+            guest_token?: string | null;
         };
-        /** @description (skeleton) list view; fixed in AVP-023. */
-        SessionSummary: {
-            /** Format: uuid */
-            id: string;
-            case_id: string;
-            /** @enum {string} */
-            status: "active" | "finished";
-            /** Format: date-time */
-            created_at: string;
-            score_summary?: string | null;
-        };
+        /** TurnCreate */
         TurnCreate: {
-            /** @description The student's utterance (size-limited, ADR-0011). */
+            /** Text */
             text: string;
         };
-        Turn: {
-            /** @description 0-based position in the transcript. */
+        /** TurnResponse */
+        TurnResponse: {
+            /** Turn Idx */
             turn_idx: number;
-            /** @enum {string} */
-            role: "student" | "patient";
+            /** Speaker */
+            speaker: string;
+            /** Text */
             text: string;
-            /** Format: date-time */
-            created_at?: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
-        /** @description (skeleton) fixed in AVP-013/014; see docs/specs/evaluation.md. */
-        Evaluation: {
-            rubric_version: string;
-            total: number;
-            max_total?: number;
-            /** @description Always true; never an official assessment (ADR-0010). */
-            is_practice_feedback: boolean;
-            criteria: components["schemas"]["CriterionResult"][];
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
         };
-        CriterionResult: {
-            id: string;
-            /** @enum {string} */
-            status: "met" | "partial" | "not_met";
-            score?: number;
-            /** @description Required when status is met; verified by code (ADR-0009). */
-            evidence?: {
-                turn_idx?: number;
-                /** @description Verbatim student quote. */
-                quote?: string;
-            } | null;
+        /** VitalsEventRequest */
+        VitalsEventRequest: {
+            /**
+             * Event
+             * @enum {string}
+             */
+            event: "MEASURE_VITALS" | "TIME_TICK" | "ORDER_ANTIPYRETIC" | "ORDER_SEDATIVE" | "ORDER_INCORRECT";
+            /** Notes */
+            notes?: string | null;
         };
-        /** @description (skeleton) fixed in AVP-019; see docs/specs/evaluation.md. */
-        Debrief: {
-            items: {
-                text: string;
-                /** @description false ⇒ marked unverified instead of cited (ADR-0005). */
-                verified: boolean;
-                citations?: {
-                    source_id: string;
-                    section: string;
-                }[];
-            }[];
-        };
-        ClinicalActionCreate: {
-            /** @enum {string} */
-            action_type: "examine" | "palpate" | "auscultate" | "measure_vitals" | "order_medication";
-            /** @description Anatomy region id (e.g. palm_hands, feet, mouth_throat, buttocks_knees). */
-            target_region: string;
-            parameters?: {
-                [key: string]: unknown;
-            };
-        };
-        ClinicalActionResult: {
-            action_id: string;
-            /** @description Description of physical findings. */
-            findings: string;
-            image_url?: string | null;
-            audio_url?: string | null;
-            /** @description Associated turn index. */
-            turn_recorded?: number;
-        };
+        /** VitalsSnapshot */
         VitalsSnapshot: {
-            /** @example 39.2 */
+            /** Temperature C */
             temperature_c: number;
-            /** @example 142 */
+            /** Heart Rate Bpm */
             heart_rate_bpm: number;
-            /** @example 32 */
+            /** Respiratory Rate Bpm */
             respiratory_rate_bpm: number;
-            /** @example 95 */
+            /** Blood Pressure Sys */
             blood_pressure_sys: number;
-            /** @example 65 */
+            /** Blood Pressure Dia */
             blood_pressure_dia: number;
-            /** @example 97 */
+            /** Spo2 Percent */
             spo2_percent: number;
-            /** @enum {string} */
+            /**
+             * Clinical State
+             * @enum {string}
+             */
             clinical_state: "GRADE_1" | "GRADE_2A_BASELINE" | "GRADE_2A_HIGH_FEVER" | "GRADE_2B_PROGRESSION" | "STABILIZED";
-            /** Format: date-time */
-            updated_at?: string;
+            /** Clinical Label */
+            clinical_label: string;
+            /** Active Symptoms */
+            active_symptoms: string[];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
     };
-    responses: {
-        /** @description Error (one shape for all failures, ADR-0011). */
-        Error: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["Error"];
-            };
-        };
-    };
-    parameters: {
-        SessionId: string;
-        /** @description Unguessable token for guest-owned sessions (ADR-0008). */
-        GuestToken: string;
-    };
+    responses: never;
+    parameters: never;
     requestBodies: never;
     headers: never;
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    health_api_v1_health_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    create_session_api_v1_sessions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session_api_v1_sessions__session_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_turns_api_v1_sessions__session_id__turns_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_turn_api_v1_sessions__session_id__turns_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TurnCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_vitals_api_v1_sessions__session_id__vitals_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VitalsSnapshot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_vitals_event_api_v1_sessions__session_id__vitals_events_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VitalsEventRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VitalsSnapshot"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    post_action_api_v1_sessions__session_id__actions_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExamActionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExamActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+}
