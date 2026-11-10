@@ -8,9 +8,14 @@ never hard-coded. The real provider is import-lazy so CI/tests need no SDK/key.
 from __future__ import annotations
 
 import re
+import time
 from abc import ABC, abstractmethod
 
 from avp_api.config import get_settings
+
+# Retry transient Gemini errors (503 overload, 429 rate limit) a few times.
+_GEMINI_ATTEMPTS = 3
+_GEMINI_BACKOFF_S = 0.8
 
 
 class LLMProvider(ABC):
@@ -78,16 +83,30 @@ class GeminiProvider(LLMProvider):
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
     ) -> str:
         from google import genai
+        from google.genai import errors as genai_errors
         from google.genai import types
 
         client = genai.Client(api_key=self._api_key)
         config = types.GenerateContentConfig(
             system_instruction=system_prompt, temperature=temperature
         )
-        resp = client.models.generate_content(
-            model=self._model, contents=prompt, config=config
-        )
-        return re.sub(r"\s+", " ", (resp.text or "")).strip()
+        last_exc: Exception | None = None
+        for attempt in range(_GEMINI_ATTEMPTS):
+            try:
+                resp = client.models.generate_content(
+                    model=self._model, contents=prompt, config=config
+                )
+                return re.sub(r"\s+", " ", (resp.text or "")).strip()
+            except genai_errors.APIError as exc:
+                # Retry transient overload/rate limit; fail fast on config errors
+                # (bad model id, invalid key).
+                if not (
+                    isinstance(exc, genai_errors.ServerError) or getattr(exc, "code", None) == 429
+                ):
+                    raise
+                last_exc = exc
+                time.sleep(_GEMINI_BACKOFF_S * (attempt + 1))
+        raise last_exc  # type: ignore[misc]
 
 
 def get_llm_provider() -> LLMProvider:
