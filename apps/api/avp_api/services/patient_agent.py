@@ -89,7 +89,10 @@ def verify_patient_reply(reply: str, case: dict, student_text: str) -> tuple[str
 
 def _render_prompt(transcript: list[dict], student_text: str) -> str:
     lines: list[str] = []
-    for t in transcript[-8:]:
+    # System turns (e.g. recorded exam findings) are not the mother's words and
+    # may hold clinical terms; never feed them to her as her own lines.
+    convo = [t for t in transcript if t.get("speaker") in ("student", "patient")]
+    for t in convo[-8:]:
         who = "Bác sĩ" if t.get("speaker") == "student" else "Mẹ"
         lines.append(f"{who}: {t.get('text')}")
     lines.append(f"Bác sĩ: {student_text}")
