@@ -28,7 +28,7 @@ def get_provider() -> LLMProvider:
 
 
 @router.post("/sessions/{session_id}/turns", response_model=TurnResponse)
-async def create_turn(
+def create_turn(
     session_id: str,
     payload: TurnCreate,
     session_repo: SessionRepository = Depends(get_session_repo),
@@ -37,7 +37,7 @@ async def create_turn(
     user_id: str | None = Depends(current_user_id),
     x_guest_token: str | None = Header(default=None),
 ) -> TurnResponse:
-    return await turns_service.submit_turn(
+    return turns_service.submit_turn(
         session_id, payload.text, session_repo, turn_repo, provider, user_id, x_guest_token
     )
 

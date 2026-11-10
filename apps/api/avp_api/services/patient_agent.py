@@ -97,14 +97,14 @@ def _render_prompt(transcript: list[dict], student_text: str) -> str:
     return "\n".join(lines)
 
 
-async def respond(
+def respond(
     case: dict, transcript: list[dict], student_text: str, provider: LLMProvider
 ) -> tuple[str, dict]:
     """Produce the patient reply plus a guardrail record for the turn."""
     system = build_system_prompt(case)
     prompt = _render_prompt(transcript, student_text)
 
-    raw = await provider.generate(prompt=prompt, system_prompt=system)
+    raw = provider.generate(prompt=prompt, system_prompt=system)
     reply, violations = verify_patient_reply(raw, case, student_text)
     guardrail: dict = {"violations": violations, "regenerated": False, "tier3_fallback": False}
 
@@ -114,7 +114,7 @@ async def respond(
             prompt + f"\n[Hệ thống: câu trước vi phạm {violations}. Chỉ trả lời bằng "
             "thông tin trong hồ sơ, không dùng từ cấm, không thêm con số lạ.]"
         )
-        raw2 = await provider.generate(prompt=retry_prompt, system_prompt=system)
+        raw2 = provider.generate(prompt=retry_prompt, system_prompt=system)
         reply2, violations2 = verify_patient_reply(raw2, case, student_text)
         guardrail["regenerated"] = True
         if violations2:

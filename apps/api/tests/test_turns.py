@@ -80,7 +80,7 @@ class _FixedProvider(LLMProvider):
     def __init__(self, text: str) -> None:
         self._text = text
 
-    async def generate(self, prompt, system_prompt=None, temperature=0.2) -> str:
+    def generate(self, prompt, system_prompt=None, temperature=0.2) -> str:
         return self._text
 
 

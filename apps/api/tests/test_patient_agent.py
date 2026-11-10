@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
-
 from avp_api.providers.llm import FakeLLMProvider, LLMProvider
 from avp_api.services import patient_agent
 
@@ -26,7 +24,7 @@ class _FixedProvider(LLMProvider):
     def __init__(self, text: str) -> None:
         self._text = text
 
-    async def generate(self, prompt, system_prompt=None, temperature=0.2) -> str:
+    def generate(self, prompt, system_prompt=None, temperature=0.2) -> str:
         return self._text
 
 
@@ -48,8 +46,8 @@ def test_number_from_student_is_allowed() -> None:
 
 
 def test_forbidden_reply_falls_back_to_tier3() -> None:
-    reply, guardrail = asyncio.run(
-        patient_agent.respond(CASE, [], "con có bị gì", _FixedProvider("Cháu bị độ 2b ạ."))
+    reply, guardrail = patient_agent.respond(
+        CASE, [], "con có bị gì", _FixedProvider("Cháu bị độ 2b ạ.")
     )
     assert "2b" not in reply
     assert guardrail["tier3_fallback"] is True
@@ -57,8 +55,8 @@ def test_forbidden_reply_falls_back_to_tier3() -> None:
 
 
 def test_fake_provider_unknown_question_is_safe() -> None:
-    reply, guardrail = asyncio.run(
-        patient_agent.respond(CASE, [], "cháu có bị tiêu chảy không", FakeLLMProvider())
+    reply, guardrail = patient_agent.respond(
+        CASE, [], "cháu có bị tiêu chảy không", FakeLLMProvider()
     )
     assert reply  # non-empty
     assert guardrail["violations"] == []

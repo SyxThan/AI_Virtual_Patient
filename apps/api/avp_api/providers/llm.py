@@ -15,7 +15,7 @@ from avp_api.config import get_settings
 
 class LLMProvider(ABC):
     @abstractmethod
-    async def generate(
+    def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
     ) -> str: ...
 
@@ -56,7 +56,7 @@ _FAKE_FALLBACK = "Dạ em không rõ ạ, em chưa để ý thấy bác sĩ ơi.
 class FakeLLMProvider(LLMProvider):
     """Offline, deterministic. Matches the student's question against keywords."""
 
-    async def generate(
+    def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
     ) -> str:
         text = prompt.lower()
@@ -74,7 +74,7 @@ class GeminiProvider(LLMProvider):
         self._api_key = api_key
         self._model = model
 
-    async def generate(
+    def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
     ) -> str:
         from google import genai
@@ -84,7 +84,7 @@ class GeminiProvider(LLMProvider):
         config = types.GenerateContentConfig(
             system_instruction=system_prompt, temperature=temperature
         )
-        resp = await client.aio.models.generate_content(
+        resp = client.models.generate_content(
             model=self._model, contents=prompt, config=config
         )
         return re.sub(r"\s+", " ", (resp.text or "")).strip()
