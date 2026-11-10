@@ -43,7 +43,9 @@ function mesh(geo: THREE.BufferGeometry, color: string, pos: [number, number, nu
 
 function collider(regionId: ExamRegionId, radius: number, pos: [number, number, number]) {
   // Invisible to the eye but still hit by the raycaster (opacity 0, visible = true).
+  // Hover raises opacity a little so the student sees what they are about to examine.
   const material = new THREE.MeshBasicMaterial({
+    color: "#22c55e",
     transparent: true,
     opacity: 0,
     depthWrite: false,

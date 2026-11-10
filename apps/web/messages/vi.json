@@ -62,6 +62,28 @@
     "illustrative": "Mô hình minh hoạ",
     "hint": "Kéo để xoay góc nhìn. Mô hình 3D chỉ để minh hoạ, không phải hình ảnh lâm sàng."
   },
+  "exam": {
+    "hintClick": "Bấm vào một vùng cơ thể của bé để khám.",
+    "observe": "Quan sát trẻ nằm yên",
+    "regions": {
+      "palm_hands": "Lòng bàn tay",
+      "feet": "Lòng bàn chân",
+      "mouth_throat": "Miệng - họng",
+      "buttocks_knees": "Mông - đầu gối",
+      "observe_child": "Quan sát toàn trạng"
+    },
+    "panelTitle": "Kết quả khám",
+    "caseAction": "Thao tác",
+    "finding": "Ghi nhận trong hồ sơ",
+    "unknown": "Hồ sơ ca bệnh không có ghi nhận cho vùng này. (Điều này không có nghĩa là bình thường.)",
+    "redFlag": "Dấu hiệu cảnh báo",
+    "illustrative": "Hình minh hoạ — không phải ảnh lâm sàng",
+    "draft": "Nội dung lâm sàng đang ở trạng thái nháp, chưa được bác sĩ thẩm định.",
+    "close": "Đóng",
+    "loading": "Đang khám…",
+    "error": "Không thực hiện được thao tác khám. Vui lòng thử lại.",
+    "systemLabel": "Kết quả khám"
+  },
   "monitor": {
     "title": "Theo dõi sinh hiệu",
     "hr": "Nhịp tim",

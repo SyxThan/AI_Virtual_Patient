@@ -3,12 +3,17 @@
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useState } from "react";
 import vi from "../../../../messages/vi.json";
+import type { ExamRegionId } from "@/components/avatar/AnatomyColliders";
 import AvatarCanvas from "@/components/avatar/AvatarCanvas";
+import ExamFindingPanel, { type ExamActionResponse } from "@/components/avatar/ExamFindingPanel";
+import type { components } from "@/lib/api-client/schema";
 import ChatInput from "@/components/workspace/ChatInput";
 import TranscriptBox, { type Turn } from "@/components/workspace/TranscriptBox";
 import VitalsMonitor from "@/components/workspace/VitalsMonitor";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+type ExamActionRequest = components["schemas"]["ExamActionRequest"];
 
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -17,6 +22,10 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [mode, setMode] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [examOpen, setExamOpen] = useState(false);
+  const [examResult, setExamResult] = useState<ExamActionResponse | null>(null);
+  const [examLoading, setExamLoading] = useState(false);
+  const [examError, setExamError] = useState<string | null>(null);
 
   const authHeaders = useCallback((): Record<string, string> => {
     const h: Record<string, string> = {};
@@ -69,6 +78,35 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     }
   }
 
+  async function handleExam(body: ExamActionRequest) {
+    setExamOpen(true);
+    setExamLoading(true);
+    setExamError(null);
+    setExamResult(null);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/sessions/${id}/actions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...authHeaders() },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error();
+      setExamResult((await res.json()) as ExamActionResponse);
+      // The exam was recorded as transcript turns: reload the canonical transcript.
+      const tRes = await fetch(`${API_URL}/api/v1/sessions/${id}/turns`, {
+        headers: authHeaders(),
+      });
+      if (tRes.ok) setTurns(await tRes.json());
+    } catch {
+      setExamError(vi.exam.error);
+    } finally {
+      setExamLoading(false);
+    }
+  }
+
+  const examineRegion = (region: ExamRegionId) =>
+    handleExam({ action: "examine_region", region });
+  const observeChild = () => handleExam({ action: "observe_child" });
+
   const modeLabel = mode === "exam" ? vi.session.mode.exam : vi.session.mode.guided;
 
   return (
@@ -92,7 +130,11 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       <div className="flex flex-1 overflow-hidden">
         {/* Patient visual area (avatar 3D arrives in a later slice) */}
         <aside className="hidden w-1/3 flex-col gap-4 overflow-y-auto border-r border-gray-200 p-4 md:flex">
-          <AvatarCanvas />
+          <AvatarCanvas
+            onExamineRegion={examineRegion}
+            onObserve={observeChild}
+            busy={examLoading}
+          />
           <VitalsMonitor sessionId={id} />
         </aside>
 
@@ -107,6 +149,14 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           <ChatInput onSend={handleSend} loading={sending} />
         </section>
       </div>
+
+      <ExamFindingPanel
+        open={examOpen}
+        result={examResult}
+        loading={examLoading}
+        error={examError}
+        onClose={() => setExamOpen(false)}
+      />
     </main>
   );
 }
