@@ -24,6 +24,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [turns, setTurns] = useState<Turn[]>([]);
   const [mode, setMode] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [finishing, setFinishing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [examOpen, setExamOpen] = useState(false);
   const [examResult, setExamResult] = useState<ExamActionResponse | null>(null);
@@ -97,6 +98,25 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     }
   }
 
+  // End the interview: the backend completes the session and queues the
+  // evaluation (idempotent), then the debrief page polls for the result.
+  async function handleFinish() {
+    setFinishing(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/sessions/${id}/finish`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error();
+      voice.stop();
+      router.push(`/debrief/${id}`);
+    } catch {
+      setError(vi.session.finishError);
+      setFinishing(false);
+    }
+  }
+
   async function handleExam(body: ExamActionRequest) {
     setExamOpen(true);
     setExamLoading(true);
@@ -139,10 +159,11 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         </div>
         <button
           type="button"
-          onClick={() => router.push(`/debrief/${id}`)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+          onClick={handleFinish}
+          disabled={finishing}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50"
         >
-          {vi.session.finish}
+          {finishing ? vi.session.finishing : vi.session.finish}
         </button>
       </header>
 
