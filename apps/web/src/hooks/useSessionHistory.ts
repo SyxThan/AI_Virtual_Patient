@@ -144,9 +144,30 @@ export function useSessionHistory() {
     setNextCursor(page.data.next_cursor ?? null);
   }, [nextCursor, loadingMore]);
 
+  /** After a successful DELETE: drop the card and refresh progress quietly (Slice 13). */
+  const remove = useCallback(async (sessionId: string) => {
+    const left = items.filter((s) => s.id !== sessionId);
+    if (left.length === 0 && nextCursor) {
+      reload(); // the page emptied but more exist: fetch the next page as the first
+      return;
+    }
+    const run = latest.current;
+    setItems(left);
+    const prog = await getJson<Progress>("sessions/progress");
+    if (run !== latest.current) return;
+    if (prog.kind === "ok") {
+      setProgress(prog.data);
+      setProgressError(false);
+    } else {
+      setProgress(null);
+      setProgressError(true);
+    }
+  }, [items, nextCursor, reload]);
+
   return {
     state,
     items,
+    remove,
     hasMore: nextCursor !== null,
     loadingMore,
     loadMoreError,

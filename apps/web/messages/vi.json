@@ -61,6 +61,106 @@
       "loadError": "Không tải được dữ liệu tiến bộ."
     }
   },
+  "privacy": {
+    "footerLink": "Quyền riêng tư",
+    "title": "Quyền riêng tư và dữ liệu của bạn",
+    "draftBadge": "Bản nháp — chờ nhóm duyệt nội dung pháp lý",
+    "intro": "Trang này mô tả đúng những gì phần mềm hiện đang làm với dữ liệu của bạn. Nội dung pháp lý chính thức sẽ được nhóm duyệt và cập nhật sau.",
+    "sections": [
+      {
+        "heading": "Dữ liệu được lưu",
+        "items": [
+          "Nội dung chữ của buổi hỏi bệnh: câu bạn gõ hoặc câu nói đã được chuyển thành chữ, và câu trả lời của bệnh nhân ảo, theo đúng thứ tự lượt.",
+          "Các thao tác khám bạn thực hiện, kết quả khám tương ứng và trạng thái sinh hiệu của phiên.",
+          "Kết quả chấm Auto-OSCE, bao gồm câu trích nguyên văn từ lời của bạn làm bằng chứng cho từng tiêu chí, và phần phản hồi (debrief).",
+          "Thông tin phiên: ca bệnh, chế độ, vai trò, thời điểm bắt đầu, kết thúc và thời điểm bạn đồng ý.",
+          "Nếu bạn đăng nhập: hồ sơ gồm tên hiển thị (nếu bạn đặt) và vai trò. Email và mật khẩu do dịch vụ đăng nhập Supabase Auth quản lý; bảng hồ sơ của ứng dụng không lưu email.",
+          "Phiên khách: máy chủ chỉ lưu bản băm của mã khách. Bản thân mã khách nằm trong bộ nhớ tạm (sessionStorage) của tab trình duyệt và mất khi đóng tab."
+        ]
+      },
+      {
+        "heading": "Dữ liệu không được lưu",
+        "items": [
+          "Ghi âm giọng nói của bạn không được lưu: âm thanh chỉ được giữ tạm trong bộ nhớ máy chủ trong lúc chuyển thành chữ, sau đó bị bỏ đi, không ghi vào cơ sở dữ liệu hay tệp.",
+          "Âm thanh giọng bệnh nhân ảo được tạo và gửi về trình duyệt của bạn, không được lưu.",
+          "Tệp PDF báo cáo được tạo mỗi lần bạn tải về và không được lưu trên máy chủ. Mã QR trong PDF chỉ chứa đường dẫn tới trang phản hồi; trang đó chỉ mở được với quyền truy cập phiên."
+        ]
+      },
+      {
+        "heading": "Mục đích sử dụng",
+        "items": [
+          "Vận hành buổi luyện tập: bệnh nhân ảo trả lời theo nội dung ca bệnh và lịch sử hội thoại của phiên.",
+          "Chấm điểm Auto-OSCE và tạo phản hồi sau buổi luyện tập. Kết quả chỉ mang tính học tập.",
+          "Nếu bạn đăng nhập: hiển thị lịch sử luyện tập và tiến bộ của bạn."
+        ]
+      },
+      {
+        "heading": "Thời gian lưu",
+        "items": [
+          "Phiên của tài khoản đăng nhập được giữ cho đến khi bạn xoá.",
+          "Phiên khách được xoá bởi tác vụ dọn dẹp khi đã quá một số ngày cấu hình (mặc định đề xuất 30 ngày, con số này đang chờ nhóm quyết định). Tác vụ do người vận hành chạy, chưa chạy tự động, nên dữ liệu có thể còn lâu hơn cho tới lần dọn dẹp kế tiếp."
+        ]
+      },
+      {
+        "heading": "Ai xem được dữ liệu",
+        "items": [
+          "Chỉ chủ phiên xem được phiên qua API: tài khoản sở hữu phiên, hoặc tab trình duyệt đang giữ mã khách của phiên đó. Người khác nhận về \"không tìm thấy\".",
+          "Trình duyệt không truy cập trực tiếp cơ sở dữ liệu; mọi truy cập đi qua máy chủ API của ứng dụng.",
+          "Người vận hành hệ thống có quyền quản trị cơ sở dữ liệu (PostgreSQL trên Supabase) về mặt kỹ thuật vẫn có thể truy cập dữ liệu."
+        ]
+      },
+      {
+        "heading": "Dịch vụ bên ngoài xử lý dữ liệu (khi được bật)",
+        "items": [
+          "Google Gemini: nhận nội dung chữ của buổi hỏi bệnh để tạo câu trả lời của bệnh nhân ảo, chấm điểm và tạo phản hồi.",
+          "Google Cloud Speech-to-Text: nhận đoạn ghi âm của bạn để chuyển thành chữ.",
+          "Google Cloud Text-to-Speech: nhận câu trả lời của bệnh nhân ảo để tạo giọng nói.",
+          "Supabase: đăng nhập (Supabase Auth) và lưu trữ cơ sở dữ liệu.",
+          "Khi các dịch vụ Google chưa được bật, ứng dụng dùng bộ giả lập chạy ngay trên máy chủ và không gửi dữ liệu tới Google."
+        ]
+      },
+      {
+        "heading": "Cách xoá dữ liệu",
+        "items": [
+          "Xoá một phiên: bấm \"Xoá phiên\" trên trang Lịch sử. Phiên khách của tab hiện tại có thể xoá ở mục bên dưới.",
+          "Xoá toàn bộ: vào trang Hồ sơ, mục \"Xoá dữ liệu của tôi\". Mọi phiên và hồ sơ của bạn bị xoá; tài khoản đăng nhập chỉ bị xoá nếu máy chủ đã được cấu hình cho việc này, và kết quả sẽ cho bạn biết rõ.",
+          "Sau khi xoá, nội dung hội thoại, kết quả chấm và phản hồi của phiên bị xoá khỏi cơ sở dữ liệu và không mở lại được. Thao tác này không hoàn tác được."
+        ]
+      }
+    ],
+    "guestTab": {
+      "heading": "Phiên khách trong tab này",
+      "body": "Tab này đang giữ mã truy cập của một phiên khách. Bạn có thể xoá phiên đó ngay bây giờ.",
+      "none": "Tab này không giữ phiên khách nào.",
+      "deleted": "Đã xoá phiên khách của tab này."
+    },
+    "delete": {
+      "button": "Xoá phiên",
+      "dialogTitle": "Xoá phiên luyện tập này?",
+      "dialogBody": "Nội dung hội thoại, kết quả chấm và phản hồi của phiên sẽ bị xoá vĩnh viễn. Không thể hoàn tác.",
+      "confirm": "Xoá vĩnh viễn",
+      "cancel": "Huỷ",
+      "working": "Đang xoá...",
+      "notFound": "Không tìm thấy phiên này (có thể đã bị xoá hoặc bạn không có quyền).",
+      "error": "Không xoá được phiên. Vui lòng thử lại.",
+      "deleted": "Đã xoá phiên."
+    },
+    "deleteMe": {
+      "heading": "Xoá dữ liệu của tôi",
+      "body": "Xoá mọi phiên luyện tập (hội thoại, kết quả chấm, phản hồi) và hồ sơ của bạn. Không thể hoàn tác.",
+      "prompt": "Nhập {word} để xác nhận",
+      "word": "XOÁ",
+      "submit": "Xoá dữ liệu của tôi",
+      "working": "Đang xoá...",
+      "error": "Không xoá được dữ liệu. Vui lòng thử lại.",
+      "done": "Đã xoá {sessions} phiên luyện tập.",
+      "profileDeleted": "Hồ sơ của bạn đã được xoá.",
+      "accountDeleted": "Tài khoản đăng nhập của bạn cũng đã được xoá.",
+      "accountKept": "Tài khoản đăng nhập (email) của bạn vẫn còn trong dịch vụ đăng nhập Supabase Auth, vì máy chủ chưa được cấu hình để xoá tài khoản. Để yêu cầu xoá hẳn tài khoản, hãy liên hệ nhóm phát triển và cho biết email đăng nhập.",
+      "signedOut": "Bạn đã được đăng xuất.",
+      "home": "Về trang chủ"
+    }
+  },
   "home": {
     "start": "Bắt đầu luyện tập"
   },

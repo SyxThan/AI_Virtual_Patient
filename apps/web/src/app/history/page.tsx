@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import vi from "../../../messages/vi.json";
 import ProgressSection from "@/components/history/ProgressSection";
 import SessionCard from "@/components/history/SessionCard";
@@ -26,6 +27,7 @@ const SECONDARY =
 
 export default function HistoryPage() {
   const h = useSessionHistory();
+  const [deletedNotice, setDeletedNotice] = useState(false);
 
   let body: React.ReactNode;
   if (h.state === "loading") {
@@ -70,7 +72,14 @@ export default function HistoryPage() {
         {h.progressError && <p className="text-xs text-gray-600">{vi.history.progress.loadError}</p>}
         <ul className="space-y-3">
           {h.items.map((s) => (
-            <SessionCard key={s.id} session={s} />
+            <SessionCard
+              key={s.id}
+              session={s}
+              onDeleted={() => {
+                setDeletedNotice(true);
+                void h.remove(s.id);
+              }}
+            />
           ))}
         </ul>
         {h.loadMoreError && (
@@ -98,6 +107,9 @@ export default function HistoryPage() {
         <h1 className="text-2xl font-semibold text-gray-900">{vi.history.title}</h1>
         <p className="text-sm text-gray-600">{vi.history.subtitle}</p>
       </header>
+      <p role="status" aria-live="polite" className={deletedNotice ? "text-sm text-green-800" : "sr-only"}>
+        {deletedNotice ? vi.privacy.delete.deleted : ""}
+      </p>
       {body}
     </main>
   );

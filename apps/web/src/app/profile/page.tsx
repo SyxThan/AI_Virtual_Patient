@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { API_URL, authHeaders } from "@/lib/sessionAuth";
+import DeleteMyDataSection, { type DeleteMeResult } from "@/components/privacy/DeleteMyDataSection";
+import { API_URL, authHeaders, fmt } from "@/lib/sessionAuth";
 
 // Local type for GET/PATCH /api/v1/me (the generated client is regenerated separately).
 type Me = { user_id: string; display_name: string | null; role: string; created_at: string };
@@ -12,12 +13,24 @@ type Me = { user_id: string; display_name: string | null; role: string; created_
 const MAX_NAME = 80;
 
 export default function ProfilePage() {
-  const { status, email } = useAuth();
+  const { status, email, signOut } = useAuth();
   const [me, setMe] = useState<Me | null>(null);
   const [name, setName] = useState("");
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [deleted, setDeleted] = useState<DeleteMeResult | null>(null);
+  const [signedOut, setSignedOut] = useState(false);
+
+  async function onDataDeleted(result: DeleteMeResult) {
+    setDeleted(result);
+    try {
+      await signOut();
+      setSignedOut(true);
+    } catch {
+      setSignedOut(false);
+    }
+  }
 
   const load = useCallback(async () => {
     setLoadError(false);
@@ -65,6 +78,27 @@ export default function ProfilePage() {
     }
   }
 
+  if (deleted) {
+    const t = vi.privacy.deleteMe;
+    return (
+      <main className="mx-auto flex max-w-md flex-col gap-4 p-8">
+        <h1 className="text-2xl font-semibold">{t.heading}</h1>
+        <div role="status" className="space-y-2 rounded-md border border-gray-300 bg-gray-50 p-4 text-sm text-gray-900">
+          <p>{fmt(t.done, { sessions: deleted.sessions_deleted })}</p>
+          {deleted.profile_deleted && <p>{t.profileDeleted}</p>}
+          {deleted.account_deleted ? (
+            <p>{t.accountDeleted}</p>
+          ) : (
+            <p className="rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900">{t.accountKept}</p>
+          )}
+          {signedOut && <p>{t.signedOut}</p>}
+        </div>
+        <Link href="/" className="w-fit rounded-md bg-black px-4 py-2 text-white">
+          {t.home}
+        </Link>
+      </main>
+    );
+  }
   if (status === "loading") {
     return <main className="mx-auto max-w-md p-8">{vi.profile.loading}</main>;
   }
@@ -123,6 +157,7 @@ export default function ProfilePage() {
           </button>
         </form>
       )}
+      <DeleteMyDataSection onDone={(r) => void onDataDeleted(r)} />
     </main>
   );
 }
