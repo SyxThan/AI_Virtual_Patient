@@ -36,6 +36,18 @@ class Settings(BaseSettings):
     llm_model_patient: str | None = None
     llm_model_evaluator: str | None = None
 
+    # --- Voice adapters (Slice 6). Unset = offline Fake providers. ---
+    stt_provider: str | None = None  # "google" | unset
+    stt_api_key: str | None = Field(default=None, repr=False)
+    stt_model: str | None = None
+    stt_language: str = "vi-VN"
+    stt_timeout_s: float = 8.0
+    tts_provider: str | None = None  # "google" | unset
+    tts_api_key: str | None = Field(default=None, repr=False)
+    tts_voice_id: str | None = None
+    tts_language: str = "vi-VN"
+    tts_timeout_s: float = 8.0
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
