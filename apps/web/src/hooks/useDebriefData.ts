@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { components } from "@/lib/api-client/schema";
-import { API_URL, authHeaders } from "@/lib/sessionAuth";
+import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 export type Evaluation = components["schemas"]["EvaluationResponse"];
 export type Debrief = components["schemas"]["DebriefResponse"];
@@ -17,6 +17,7 @@ const MAX_POLLS = 120; // ~3 minutes, then ask the user to reload
 type Fetched<T> = { state: LoadState; data: T | null };
 
 async function getJson<T>(path: string): Promise<Fetched<T>> {
+  await whenAuthReady(); // signed-in sessions need the restored bearer token
   const res = await fetch(`${API_URL}/api/v1/sessions/${path}`, { headers: authHeaders() });
   if (res.status === 202) return { state: "pending", data: (await res.json()) as T };
   if (res.status === 404) return { state: "notFound", data: null };

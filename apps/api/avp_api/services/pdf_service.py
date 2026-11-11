@@ -167,11 +167,14 @@ def build_report(
     debrief: DebriefResponse,
     case: dict,
     web_base_url: str,
+    student_name: str | None = None,
 ) -> Report:
     date = (evaluation.created_at or session.created_at).strftime("%d/%m/%Y")
     score = "—" if evaluation.total_score is None else f"{evaluation.total_score:g} / 100"
     info = [
         ("Mã phiên:", session.id),
+        # Profile display name only (never the email); omitted for guests (AVP-108).
+        *([("Học viên:", sanitize(student_name))] if student_name else []),
         ("Ca bệnh:", sanitize(_case_title(case, session.case_id))),
         ("Chế độ:", MODE_VI.get(session.mode, session.mode)),
         ("Ngày thực hiện:", date),
@@ -346,8 +349,9 @@ def generate_debrief_pdf(
     debrief: DebriefResponse,
     case: dict,
     web_base_url: str,
+    student_name: str | None = None,
 ) -> bytes:
-    report = build_report(session, evaluation, debrief, case, web_base_url)
+    report = build_report(session, evaluation, debrief, case, web_base_url, student_name)
     leftover = find_forbidden_wording(report.all_text())
     if leftover:  # fixed strings changed by someone: fail loudly, never print it
         raise ValueError(f"ADR-0010 wording in report: {leftover}")

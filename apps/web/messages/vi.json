@@ -203,5 +203,91 @@
   },
   "common": {
     "placeholder": "Màn hình này sẽ được hoàn thiện ở các task sau."
+  },
+  "nav": {
+    "brand": "Bệnh nhân ảo AI",
+    "start": "Bắt đầu luyện tập",
+    "history": "Lịch sử",
+    "signIn": "Đăng nhập",
+    "account": "Tài khoản",
+    "profile": "Hồ sơ",
+    "signOut": "Đăng xuất",
+    "menuLabel": "Mở menu tài khoản",
+    "footer": "Công cụ luyện tập hỏi bệnh. Phản hồi Auto-OSCE chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên."
+  },
+  "auth": {
+    "title": "Đăng nhập",
+    "signUpTitle": "Tạo tài khoản",
+    "magicTitle": "Đăng nhập bằng liên kết qua email",
+    "forgotTitle": "Quên mật khẩu",
+    "resetTitle": "Đặt mật khẩu mới",
+    "tabs": {
+      "signIn": "Mật khẩu",
+      "magic": "Liên kết qua email",
+      "signUp": "Đăng ký"
+    },
+    "email": "Email",
+    "password": "Mật khẩu",
+    "newPassword": "Mật khẩu mới",
+    "passwordHint": "Tối thiểu 8 ký tự.",
+    "submitSignIn": "Đăng nhập",
+    "submitSignUp": "Tạo tài khoản",
+    "submitMagic": "Gửi liên kết đăng nhập",
+    "submitForgot": "Gửi email đặt lại mật khẩu",
+    "submitReset": "Lưu mật khẩu mới",
+    "working": "Đang xử lý...",
+    "forgotLink": "Quên mật khẩu?",
+    "backToSignIn": "Quay lại đăng nhập",
+    "guest": "Luyện tập không cần tài khoản",
+    "guestHint": "Phiên khách chỉ lưu trong tab này. Đăng nhập để giữ kết quả và xem lịch sử.",
+    "unavailable": "Đăng nhập hiện chưa được cấu hình. Bạn vẫn có thể luyện tập không cần tài khoản.",
+    "signedInAs": "Bạn đang đăng nhập với {email}.",
+    "sent": {
+      "magic": "Đã gửi liên kết đăng nhập. Hãy mở email và bấm vào liên kết.",
+      "signUp": "Đã tạo tài khoản. Hãy mở email để xác nhận trước khi đăng nhập.",
+      "forgot": "Nếu email này có tài khoản, bạn sẽ nhận được liên kết đặt lại mật khẩu.",
+      "reset": "Đã đổi mật khẩu."
+    },
+    "errors": {
+      "invalidCredentials": "Email hoặc mật khẩu không đúng.",
+      "emailNotConfirmed": "Email chưa được xác nhận. Hãy mở email xác nhận trước.",
+      "userExists": "Email này đã có tài khoản. Hãy đăng nhập.",
+      "weakPassword": "Mật khẩu quá yếu. Hãy dùng ít nhất 8 ký tự.",
+      "rateLimited": "Bạn thao tác quá nhanh. Vui lòng đợi một lát rồi thử lại.",
+      "missingEmail": "Vui lòng nhập email.",
+      "generic": "Không thực hiện được. Vui lòng thử lại."
+    },
+    "callback": {
+      "working": "Đang hoàn tất đăng nhập...",
+      "failed": "Liên kết không hợp lệ hoặc đã hết hạn.",
+      "back": "Về trang đăng nhập"
+    },
+    "claim": {
+      "prompt": "Bạn có một phiên luyện tập khách trong tab này. Lưu phiên đó vào tài khoản để xem lại sau?",
+      "accept": "Lưu vào tài khoản",
+      "dismiss": "Bỏ qua",
+      "working": "Đang lưu...",
+      "done": "Đã lưu phiên vào tài khoản.",
+      "failed": "Không lưu được phiên này (phiên không còn hợp lệ hoặc đã thuộc tài khoản khác)."
+    },
+    "setupGuest": "Bạn đang luyện tập không cần tài khoản; kết quả chỉ giữ trong tab này.",
+    "setupSignIn": "Đăng nhập để lưu kết quả",
+    "setupSignedIn": "Phiên này sẽ được lưu vào tài khoản của bạn."
+  },
+  "profile": {
+    "title": "Hồ sơ",
+    "email": "Email",
+    "displayName": "Tên hiển thị",
+    "displayNameHint": "Tối đa 80 ký tự. Tên này được in trên báo cáo PDF; email không bao giờ được in.",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "saved": "Đã lưu.",
+    "loading": "Đang tải hồ sơ...",
+    "loadError": "Không tải được hồ sơ. Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "saveError": "Không lưu được. Vui lòng thử lại.",
+    "tooLong": "Tên hiển thị tối đa 80 ký tự.",
+    "signInRequired": "Bạn cần đăng nhập để xem hồ sơ.",
+    "signInLink": "Đăng nhập"
   }
 }

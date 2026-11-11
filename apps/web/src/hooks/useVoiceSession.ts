@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import vi from "../../messages/vi.json";
+import { API_URL, whenAuthReady, wsAuthMessage } from "@/lib/sessionAuth";
 
 /**
  * Push-to-talk voice loop over `/ws/sessions/{id}` (Slice 6-02).
  *
- * Protocol: first message is `{type:"auth", token}` (never in the URL), then binary
+ * Protocol: first message is `{type:"auth", access_token}` when signed in or
+ * `{type:"auth", token}` for a guest (never in the URL), then binary
  * `audio/webm;codecs=opus` chunks, then `{type:"end"}`. The server replies with
  * transcript / audio / timing / error events. Any voice failure leaves the socket
  * (and the text chat) usable. Playback goes through an AnalyserNode that is exposed
@@ -23,7 +25,6 @@ type ServerEvent =
   | { type: "timing"; stt_ms: number | null; llm_ms: number | null; tts_ms: number | null }
   | { type: "error"; code: string; message: string };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const MIME = "audio/webm;codecs=opus";
 const CHUNK_MS = 250;
 
@@ -31,14 +32,6 @@ function wsBaseUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_WS_URL;
   if (explicit) return explicit.replace(/\/$/, "");
   return API_URL.replace(/\/$/, "").replace(/^http(s?):/, (_m, s: string) => `ws${s}:`);
-}
-
-function guestToken(): string | null {
-  try {
-    return sessionStorage.getItem("avp_guest_token");
-  } catch {
-    return null;
-  }
 }
 
 // Server error code -> [message, blocking?]. Non-blocking codes are notices: the
@@ -132,7 +125,9 @@ export function useVoiceSession({
     wsRef.current = ws;
     const ready = new Promise<WebSocket>((resolve, reject) => {
       let isReady = false;
-      ws.onopen = () => ws.send(JSON.stringify({ type: "auth", token: guestToken() ?? "" }));
+      ws.onopen = () => {
+        void whenAuthReady().then(() => ws.send(JSON.stringify(wsAuthMessage())));
+      };
       ws.onmessage = (m) => {
         if (typeof m.data !== "string") return;
         let ev: ServerEvent;

@@ -8,6 +8,8 @@ evaluation and the debrief `done`. Sync `def` routes.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.responses import JSONResponse, Response
 
@@ -19,7 +21,13 @@ from avp_api.db.repositories.job_repo import JobRepository, SqlJobRepository
 from avp_api.db.repositories.session_repo import SessionRepository, SqlSessionRepository
 from avp_api.db.session import get_db
 from avp_api.schemas.debrief import DebriefResponse
-from avp_api.services import debrief_service, evaluation_service, pdf_service, session_service
+from avp_api.services import (
+    debrief_service,
+    evaluation_service,
+    pdf_service,
+    profile_service,
+    session_service,
+)
 
 router = APIRouter(tags=["debrief"])
 
@@ -38,6 +46,11 @@ def get_debrief_repo(db=Depends(get_db)) -> DebriefRepository:
 
 def get_job_repo(db=Depends(get_db)) -> JobRepository:
     return SqlJobRepository(db)
+
+
+def get_display_name_lookup() -> Callable[[str | None], str | None]:
+    # Lazy: opens the DB only for a signed-in owner (guests never query profiles).
+    return profile_service.display_name_from_db
 
 
 @router.get(
@@ -79,6 +92,7 @@ def get_debrief_pdf(
     job_repo: JobRepository = Depends(get_job_repo),
     user_id: str | None = Depends(current_user_id),
     x_guest_token: str | None = Header(default=None),
+    display_name_lookup: Callable[[str | None], str | None] = Depends(get_display_name_lookup),
 ):
     sess = session_service.get_session(session_id, session_repo, user_id, x_guest_token)
     evaluation = evaluation_service.get_evaluation(
@@ -96,8 +110,11 @@ def get_debrief_pdf(
             detail={"code": "REPORT_UNAVAILABLE", "message": "Evaluation or debrief failed."},
         )
     case = session_repo.get_case_content(sess.case_id, sess.case_version) or {}
+    # The ownership check above passed, so a non-None caller is the session owner
+    # (a signed-in user opening an unclaimed guest session is not: print no name).
+    owner_id = user_id if session_repo.get(session_id).user_id == user_id else None
     pdf = pdf_service.generate_debrief_pdf(
-        sess, evaluation, debrief, case, get_settings().web_base_url
+        sess, evaluation, debrief, case, get_settings().web_base_url, display_name_lookup(owner_id)
     )
     filename = f"avp-practice-report-{session_id[:8]}.pdf"
     return Response(

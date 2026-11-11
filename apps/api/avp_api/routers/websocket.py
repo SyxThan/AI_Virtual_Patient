@@ -1,7 +1,8 @@
 """Voice/text turn loop over WebSocket: /ws/sessions/{session_id} (Slice 6-02).
 
 Protocol (docs/specs/openapi.yaml x-websocket, voice-pipeline skill):
-  client -> {"type": "auth", "token": "<guest token>"}          (first message; never in URL)
+  client -> {"type": "auth", "access_token": "<Supabase JWT>"}  (signed in) or
+            {"type": "auth", "token": "<guest token>"}          (guest; first message, never URL)
   server -> {"type": "ready"}
   client -> binary audio chunks (audio/webm;codecs=opus) ... then {"type": "end"}
             or {"type": "text", "text": "..."} for a typed turn,
@@ -30,6 +31,7 @@ from contextlib import AbstractContextManager, contextmanager
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from fastapi.concurrency import run_in_threadpool
 
+from avp_api.auth import TokenVerifier, get_verifier
 from avp_api.config import get_settings
 from avp_api.db.repositories.session_repo import SessionRepository, SqlSessionRepository
 from avp_api.db.repositories.turn_repo import SqlTurnRepository, TurnRepository
@@ -106,39 +108,48 @@ async def voice_session(
     llm: LLMProvider = Depends(get_ws_llm),
     stt: STTProvider = Depends(get_ws_stt),
     tts: TTSProvider = Depends(get_ws_tts),
+    verifier: TokenVerifier = Depends(get_verifier),
 ) -> None:
     if not _origin_allowed(ws):
         await ws.close(code=status.WS_1008_POLICY_VIOLATION)
         return
     await ws.accept()
 
-    # --- auth: first message, guest-token ownership via session_service ---
+    # --- auth: first message; JWT (ADR-0008) or guest token, then the shared
+    # ownership check in session_service (a foreign session is refused like a miss).
+    user_id: str | None = None
+    guest_token: str | None = None
     try:
         first = await asyncio.wait_for(ws.receive_json(), timeout=AUTH_TIMEOUT_S)
-        token = first.get("token") if isinstance(first, dict) else None
-        if not isinstance(first, dict) or first.get("type") != "auth" or not token:
+        if not isinstance(first, dict) or first.get("type") != "auth":
             raise ValueError("bad auth message")
-        # TODO(security): bearer JWTs once ADR-0008 JWKS verification lands; today the
-        # guest-token path is the working one (UnconfiguredVerifier refuses bearers).
+        access_token, token = first.get("access_token"), first.get("token")
+        if isinstance(access_token, str) and access_token:
+            user_id = await run_in_threadpool(verifier.verify, access_token)
+            # An unclaimed guest session stays reachable with its guest token too.
+            guest_token = str(token) if isinstance(token, str) and token else None
+        elif isinstance(token, str) and token:
+            guest_token = token
+        else:
+            raise ValueError("bad auth message")
 
         def _check() -> None:
             with repo_factory() as (session_repo, _):
-                session_service.get_session(session_id, session_repo, None, str(token))
+                session_service.get_session(session_id, session_repo, user_id, guest_token)
 
         await run_in_threadpool(_check)
     except WebSocketDisconnect:
         return
-    except Exception:  # noqa: BLE001 - timeout, bad JSON, 404 ownership miss: all refused
-        await ws.close(code=status.WS_1008_POLICY_VIOLATION)
+    except Exception:  # noqa: BLE001 - timeout, bad JSON, bad JWT, 404 miss: all refused
+        await ws.close(code=status.WS_1008_POLICY_VIOLATION)  # never echo the token
         return
-    guest_token = str(token)
     await ws.send_json({"type": "ready"})
 
     async def run_turn(text: str, stt_ms: int | None) -> None:
         def _submit():
             with repo_factory() as (session_repo, turn_repo):
                 return turns_service.submit_turn(
-                    session_id, text, session_repo, turn_repo, llm, None, guest_token
+                    session_id, text, session_repo, turn_repo, llm, user_id, guest_token
                 )
 
         t0 = time.perf_counter()

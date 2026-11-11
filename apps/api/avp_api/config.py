@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     # --- Data access (ADR-0007). Optional until AVP-007/AVP-034. ---
     database_url: str | None = None
     supabase_url: str | None = None
+    # --- Auth (ADR-0008, AVP-106). Public JWKS only; no Supabase secret is needed. ---
+    supabase_jwt_audience: str = "authenticated"
+    jwks_cache_ttl_s: float = 600.0
 
     # --- Provider adapters (ADR-0006). Optional until the agents land. ---
     llm_provider: str | None = None
