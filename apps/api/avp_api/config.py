@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     llm_api_key: str | None = Field(default=None, repr=False)
     llm_model_patient: str | None = None
     llm_model_evaluator: str | None = None
+    # RAG embeddings (Slice 8, AVP-018). Changing the model means re-ingesting the
+    # corpus: chunks are stored with the model id and only same-model chunks match.
+    embedding_model: str | None = None
 
     # --- Voice adapters (Slice 6). Unset = offline Fake providers. ---
     stt_provider: str | None = None  # "google" | unset

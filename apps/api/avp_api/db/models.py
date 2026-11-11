@@ -236,6 +236,17 @@ class SourceDocument(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
+    # 0002 (AVP-018): stable key for idempotent ingest, clinician review status of
+    # the (summarised) text, and a hash of the ingested content + embedding model.
+    source_key: Mapped[str | None] = mapped_column(Text, unique=True)
+    review_status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'draft'"))
+    content_hash: Mapped[str | None] = mapped_column(Text)
+    __table_args__ = (
+        CheckConstraint(
+            "review_status in ('draft', 'clinician_reviewed')",
+            name="source_documents_review_status_check",
+        ),
+    )
 
 
 class SourceChunk(Base):
@@ -250,7 +261,17 @@ class SourceChunk(Base):
     text: Mapped[str] = mapped_column(Text, nullable=False)
     # Dimension is fixed by the embedding model chosen in AVP-018.
     embedding: Mapped[list[float] | None] = mapped_column(Vector(768))
-    __table_args__ = (UniqueConstraint("document_id", "chunk_index", name="source_chunks_unique"),)
+    # 0002: the model that produced `embedding`; retrieval compares same-model vectors only.
+    embedding_model: Mapped[str | None] = mapped_column(Text)
+    __table_args__ = (
+        UniqueConstraint("document_id", "chunk_index", name="source_chunks_unique"),
+        Index(
+            "source_chunks_embedding_hnsw_idx",
+            "embedding",
+            postgresql_using="hnsw",
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
+    )
 
 
 class Job(Base):

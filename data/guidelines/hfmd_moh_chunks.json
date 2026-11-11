@@ -1,0 +1,85 @@
+{
+  "corpus": "hfmd-guidelines",
+  "corpus_version": 1,
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (Slice 8, AVP-017/018). Every chunk is an author-written Vietnamese SUMMARY (origin: author_added), NOT a verbatim excerpt; no clinician has compared it with the original documents yet. The API returns review_status=draft with every citation and the UI must show it as unverified.",
+      "TODO(clinician): compare each MOH chunk word for word with Quyết định 1003/QĐ-BYT (2012), correct any wording or threshold, and add the page number to `section` (page numbers are left out on purpose rather than guessed).",
+      "TODO(clinician): the Slice 8 brief summarised grade 2a as 'sốt > 39°C kéo dài > 2 ngày' and grade 2b as 'mạch > 150 l/p'. The chunks below instead follow the author's reading of the guideline ('sốt trên 2 ngày, HOẶC sốt trên 39°C'; 2b group 1 pulse > 130, group 2 pulse > 150). Confirm which is right.",
+      "TODO(clinician): grade 2b drug doses (phenobarbital IV, IVIG) are deliberately omitted; add them only from the original text.",
+      "The BV Bệnh Nhiệt đới 2023 chunks are restatements of content already in data/cases/case-01-hfmd.json (which cites that document, Bài 20); the original book was not available in this repository when they were written.",
+      "rights_checked=true for both documents was set on the project owner's instruction in the Slice 8 brief (2026-11-11). Record both sources in the proposal's IP section."
+    ]
+  },
+  "documents": [
+    {
+      "source_key": "moh-qd-1003-2012",
+      "title": "Hướng dẫn chẩn đoán, điều trị bệnh Tay - Chân - Miệng (Quyết định 1003/QĐ-BYT)",
+      "publisher": "Bộ Y tế",
+      "year": 2012,
+      "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
+      "rights_checked": true,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "Chẩn đoán - Triệu chứng lâm sàng",
+          "text": "Tóm tắt: bệnh Tay - Chân - Miệng thường gặp ở trẻ nhỏ, khởi phát với sốt nhẹ, mệt mỏi, đau họng, biếng ăn. Đặc trưng là loét miệng (vết loét đỏ hay phỏng nước nhỏ ở niêm mạc miệng, lợi, lưỡi) khiến trẻ đau, chảy nước bọt, bỏ ăn; và phát ban dạng phỏng nước ở lòng bàn tay, lòng bàn chân, gối, mông."
+        },
+        {
+          "section": "Phân độ lâm sàng - Độ 1",
+          "text": "Tóm tắt: Độ 1 khi trẻ chỉ có loét miệng và/hoặc tổn thương da (phát ban phỏng nước), chưa có dấu hiệu thần kinh, tim mạch hay hô hấp."
+        },
+        {
+          "section": "Phân độ lâm sàng - Độ 2a",
+          "text": "Tóm tắt: Độ 2a khi có một trong các dấu hiệu: bệnh sử có giật mình dưới 2 lần trong 30 phút và không ghi nhận giật mình lúc khám; sốt trên 2 ngày, hoặc sốt trên 39°C; nôn; lừ đừ; khó ngủ; quấy khóc vô cớ."
+        },
+        {
+          "section": "Phân độ lâm sàng - Độ 2b",
+          "text": "Tóm tắt: Độ 2b nhóm 1 khi ghi nhận giật mình lúc khám, hoặc bệnh sử giật mình từ 2 lần trở lên trong 30 phút, hoặc giật mình kèm ngủ gà hay mạch nhanh trên 130 lần/phút khi trẻ nằm yên, không sốt. Độ 2b nhóm 2 khi có sốt cao từ 39,5°C không đáp ứng thuốc hạ sốt, mạch nhanh trên 150 lần/phút, thất điều, rung giật nhãn cầu, lác mắt, yếu hoặc liệt chi, liệt thần kinh sọ."
+        },
+        {
+          "section": "Điều trị - Nguyên tắc chung",
+          "text": "Tóm tắt: hiện chưa có thuốc điều trị đặc hiệu, chủ yếu điều trị hỗ trợ. Theo dõi sát để phát hiện sớm và xử trí biến chứng; bảo đảm dinh dưỡng, nghỉ ngơi. Không dùng kháng sinh khi không có bằng chứng bội nhiễm. Không dùng corticoid."
+        },
+        {
+          "section": "Điều trị - Độ 1",
+          "text": "Tóm tắt: Độ 1 điều trị ngoại trú và theo dõi tại cơ sở y tế; hạ sốt bằng paracetamol khi sốt cao; vệ sinh răng miệng, dinh dưỡng đầy đủ; tái khám định kỳ. Dặn thân nhân đưa trẻ đi khám lại ngay khi có dấu hiệu nặng: sốt cao khó hạ, giật mình, đi loạng choạng, run chi, li bì, nôn nhiều, thở nhanh hoặc khó thở, da nổi vân tím."
+        },
+        {
+          "section": "Điều trị - Độ 2a",
+          "text": "Tóm tắt: Độ 2a điều trị nội trú (nhập viện theo dõi). Phenobarbital uống 5-7 mg/kg/ngày. Hạ sốt khi sốt cao bằng paracetamol 10-15 mg/kg/lần; nếu sốt không hạ có thể phối hợp ibuprofen. Theo dõi sát mạch, nhiệt độ, tri giác và số lần giật mình để phát hiện sớm chuyển độ nặng hơn."
+        },
+        {
+          "section": "Điều trị - Độ 2b",
+          "text": "Tóm tắt: Độ 2b điều trị tại phòng cấp cứu hoặc hồi sức; nằm đầu cao, thở oxy, theo dõi liên tục mạch, nhịp thở, huyết áp, SpO2 và tri giác. Thuốc và liều cho độ 2b theo văn bản gốc (chưa đưa vào bản tóm tắt này)."
+        }
+      ]
+    },
+    {
+      "source_key": "htd-hcm-2023-bai20",
+      "title": "Hướng dẫn chẩn đoán và điều trị 2023 - BV Bệnh Nhiệt đới TP.HCM (Bài 20: Bệnh Tay - Chân - Miệng)",
+      "publisher": "Bệnh viện Bệnh Nhiệt đới TP.HCM",
+      "year": 2023,
+      "license_note": "Tài liệu chuyên môn của bệnh viện; dùng trích dẫn cho mục đích đào tạo, cần ghi nguồn",
+      "rights_checked": true,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "Bài 20 - Chẩn đoán phân biệt",
+          "text": "Tóm tắt: cần phân biệt bệnh Tay - Chân - Miệng với thủy đậu, loét miệng aphthe, sốt phát ban dị ứng, viêm da mủ và viêm màng não mủ."
+        },
+        {
+          "section": "Bài 20 - Cận lâm sàng, tránh lạm dụng",
+          "text": "Tóm tắt: ở độ 1 hoặc 2a không chỉ định chọc dò tủy sống vì chưa có tổn thương viêm não - màng não sâu, và không chụp CT sọ não khi trẻ chỉ giật mình nhẹ, chưa có dấu hiệu thần kinh khu trú."
+        },
+        {
+          "section": "Bài 20 - Theo dõi và tư vấn",
+          "text": "Tóm tắt: ca có dấu hiệu cảnh báo cần nhập viện theo dõi sát mạch, tri giác và cơn giật mình; ca nhẹ theo dõi tại nhà, cách ly, vệ sinh tay. Tư vấn thân nhân các dấu hiệu nặng cần tái khám hoặc cấp cứu ngay: sốt cao khó hạ, giật mình nhiều, run chi, yếu liệt, thở bất thường, da nổi vân tím."
+        }
+      ]
+    }
+  ]
+}
