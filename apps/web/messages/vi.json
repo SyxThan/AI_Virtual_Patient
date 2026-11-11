@@ -347,5 +347,177 @@
     "tooLong": "Tên hiển thị tối đa 80 ký tự.",
     "signInRequired": "Bạn cần đăng nhập để xem hồ sơ.",
     "signInLink": "Đăng nhập"
+  },
+  "landing": {
+    "eyebrow": "Mô phỏng hỏi bệnh Nhi khoa bằng tiếng Việt",
+    "title": "Luyện hỏi bệnh với bệnh nhân ảo, nhận phản hồi theo bảng kiểm OSCE",
+    "lead": "Bạn hỏi bệnh người mẹ đang bế bé bằng giọng nói hoặc gõ chữ, khám trên mô hình 3D, theo dõi sinh hiệu, rồi nhận phản hồi học tập có dẫn chứng từ chính lời bạn nói.",
+    "ctaStart": "Bắt đầu luyện tập",
+    "ctaHistory": "Xem lịch sử luyện tập",
+    "caseLabel": "Ca hiện có",
+    "stepsTitle": "Cách hoạt động",
+    "steps": [
+      {
+        "title": "Chuẩn bị",
+        "body": "Chọn ca bệnh, vai trò và chế độ Luyện tập hoặc Thi thử, rồi đồng ý điều khoản lưu trữ."
+      },
+      {
+        "title": "Khám",
+        "body": "Hỏi bệnh người mẹ, khám các vùng trên mô hình 3D, đo sinh hiệu và xử trí ban đầu."
+      },
+      {
+        "title": "Phản hồi",
+        "body": "Kết thúc buổi khám để nhận điểm Auto-OSCE, kèm câu nói nguyên văn làm bằng chứng và trích dẫn tài liệu hướng dẫn."
+      }
+    ],
+    "requirementsTitle": "Yêu cầu thiết bị",
+    "requirements": [
+      "Trình duyệt mới có hỗ trợ WebGL (Chrome, Edge, Firefox hoặc Safari) để hiển thị mô hình 3D.",
+      "Micro là tùy chọn: nếu không có micro hoặc không cấp quyền, bạn vẫn hỏi bệnh bằng cách gõ chữ.",
+      "Kết nối Internet ổn định. Nên dùng máy tính hoặc máy tính bảng để có không gian khám rộng hơn."
+    ],
+    "draftTitle": "Nội dung lâm sàng đang chờ bác sĩ duyệt",
+    "draftBody": "Ca bệnh, sinh hiệu và bảng kiểm hiện là bản nháp do nhóm phát triển biên soạn, chưa được bác sĩ thẩm định. Không dùng để ra quyết định lâm sàng.",
+    "practiceTitle": "Chỉ là phản hồi luyện tập",
+    "practiceBody": "Điểm Auto-OSCE và nhận xét chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên.",
+    "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn"
+  },
+  "errors": {
+    "notFoundTitle": "Không tìm thấy trang",
+    "notFoundBody": "Đường dẫn này không tồn tại hoặc đã được thay đổi.",
+    "home": "Về trang chủ",
+    "start": "Bắt đầu luyện tập",
+    "errorTitle": "Đã có lỗi xảy ra",
+    "errorBody": "Trang gặp sự cố ngoài dự kiến. Bạn có thể thử lại; nếu vẫn lỗi, hãy tải lại trang.",
+    "retry": "Thử lại",
+    "errorRef": "Mã tham chiếu: {digest}",
+    "loading": "Đang tải…"
+  },
+  "workspace": {
+    "pageTitle": "Phòng khám",
+    "loading": "Đang tải phòng khám…",
+    "notFound": "Không tìm thấy phiên khám này, hoặc bạn không có quyền mở (hãy dùng cùng trình duyệt đã tạo phiên).",
+    "loadError": "Không tải được phiên khám. Kiểm tra kết nối rồi thử lại.",
+    "retryLoad": "Thử lại",
+    "backToSetup": "Tạo phiên mới",
+    "redirecting": "Buổi khám đã kết thúc. Đang chuyển sang trang phản hồi…",
+    "waiting": "Người mẹ đang trả lời…",
+    "notSent": "Chưa gửi được",
+    "resend": "Gửi lại",
+    "discard": "Bỏ câu này",
+    "inputLabel": "Câu hỏi cho người mẹ",
+    "inputDisabledTimeUp": "Đã hết thời gian, không thể hỏi thêm.",
+    "help": "Hướng dẫn",
+    "errors": {
+      "timeout": "Người mẹ chưa trả lời kịp (quá thời gian chờ). Câu hỏi chưa được ghi nhận, bạn hãy gửi lại.",
+      "unavailable": "Người bệnh tạm thời không phản hồi được. Câu hỏi chưa được ghi nhận, bạn hãy gửi lại.",
+      "network": "Không kết nối được máy chủ. Câu hỏi chưa được ghi nhận; kiểm tra mạng rồi gửi lại.",
+      "tooLong": "Câu hỏi quá dài (tối đa 2000 ký tự). Hãy rút gọn rồi gửi lại.",
+      "timeUp": "Đã hết thời gian thi thử, không thể hỏi thêm.",
+      "finished": "Buổi khám đã kết thúc, không thể hỏi thêm."
+    },
+    "timer": {
+      "elapsed": "Thời gian khám",
+      "remaining": "Thời gian còn lại",
+      "warn5": "Còn 5 phút.",
+      "warn1": "Còn 1 phút.",
+      "timeUpTitle": "Đã hết thời gian thi thử",
+      "timeUpBody": "Bạn không thể hỏi thêm. Hãy kết thúc buổi khám để nhận phản hồi."
+    },
+    "finish": {
+      "title": "Kết thúc buổi khám?",
+      "body": "Sau khi kết thúc, bạn sẽ không thể hỏi thêm hay khám thêm. Hệ thống sẽ chấm điểm dựa trên những gì đã diễn ra trong buổi khám.",
+      "turns": "Hội thoại hiện có {n} lượt.",
+      "confirm": "Kết thúc và xem phản hồi",
+      "cancel": "Tiếp tục khám"
+    },
+    "mic": {
+      "deniedTitle": "Micro đang bị chặn",
+      "deniedSteps": [
+        "Bấm biểu tượng ổ khoá hoặc micro ở cạnh thanh địa chỉ của trình duyệt.",
+        "Chọn Cho phép (Allow) cho Micro, rồi tải lại trang.",
+        "Trong lúc đó, bạn cứ gõ câu hỏi ở ô bên dưới."
+      ],
+      "unsupportedTitle": "Trình duyệt không hỗ trợ ghi âm",
+      "unsupportedBody": "Hãy dùng Chrome, Edge hoặc Firefox bản mới để nói, hoặc gõ câu hỏi ở ô bên dưới.",
+      "textMode": "Đã chuyển sang chế độ nhập chữ."
+    },
+    "voice": {
+      "reconnecting": "Mất kết nối giọng nói, đang kết nối lại (lần {n}/{max})…",
+      "gaveUp": "Không kết nối lại được giọng nói. Bạn hãy dùng ô nhập chữ bên dưới.",
+      "retryVoice": "Thử kết nối giọng nói lại",
+      "timeout": "Người mẹ chưa trả lời kịp qua giọng nói. Bạn hãy nói lại hoặc gõ câu hỏi.",
+      "timeUp": "Đã hết thời gian thi thử, không thể hỏi thêm.",
+      "finished": "Buổi khám đã kết thúc."
+    },
+    "regions": {
+      "patient": "Bệnh nhân và sinh hiệu",
+      "chat": "Hội thoại với người mẹ",
+      "transcript": "Nội dung hội thoại"
+    }
+  },
+  "guide": {
+    "title": "Nhắc việc khi hỏi bệnh",
+    "subtitle": "Dựa trên các tiêu chí của bảng kiểm. Bạn tự đánh dấu; hệ thống không chấm điểm ở đây.",
+    "draft": "Câu chữ lấy từ bảng kiểm bản nháp, đang chờ bác sĩ duyệt.",
+    "progress": "Đã đánh dấu {done}/{total}",
+    "loadError": "Không tải được danh sách nhắc việc.",
+    "retry": "Thử lại",
+    "empty": "Ca bệnh chưa có tiêu chí nhắc việc.",
+    "domains": {
+      "history": "Bệnh sử",
+      "epidemiology": "Dịch tễ",
+      "physical_exam": "Khám thực thể",
+      "investigations": "Cận lâm sàng",
+      "diagnosis": "Chẩn đoán",
+      "management": "Xử trí",
+      "communication": "Giao tiếp"
+    }
+  },
+  "onboarding": {
+    "title": "Hướng dẫn nhanh",
+    "stepOf": "Bước {n}/{total}",
+    "steps": [
+      {
+        "title": "Hỏi bệnh",
+        "body": "Giữ nút “Giữ để nói” (hoặc phím Space) rồi nói, hoặc gõ câu hỏi vào ô nhập chữ. Người mẹ chỉ trả lời theo hồ sơ ca bệnh."
+      },
+      {
+        "title": "Khám trên avatar",
+        "body": "Bấm vào một vùng cơ thể của bé trên mô hình 3D, hoặc dùng các nút khám ngay dưới mô hình, để xem ghi nhận khám."
+      },
+      {
+        "title": "Sinh hiệu",
+        "body": "Màn hình theo dõi hiển thị nhịp tim, nhiệt độ, nhịp thở, huyết áp và SpO₂. Bấm “Đo sinh hiệu” để cập nhật; can thiệp của bạn có thể làm sinh hiệu thay đổi."
+      },
+      {
+        "title": "Kết thúc",
+        "body": "Khi đã hỏi và khám xong, bấm “Kết thúc buổi khám”. Sau đó bạn không hỏi thêm được; hệ thống chấm điểm và tạo phản hồi luyện tập."
+      }
+    ],
+    "next": "Tiếp",
+    "back": "Quay lại",
+    "skip": "Bỏ qua",
+    "done": "Bắt đầu khám"
+  },
+  "a11y": {
+    "skipToContent": "Bỏ qua đến nội dung chính",
+    "openMenu": "Mở menu điều hướng",
+    "closeMenu": "Đóng menu điều hướng",
+    "mainNav": "Điều hướng chính",
+    "close": "Đóng",
+    "vitalsAlert": "Cảnh báo sinh hiệu: {alerts}",
+    "hrHigh": "Nhịp tim nhanh",
+    "spo2Low": "SpO₂ thấp",
+    "examButtons": "Khám bằng nút (dùng được với bàn phím)"
+  },
+  "setupUx": {
+    "guidedDesc": "Hiện danh sách nhắc việc dựa trên bảng kiểm (bạn tự đánh dấu) và đồng hồ đếm thời gian khám.",
+    "examDesc": "Ẩn nhắc việc, mô phỏng một trạm OSCE. Nếu có cấu hình giới hạn thời gian, đồng hồ sẽ đếm ngược.",
+    "privacyLink": "Xem chính sách quyền riêng tư",
+    "consentHint": "Bạn cần đồng ý để bắt đầu buổi khám."
+  },
+  "debriefUx": {
+    "reviewTranscript": "Xem lại transcript"
   }
 }
