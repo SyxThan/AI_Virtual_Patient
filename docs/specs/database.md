@@ -86,6 +86,8 @@ Not in the database: evaluation results used as proposal evidence. Those stay as
 - Alembic in `apps/api/alembic`, one migration per change, hand-reviewed after `--autogenerate`. Each new table's migration also enables RLS and revokes `anon`/`authenticated`.
 - Naming: tables plural snake_case; ids `uuid` (`gen_random_uuid()`) except high-volume append tables that use `bigint generated always as identity`; all timestamps `timestamptz`.
 - `make load-cases` is idempotent: it hashes each `data/cases/*.json`; when the hash changes it, in one transaction, sets the old version `is_active = false` and inserts the new version (the unique index allows only one active version per case). Old versions stay because sessions point to them.
+- `0002` (AVP-018) adds `source_documents.source_key` (unique), `review_status` (`draft` | `clinician_reviewed`), `content_hash`, `source_chunks.embedding_model`, and an HNSW `vector_cosine_ops` index on `source_chunks.embedding`. `schema.sql` describes 0001 only.
+- `python scripts/ingest_guidelines.py` is idempotent: it upserts by `source_key`, skips a document whose text + metadata + embedding model hash is unchanged, refuses `rights_checked != true` (T-RAG-03), and stores the embedding model per chunk. Retrieval compares only same-model vectors, so changing `EMBEDDING_MODEL` means re-running the ingest.
 - Migrations are not delegated to agy.
 
 ## Verified

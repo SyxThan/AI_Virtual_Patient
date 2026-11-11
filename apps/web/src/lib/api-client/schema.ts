@@ -175,10 +175,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/debrief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Debrief */
+        get: operations["get_debrief_api_v1_sessions__session_id__debrief_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CitationItem */
+        CitationItem: {
+            /** Source Id */
+            source_id: string;
+            /** Chunk Id */
+            chunk_id: string;
+            /** Document Title */
+            document_title: string;
+            /** Publisher */
+            publisher?: string | null;
+            /** Year */
+            year?: number | null;
+            /** Section */
+            section: string;
+            /** Quote Excerpt */
+            quote_excerpt: string;
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "draft" | "clinician_reviewed";
+        };
         /** CriterionResultResponse */
         CriterionResultResponse: {
             /** Criterion Id */
@@ -211,6 +250,61 @@ export interface components {
              * @default false
              */
             low_reliability: boolean;
+        };
+        /** DebriefClaimItem */
+        DebriefClaimItem: {
+            /** Text */
+            text: string;
+            /** Criterion Id */
+            criterion_id?: string | null;
+            /** Verified */
+            verified: boolean;
+            /** Citations */
+            citations?: components["schemas"]["CitationItem"][];
+        };
+        /** DebriefResponse */
+        DebriefResponse: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "done" | "failed";
+            /** Session Id */
+            session_id: string;
+            /** Id */
+            id?: string | null;
+            /** Evaluation Id */
+            evaluation_id?: string | null;
+            summary?: components["schemas"]["PedagogicalSummary"] | null;
+            /** Items */
+            items?: components["schemas"]["DebriefClaimItem"][];
+            /** Critical Missed */
+            critical_missed?: boolean | null;
+            /** Model */
+            model?: string | null;
+            /** Prompt Version */
+            prompt_version?: string | null;
+            /** Embedding Model */
+            embedding_model?: string | null;
+            /**
+             * Sources Reviewed
+             * @default false
+             */
+            sources_reviewed: boolean;
+            /** Error */
+            error?: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /**
+             * Practice Feedback Only
+             * @default true
+             */
+            practice_feedback_only: boolean;
+            /**
+             * Notice
+             * @default Học liệu phản hồi để luyện tập, không thay thế giảng viên và không phải chứng chỉ. Chỉ các nhận xét có trích dẫn mới được đối chiếu với tài liệu hướng dẫn; tài liệu nguồn hiện là bản tóm tắt nháp, chưa được bác sĩ duyệt.
+             */
+            notice: string;
         };
         /** EvaluationResponse */
         EvaluationResponse: {
@@ -310,6 +404,22 @@ export interface components {
         HealthResponse: {
             /** Status */
             status: string;
+        };
+        /**
+         * PedagogicalSummary
+         * @description The 5-tier feedback frame.
+         */
+        PedagogicalSummary: {
+            /** Expected Approach */
+            expected_approach: string;
+            /** Rationale */
+            rationale: string;
+            /** Learning Points */
+            learning_points?: string[];
+            /** Acceptable Alternatives */
+            acceptable_alternatives: string;
+            /** Important Errors */
+            important_errors?: string[];
         };
         /** SessionCreate */
         SessionCreate: {
@@ -804,6 +914,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_debrief_api_v1_sessions__session_id__debrief_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebriefResponse"];
+                };
+            };
+            /** @description Debrief pending. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DebriefResponse"];
                 };
             };
             /** @description Validation Error */

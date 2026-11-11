@@ -379,16 +379,45 @@ components:
 
     Debrief:
       type: object
-      description: (skeleton) fixed in AVP-019; see docs/specs/evaluation.md.
-      required: [items]
+      description: >
+        Fixed in AVP-019 (generated FastAPI schema `DebriefResponse` is the source of
+        truth). 5-tier summary + claims; a claim is verified only if it has a citation
+        that resolved to a retrieved source chunk (T-RAG-01/02).
+      required: [status, session_id, items, practice_feedback_only, notice]
       properties:
+        status: { type: string, enum: [pending, done, failed] }
+        session_id: { type: string }
+        id: { type: string, nullable: true }
+        evaluation_id: { type: string, nullable: true }
+        summary:
+          type: object
+          nullable: true
+          required: [expected_approach, rationale, learning_points,
+                     acceptable_alternatives, important_errors]
+          properties:
+            expected_approach: { type: string }
+            rationale: { type: string }
+            learning_points: { type: array, items: { type: string } }
+            acceptable_alternatives: { type: string }
+            important_errors: { type: array, items: { type: string } }
+        critical_missed: { type: boolean, nullable: true }
+        model: { type: string, nullable: true }
+        prompt_version: { type: string, nullable: true }
+        embedding_model: { type: string, nullable: true }
+        sources_reviewed:
+          type: boolean
+          description: false while any cited source is a draft (not clinician-reviewed).
+        error: { type: string, nullable: true, description: Safe Vietnamese message. }
+        practice_feedback_only: { type: boolean }
+        notice: { type: string }
         items:
           type: array
           items:
             type: object
-            required: [text, verified]
+            required: [text, verified, citations]
             properties:
               text: { type: string }
+              criterion_id: { type: string, nullable: true }
               verified:
                 type: boolean
                 description: false ⇒ marked unverified instead of cited (ADR-0005).
@@ -396,10 +425,17 @@ components:
                 type: array
                 items:
                   type: object
-                  required: [source_id, section]
+                  required: [source_id, chunk_id, document_title, section,
+                             quote_excerpt, review_status]
                   properties:
-                    source_id: { type: string }
+                    source_id: { type: string, description: Stable document key. }
+                    chunk_id: { type: string }
+                    document_title: { type: string }
+                    publisher: { type: string, nullable: true }
+                    year: { type: integer, nullable: true }
                     section: { type: string }
+                    quote_excerpt: { type: string, description: Copied from the stored chunk. }
+                    review_status: { type: string, enum: [draft, clinician_reviewed] }
 
     ClinicalActionCreate:
       type: object

@@ -792,10 +792,158 @@
           }
         }
       }
+    },
+    "/api/v1/sessions/{session_id}/debrief": {
+      "get": {
+        "tags": [
+          "debrief"
+        ],
+        "summary": "Get Debrief",
+        "operationId": "get_debrief_api_v1_sessions__session_id__debrief_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebriefResponse"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Debrief pending.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebriefResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "CitationItem": {
+        "properties": {
+          "source_id": {
+            "type": "string",
+            "title": "Source Id"
+          },
+          "chunk_id": {
+            "type": "string",
+            "title": "Chunk Id"
+          },
+          "document_title": {
+            "type": "string",
+            "title": "Document Title"
+          },
+          "publisher": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publisher"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "quote_excerpt": {
+            "type": "string",
+            "title": "Quote Excerpt"
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "clinician_reviewed"
+            ],
+            "title": "Review Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source_id",
+          "chunk_id",
+          "document_title",
+          "section",
+          "quote_excerpt",
+          "review_status"
+        ],
+        "title": "CitationItem"
+      },
       "CriterionResultResponse": {
         "properties": {
           "criterion_id": {
@@ -892,6 +1040,186 @@
           "flagged"
         ],
         "title": "CriterionResultResponse"
+      },
+      "DebriefClaimItem": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "criterion_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Criterion Id"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "citations": {
+            "items": {
+              "$ref": "#/components/schemas/CitationItem"
+            },
+            "type": "array",
+            "title": "Citations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "verified"
+        ],
+        "title": "DebriefClaimItem"
+      },
+      "DebriefResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "done",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "evaluation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Id"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PedagogicalSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DebriefClaimItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "critical_missed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Critical Missed"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "embedding_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Embedding Model"
+          },
+          "sources_reviewed": {
+            "type": "boolean",
+            "title": "Sources Reviewed",
+            "default": false
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "practice_feedback_only": {
+            "type": "boolean",
+            "title": "Practice Feedback Only",
+            "default": true
+          },
+          "notice": {
+            "type": "string",
+            "title": "Notice",
+            "default": "Học liệu phản hồi để luyện tập, không thay thế giảng viên và không phải chứng chỉ. Chỉ các nhận xét có trích dẫn mới được đối chiếu với tài liệu hướng dẫn; tài liệu nguồn hiện là bản tóm tắt nháp, chưa được bác sĩ duyệt."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "session_id"
+        ],
+        "title": "DebriefResponse"
       },
       "EvaluationResponse": {
         "properties": {
@@ -1200,6 +1528,44 @@
           "status"
         ],
         "title": "HealthResponse"
+      },
+      "PedagogicalSummary": {
+        "properties": {
+          "expected_approach": {
+            "type": "string",
+            "title": "Expected Approach"
+          },
+          "rationale": {
+            "type": "string",
+            "title": "Rationale"
+          },
+          "learning_points": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Learning Points"
+          },
+          "acceptable_alternatives": {
+            "type": "string",
+            "title": "Acceptable Alternatives"
+          },
+          "important_errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Important Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected_approach",
+          "rationale",
+          "acceptable_alternatives"
+        ],
+        "title": "PedagogicalSummary",
+        "description": "The 5-tier feedback frame."
       },
       "SessionCreate": {
         "properties": {
