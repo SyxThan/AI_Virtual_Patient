@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     api_prefix: str = "/api/v1"
     # Comma-separated CORS origins, e.g. "http://localhost:3000".
     allowed_origins: str = "http://localhost:3000"
+    # Public web origin printed in the practice-report QR code (Slice 9, AVP-105).
+    web_base_url: str = "http://localhost:3000"
 
     # --- Data access (ADR-0007). Optional until AVP-007/AVP-034. ---
     database_url: str | None = None
