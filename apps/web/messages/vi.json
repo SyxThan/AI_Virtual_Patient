@@ -3,6 +3,64 @@
     "title": "Bệnh nhân ảo AI",
     "description": "Luyện hỏi bệnh bằng tiếng Việt với bệnh nhân mô phỏng, chấm điểm theo bảng kiểm OSCE kèm phản hồi học tập."
   },
+  "history": {
+    "title": "Lịch sử luyện tập",
+    "subtitle": "Các phiên luyện tập của bạn, mới nhất trước.",
+    "loading": "Đang tải lịch sử…",
+    "signInPrompt": "Đăng nhập để xem lịch sử luyện tập",
+    "signInHint": "Phiên luyện tập của khách không được lưu vào lịch sử.",
+    "signIn": "Đăng nhập",
+    "guestPractice": "Luyện tập không cần đăng nhập",
+    "empty": "Bạn chưa có phiên luyện tập nào.",
+    "startFirst": "Bắt đầu phiên đầu tiên",
+    "loadError": "Không tải được lịch sử luyện tập. Vui lòng thử lại.",
+    "retry": "Thử lại",
+    "loadMore": "Tải thêm",
+    "loadingMore": "Đang tải…",
+    "loadMoreError": "Không tải thêm được. Vui lòng thử lại.",
+    "startedAt": "Bắt đầu lúc {date}",
+    "score": "{score}/100",
+    "noScore": "Chưa có điểm",
+    "redFlag": "Bỏ sót dấu hiệu nguy hiểm",
+    "continue": "Tiếp tục",
+    "viewFeedback": "Xem phản hồi",
+    "mode": {
+      "guided": "Luyện tập",
+      "exam": "Thi thử (OSCE)"
+    },
+    "status": {
+      "active": "Đang khám",
+      "completed": "Đã kết thúc",
+      "abandoned": "Đã bỏ dở",
+      "evaluating": "Đang chấm điểm",
+      "evaluated": "Đã chấm điểm",
+      "failed": "Lỗi"
+    },
+    "evaluation": {
+      "none": "Chưa chấm",
+      "pending": "Đang chấm",
+      "done": "Đã chấm",
+      "failed": "Chấm điểm lỗi"
+    },
+    "progress": {
+      "title": "Tiến bộ qua các lần luyện",
+      "label": "phản hồi luyện tập, không phải đánh giá chính thức",
+      "chartTitle": "Điểm tổng theo lần luyện",
+      "chartDesc": "Điểm tổng của {count} lần luyện đã chấm, từ cũ đến mới. Thấp nhất {min}, cao nhất {max}.",
+      "attempt": "Lần {n}",
+      "pointTitle": "Lần {n} ({date}): {score}/100",
+      "redFlagMark": "Vòng tròn rỗng: lần luyện có bỏ sót dấu hiệu nguy hiểm.",
+      "criteriaTitle": "Tỉ lệ đạt theo tiêu chí",
+      "rubricVersion": "Bảng kiểm phiên bản {v}",
+      "colCriterion": "Tiêu chí",
+      "colMet": "Đạt / số lần",
+      "colPartial": "Đạt một phần",
+      "colAttempt": "Lần",
+      "colDate": "Ngày",
+      "colScore": "Điểm",
+      "loadError": "Không tải được dữ liệu tiến bộ."
+    }
+  },
   "home": {
     "start": "Bắt đầu luyện tập"
   },
