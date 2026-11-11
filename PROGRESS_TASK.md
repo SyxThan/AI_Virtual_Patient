@@ -1,6 +1,6 @@
 # Báo cáo tiến độ — nhiệm vụ đã hoàn thành
 
-Cập nhật: 2026-11-11 (Slice 9). Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
+Cập nhật: 2026-11-12 (sau Slice 9; lập kế hoạch Giai đoạn 2). Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
 
 ## Bảng trạng thái
 
@@ -31,8 +31,10 @@ Cập nhật: 2026-11-11 (Slice 9). Chỉ ghi ✅ khi đã verify (build/test/mi
 | AVP-014 (S7-01) | Evaluator Agent + job queue (`SKIP LOCKED`) + `/finish`, `/evaluation`, `/evaluation/retry` + nút Kết thúc | ✅ Merged | PR #18 | Chưa chạy Evaluator với Gemini thật |
 | AVP-017/018 (S8-01) | Embedding adapter (Fake 768d + Gemini lazy), corpus HFMD (QĐ 1003 + BV BNĐ 2023), rights gate, pgvector repo, migration 0002 (HNSW), `ingest_guidelines.py` | ✅ Merged | PR #19 | Corpus là **bản tóm tắt nháp**, chưa đối chiếu nguyên văn, chưa có số trang: chờ bác sĩ |
 | AVP-019 (S8-02) | Debriefing Agent 5 tầng + citation verifier + chuỗi job evaluate→debrief + `GET /debrief` | ✅ Merged | PR #19 | Chưa chạy với Gemini thật; ngưỡng liên quan cho Gemini chưa hiệu chỉnh |
-| AVP-105 (S9-02) | PDF báo cáo phản hồi + QR (`GET /sessions/{id}/debrief/pdf`), chặn từ ngữ ADR-0010, font Unicode + fallback ASCII | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #20** | Thêm dependency `fpdf2`, `qrcode[pil]` (theo brief) |
-| AVP-015 (S9-01) | Màn hình Debrief `/debrief/[id]`: polling, cảnh báo red flag, bảng kiểm + bằng chứng → transcript, phản hồi 5 tầng, trích dẫn, xuất PDF | ✅ Code xong & **chạy thật trên trình duyệt**, 🟡 chờ merge | **PR #20** | — |
+| AVP-105 (S9-02) | PDF báo cáo phản hồi + QR (`GET /sessions/{id}/debrief/pdf`), chặn từ ngữ ADR-0010, font Unicode + fallback ASCII | ✅ Merged | **PR #20** | Thêm dependency `fpdf2`, `qrcode[pil]` (theo brief) |
+| AVP-015 (S9-01) | Màn hình Debrief `/debrief/[id]`: polling, cảnh báo red flag, bảng kiểm + bằng chứng → transcript, phản hồi 5 tầng, trích dẫn, xuất PDF | ✅ Merged | **PR #20** | — |
+| AVP-025 (pt1) | Test API luồng đầy đủ + phân quyền 11 route (agy viết, Claude review) | 🟡 Chờ merge | **PR #21** | 105 test pass; chưa có Playwright / staging |
+| AVP-042 | Kế hoạch Giai đoạn 2 (Slice 10–14) trong `docs/tasks.md` + cập nhật scope, quality gates, open questions, risks | 🟡 Chờ merge | PR (docs) | Chỉ tài liệu |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -133,15 +135,15 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - ⚠ Người quét mã QR chỉ xem được trang nếu có quyền với phiên (cùng trình duyệt với phiên khách, hoặc đăng nhập). Chưa có trang xác thực công khai: nếu cần thì phải thiết kế riêng, vì transcript là dữ liệu cá nhân.
 
 ## Tổng kết
-**9/9 vertical slice đã hoàn tất về mặt code** (Slice 9 chờ merge PR #20). Chưa phải bản phát hành: ca bệnh và corpus RAG vẫn là bản nháp chờ bác sĩ duyệt; chưa chạy với Gemini/Google thật; các chỉ số (latency, kappa, T-OSCE-04) chưa đo.
+**9/9 vertical slice của Giai đoạn 1 đã merge.** Giai đoạn 2 (Slice 10–14: tài khoản, lịch sử, hoàn thiện UX, quyền riêng tư, triển khai & đo lường) đã lên kế hoạch trong `docs/tasks.md`; chưa bắt đầu code. Chưa phải bản phát hành: ca bệnh và corpus RAG vẫn là bản nháp chờ bác sĩ duyệt; chưa chạy với Gemini/Google thật; các chỉ số (latency, kappa, T-OSCE-04) chưa đo.
 
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #20** (Slice 9). Base `main`. Sau khi merge: `pip install -e ".[dev]"` trong `apps/api` (thêm `fpdf2`, `qrcode`); đặt `WEB_BASE_URL` khi deploy.
+1. **PR #21** (AVP-025 test). 2. PR docs AVP-042 (kế hoạch Giai đoạn 2). Hai PR độc lập, merge thứ tự nào cũng được.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.
 - Bật **branch protection squash-only** trên GitHub (các PR đang merge dạng merge-commit).
-- Quyết các điểm trong `docs/OPEN_QUESTIONS.md` (do nhóm thêm khi mở rộng scope).
+- Quyết các điểm trong `docs/OPEN_QUESTIONS.md`, đặc biệt Câu 5 (hosting), 7 (lưu phiên khách), 8 (giới hạn chi phí), 10 (phương thức đăng nhập) — chặn Slice 10, 13, 14.
 
 ## Rủi ro / nợ kỹ thuật
 - Migration tham chiếu `auth.users` + role `anon`/`authenticated` (Supabase); verify local cần dựng 2 role + schema `auth` (đã làm khi test). Trên Supabase thật sẽ có sẵn.
