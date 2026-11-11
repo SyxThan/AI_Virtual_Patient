@@ -80,8 +80,8 @@ Xây dựng nền tảng Bệnh nhân Ảo y tế (AI Virtual Patient) tương t
   * **Then:** Modal mở ra hiển thị nguyên văn đoạn trích từ Hướng dẫn chẩn đoán và điều trị Bệnh Tay chân miệng (Quyết định 1003/QĐ-BYT) kèm số trang và mục điều trị cụ thể.
 * **Kịch bản 4.4: Xuất báo cáo PDF kèm QR Code**
   * **Given:** Sinh viên ở trang Debriefing.
-  * **When:** Bấm nút "Xuất chứng nhận thực hành (PDF)".
-  * **Then:** File PDF chuẩn A4 được tải xuống, có chứa đầy đủ thông tin: Tên sinh viên, Ca lâm sàng, Điểm OSCE từng phần, Lỗi sai cần khắc phục, Ghi chú miễn trừ y khoa, và Mã QR liên kết trực tiếp tới bản ghi phiên khám trực tuyến để hậu kiểm.
+  * **When:** Bấm nút "Xuất báo cáo PDF" (báo cáo phản hồi thực hành; không dùng từ "chứng nhận/chứng chỉ" theo ADR-0010).
+  * **Then:** File PDF chuẩn A4 được tải xuống, có chứa đầy đủ thông tin: Tên hiển thị của người học (chỉ khi đã đăng nhập và đặt tên — Slice 10), Ca lâm sàng, Điểm OSCE từng phần, Lỗi sai cần khắc phục, Ghi chú miễn trừ y khoa, và Mã QR liên kết tới trang phiên (`/debrief/{id}`, không chứa token; người xem phải có quyền với phiên). Trang xác thực công khai không lộ transcript là `TASK-S13-02`, chờ quyết định.
 
 ---
 
@@ -90,3 +90,56 @@ Xây dựng nền tảng Bệnh nhân Ảo y tế (AI Virtual Patient) tương t
 2. **Không Secrets:** Không chứa bất kỳ API key, token hay mật khẩu thật nào trong repo.
 3. **Mô phỏng độc lập (Mock-first):** Toàn bộ các dịch vụ ngoài (LLM, STT, TTS, Vector DB) có adapter giả lập (Fake/Mock) để chạy demo offline không phụ thuộc mạng.
 4. **Y khoa thận trọng:** Toàn bộ văn bản kết quả ghi rõ: *"Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ hành nghề y tế"*.
+
+---
+
+## 5. Giai đoạn 2 — Hoàn thiện Web (Slice 10–14)
+
+**Nguyên tắc:** không mở rộng MVP (vẫn 1 ca, 3 màn hình lõi; không thanh toán, không LMS). Chỉ bổ sung những phần cần để người dùng thật dùng được: tài khoản, lịch sử, xử lý lỗi, quyền riêng tư, triển khai, đo lường. Chi tiết task: `docs/tasks.md`.
+
+### 5.1. Màn hình phụ trợ (bổ sung quanh 3 màn hình lõi)
+| Route | Mục đích | Slice |
+|---|---|---|
+| `/` | Trang giới thiệu: cách dùng 3 bước, yêu cầu thiết bị, miễn trừ | 12 |
+| `/login` | Đăng nhập / đăng ký (Supabase Auth); vẫn cho phép dùng như khách | 10 |
+| `/profile` | Tên hiển thị, xoá dữ liệu của tôi | 10, 13 |
+| `/history` | Danh sách phiên đã luyện, tiếp tục / xem phản hồi, tiến bộ | 11 |
+| `/privacy` | Chính sách dữ liệu: lưu gì, bao lâu, cách xoá | 13 |
+| `/verify/[code]` | Xác thực báo cáo qua QR, không lộ dữ liệu cá nhân (chờ quyết định Q6) | 13 |
+
+### 5.2. Tiêu chí chấp nhận (Given/When/Then)
+
+**Tính năng 5: Tài khoản**
+* **Kịch bản 5.1: Kết quả không mất khi đóng trình duyệt**
+  * **Given:** Người học đã đăng nhập và hoàn thành một phiên.
+  * **When:** Đóng trình duyệt, mở lại và đăng nhập trên máy khác.
+  * **Then:** Thấy phiên trong `/history`, mở được phản hồi và tải PDF.
+* **Kịch bản 5.2: Không xem được phiên của người khác**
+  * **Given:** User A và User B đều đã đăng nhập.
+  * **When:** B mở URL `/debrief/{id-của-A}` hoặc gọi API của phiên đó.
+  * **Then:** Nhận 404 trên mọi route (T-SEC-01, T-AUTH-01).
+* **Kịch bản 5.3: Vẫn dùng được như khách**
+  * **Given:** Người dùng không có tài khoản.
+  * **When:** Chọn "Luyện tập không cần tài khoản".
+  * **Then:** Luồng 3 màn hình chạy như Giai đoạn 1; sau đó có thể đăng nhập để giữ phiên đó (claim).
+
+**Tính năng 6: Lịch sử & Tiến bộ**
+* **Kịch bản 6.1:** **Given** người học có ≥ 2 phiên đã chấm; **When** mở `/history`; **Then** thấy ngày, chế độ, điểm, cờ red flag của từng phiên (mới nhất trước) và biểu đồ chỉ dựng từ kết quả đã lưu.
+
+**Tính năng 7: Ổn định & lỗi**
+* **Kịch bản 7.1:** **Given** người học từ chối quyền micro; **When** vào Workspace; **Then** thấy hướng dẫn bật quyền và ô nhập chữ vẫn dùng được (T-UX-01).
+* **Kịch bản 7.2:** **Given** LLM/STT/TTS lỗi hoặc quá thời gian; **When** người học gửi câu hỏi; **Then** thấy thông báo lỗi rõ ràng và nút gửi lại, không có câu trả lời giả (T-UX-02, T-VOICE-03).
+* **Kịch bản 7.3:** **Given** người học lỡ tải lại trang giữa phiên; **When** trang mở lại; **Then** transcript, sinh hiệu và chế độ được khôi phục (T-SESSION-01).
+
+**Tính năng 8: Quyền riêng tư**
+* **Kịch bản 8.1:** **Given** người học muốn xoá dữ liệu; **When** bấm "Xoá phiên này" hoặc "Xoá dữ liệu của tôi" và xác nhận; **Then** transcript, kết quả chấm, phản hồi bị xoá khỏi DB và mọi route trả 404 (T-PRIV-01).
+
+**Tính năng 9: Vận hành**
+* **Kịch bản 9.1:** **Given** một người gửi quá nhiều yêu cầu; **When** vượt giới hạn; **Then** nhận 429 có thời gian chờ, chi phí API không vượt trần ngày (T-RATE-01).
+* **Kịch bản 9.2:** **Given** bản deploy staging; **When** chạy smoke test luồng đầy đủ 3 lần liên tiếp; **Then** cả 3 lần thành công (release gate).
+
+### 5.3. Definition of Done bổ sung cho Giai đoạn 2
+1. Route mới có test phân quyền (khách, user A, user B).
+2. Bảng mới có migration Alembic + `make db-check-rls` OK.
+3. Không lưu token Supabase ngoài cơ chế của `supabase-js`; không khoá service-role ở trình duyệt.
+4. Mọi chỉ số công bố (latency, kappa, SUS…) lấy từ `evals/results/` (Hard Rule 3).

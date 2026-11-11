@@ -36,6 +36,14 @@ From the workbook's Test Plan and Release Gate, with test lanes added because LL
 | T-E2E-01 | Full flow | Session, chat, finish, evaluate, debrief, history | Completes on staging | Critical | E2E | AVP-025 |
 | T-UX-01 | Mic permission denied | Deny microphone | Guidance and text fallback | Medium | Manual | AVP-022 |
 | T-UX-02 | Loading and error | Slow or failing provider | Loading, retry, no false success | Medium | Manual | AVP-036 |
+| T-AUTH-01 | JWT verification | Expired, wrong-signature, wrong-issuer token; valid token for user A | 401 `AUTH_INVALID` for bad tokens; A sees only A's sessions (HTTP and WS); token never logged | Critical | CI | AVP-106 |
+| T-AUTH-02 | Guest claim | Signed-in user claims a guest session with a wrong or foreign token | 404, session unchanged; correct token moves ownership once (idempotent) | High | CI | AVP-108 |
+| T-HIST-01 | Session history | User with 25 sessions; another user's sessions exist | Own sessions only, newest first, stable cursor pages, no transcript in list | Critical | CI | AVP-109 |
+| T-PRIV-01 | Delete my data | Owner deletes a session / account | All child rows gone; every route 404; non-owner delete is 404 | Critical | CI (real DB) | AVP-115 |
+| T-PRIV-02 | Public verify page | Valid, wrong and revoked verify codes | Wrong/revoked 404; page shows no transcript or personal data | High | CI + Manual | AVP-116 |
+| T-RATE-01 | Rate and cost limits | Burst of turns / sessions; daily cost cap reached | 429 with `Retry-After`; over cap falls back to Fake with a clear notice | High | CI | AVP-118 |
+| T-UX-03 | Responsive and a11y | 375 px and 1280 px widths; axe scan of 4 main pages | No horizontal scroll; no serious/critical axe violations | Medium | CI (Playwright) | AVP-114 |
+| T-E2E-02 | Browser full flow | Playwright: setup, chat, exam, finish, debrief, evidence drawer, PDF, history | Passes in CI with Fake providers | Critical | E2E | AVP-025 |
 
 Rules: any failing Critical blocks release; a failing High needs an issue and a workaround written in the release notes; Medium is triaged. Results go in `evals/results/`; manual results in the release checklist.
 

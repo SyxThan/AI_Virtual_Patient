@@ -10,4 +10,8 @@
 | 2026-11-09 | `docs/specs/openapi.yaml` | **Cập nhật** | Bổ sung các endpoint hợp đồng API mới:<br>• `POST /sessions/{id}/actions`: Khám thực thể qua raycasting 3D.<br>• `GET /sessions/{id}/vitals`: Lấy snapshot sinh hiệu hiện tại.<br>• `GET /sessions/{id}/debrief/pdf`: Xuất file PDF bảng điểm kèm mã QR. |
 | 2026-11-09 | `docs/TASKS.md` | **Tạo mới** | Tái cấu trúc danh mục công việc kỹ thuật thành 9 Vertical Slices hoàn chỉnh (tương ứng lộ trình GĐ 4), gán độ ưu tiên P0/P1/P2, mã định danh, dependencies, file liên quan và Acceptance Criteria. |
 | 2026-11-09 | `docs/OPEN_QUESTIONS.md` | **Tạo mới** | Ghi nhận các quyết định kiến trúc và lựa chọn mặc định hợp lý (3D model format, voice provider, scoring cap rules) để Product Owner rà soát duyệt mà không chặn tiến độ. |
-
+| 2026-11-12 | `docs/tasks.md` | **Cập nhật** | • Cập nhật trạng thái thật của Slice 1–9 (đều đã merge, PR #2–#20).<br>• Thêm **Giai đoạn 2 — Slice 10–14** (Tài khoản, Lịch sử, Hoàn thiện UX, Quyền riêng tư, Triển khai & Đo lường) với 16 task `TASK-S10-01`…`TASK-S14-05`, mã AVP-106…AVP-119, ký hiệu giao được cho agy hay không, thứ tự đề xuất và mục Ngoài phạm vi. |
+| 2026-11-12 | `docs/specs/product-scope.md` | **Cập nhật** | • Sửa Kịch bản 4.4: bỏ "chứng nhận" (ADR-0010), tên người học chỉ in khi đã đăng nhập, QR không mở transcript công khai.<br>• Thêm mục 5: màn hình phụ trợ, Given/When/Then cho Tính năng 5–9, DoD bổ sung. |
+| 2026-11-12 | `docs/specs/quality-gates.md` | **Cập nhật** | Thêm T-AUTH-01/02, T-HIST-01, T-PRIV-01/02, T-RATE-01, T-UX-03, T-E2E-02. |
+| 2026-11-12 | `docs/OPEN_QUESTIONS.md` | **Cập nhật** | Ghi mâu thuẫn QR ↔ quyền riêng tư (Câu 4); thêm Câu 5–10 (hosting, trang xác thực công khai, lưu phiên khách, giới hạn chi phí, chế độ thi, phương thức đăng nhập). |
+| 2026-11-12 | `docs/risks.md` | **Cập nhật** | Thêm R-15 (lỗi phân quyền lộ transcript), R-16 (chi phí API khi deploy công khai), R-17 (người dùng thật trước khi có xoá dữ liệu). |

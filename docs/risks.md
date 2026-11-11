@@ -1,6 +1,6 @@
 # Risk register
 
-R-01 to R-10 are from the workbook. R-11 to R-14 are added by this repo. Review at each scope gate (Days 7, 14, 21) and at release rehearsal.
+R-01 to R-10 are from the workbook. R-11 to R-14 are added by this repo; R-15 to R-17 cover Phase 2 (Slices 10-14). Review at each scope gate (Days 7, 14, 21) and at release rehearsal.
 
 | ID | Risk | Likelihood | Impact | Pri | Early sign | Mitigation | Owner |
 |---|---|---|---|---|---|---|---|
@@ -18,3 +18,6 @@ R-01 to R-10 are from the workbook. R-11 to R-14 are added by this repo. Review 
 | R-12 | Work delegated to agy is wrong, out of scope, or silently produces nothing | Medium | Medium | P1 | Retries, scope violations, empty output | Wrapper checks scope, report and acceptance; delegation log; stop delegating a task type after repeated rework | Lead |
 | R-13 | Supabase plan limits (pausing, backups, connections) disrupt the demo | Medium | High | P1 | Project paused, connection errors | Check plan policy (AVP-034), wake and test before rehearsals, session pooler, small pool | DevOps |
 | R-14 | Unreviewed LLM-drafted lay wording is mistaken for verified clinical content | Medium | High | P0 | Facts with `author_added` or `draft` status shown in demo | Per-fact status, validator lists unreviewed items, UI banner when a case is unreviewed | Product/Clinical |
+| R-15 | Auth or ownership bug exposes another student's transcript (Phase 2) | Medium | Very high | P0 | T-SEC-01/T-AUTH-01 failures, 200 on foreign session | JWKS verification in FastAPI only, one ownership check for guest and user, tests per route (AVP-106, AVP-109) | Backend |
+| R-16 | Public deploy runs up LLM/STT/TTS cost | Medium | High | P0 | Spend alert, unusual turn volume | Per-session and per-IP limits, daily cap with Fake fallback (AVP-118), Google Cloud budget alerts | DevOps |
+| R-17 | Real users before delete-my-data and privacy page exist | Medium | High | P0 | Pilot planned before Slice 13 | Slice 13 is a gate for any pilot with real students (AVP-115) | Product |
