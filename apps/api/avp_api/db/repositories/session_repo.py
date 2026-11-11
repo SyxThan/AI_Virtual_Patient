@@ -52,6 +52,8 @@ class SessionRepository(Protocol):
 
     def update_state(self, session_id: str, state: dict) -> None: ...
 
+    def set_status(self, session_id: str, status: str) -> None: ...
+
 
 def _to_record(row: models.Session) -> SessionRecord:
     return SessionRecord(
@@ -103,4 +105,10 @@ class SqlSessionRepository:
         row = self.db.get(models.Session, uuid.UUID(session_id))
         if row is not None:
             row.state = state
+            self.db.commit()
+
+    def set_status(self, session_id: str, status: str) -> None:
+        row = self.db.get(models.Session, uuid.UUID(session_id))
+        if row is not None:
+            row.status = status
             self.db.commit()

@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from avp_api.config import get_settings
-from avp_api.routers import actions, health, sessions, turns, vitals, websocket
+from avp_api.routers import actions, evaluations, health, sessions, turns, vitals, websocket
 
 
 def _error_body(code: str, message: str) -> dict:
@@ -59,6 +59,7 @@ def create_app() -> FastAPI:
     app.include_router(turns.router, prefix=settings.api_prefix)
     app.include_router(vitals.router, prefix=settings.api_prefix)
     app.include_router(actions.router, prefix=settings.api_prefix)
+    app.include_router(evaluations.router, prefix=settings.api_prefix)
     # WebSocket voice/text loop at /ws/sessions/{id} (no REST prefix; not in OpenAPI).
     app.include_router(websocket.router)
     return app
