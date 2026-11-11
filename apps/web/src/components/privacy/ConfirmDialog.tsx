@@ -72,7 +72,7 @@ export default function ConfirmDialog({ open, title, children, actions, onCancel
         e.preventDefault(); // native Escape path: same rule as onKeyDown
         if (!busy) onCancel();
       }}
-      className="w-[min(28rem,calc(100vw-2rem))] rounded-lg border border-gray-200 p-0 text-left shadow-xl backdrop:bg-black/40"
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-lg border border-gray-200 p-0 text-left shadow-xl backdrop:bg-black/40"
     >
       <div className="space-y-3 p-5">
         <h2 id={titleId} className="text-lg font-semibold text-gray-900">
