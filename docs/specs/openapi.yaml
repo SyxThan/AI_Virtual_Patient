@@ -65,20 +65,49 @@ paths:
         "401": { $ref: "#/components/responses/Error" }
     get:
       tags: [sessions]
-      summary: List the caller's sessions (history).
+      summary: List the caller's own sessions (practice history, AVP-109).
       description: >
-        Signed-in users see their own sessions; guests pass X-Guest-Token to see
-        theirs. Ownership is enforced server-side (ADR-0007, ADR-0008).
+        Signed-in users only; a guest gets 401 AUTH_REQUIRED. Newest first by
+        (started_at desc, id desc), keyset-paginated with an opaque cursor. One
+        query (latest evaluation joined per session); never returns transcript.
+      security:
+        - supabaseBearer: []
       parameters:
-        - $ref: "#/components/parameters/GuestToken"
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - name: cursor
+          in: query
+          required: false
+          description: The next_cursor of the previous page.
+          schema: { type: string }
       responses:
         "200":
-          description: Session list.
+          description: One page of the caller's sessions.
           content:
             application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/SessionSummary" }
+              schema: { $ref: "#/components/schemas/SessionSummaryPage" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+
+  /sessions/progress:
+    get:
+      tags: [sessions]
+      summary: Score per attempt and per-criterion counts (AVP-111).
+      description: >
+        Signed-in users only. Computed only from each session's latest stored
+        evaluation with status done, grouped by rubric_version; never
+        extrapolated. Practice feedback, not an official assessment.
+      security:
+        - supabaseBearer: []
+      responses:
+        "200":
+          description: Progress over the caller's evaluated attempts.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProgressResponse" }
         "401": { $ref: "#/components/responses/Error" }
 
   /sessions/{id}:
@@ -376,14 +405,74 @@ components:
 
     SessionSummary:
       type: object
-      description: (skeleton) list view; fixed in AVP-023.
-      required: [id, case_id, status, created_at]
+      description: One row of the history list (no transcript).
+      required: [id, case_id, mode, status, started_at, critical_missed, evaluation_status]
       properties:
         id: { type: string, format: uuid }
         case_id: { type: string }
-        status: { type: string, enum: [active, finished] }
-        created_at: { type: string, format: date-time }
-        score_summary: { type: [string, "null"] }
+        case_title: { type: [string, "null"] }
+        mode: { type: string, enum: [guided, exam] }
+        status:
+          type: string
+          enum: [active, completed, abandoned, evaluating, evaluated, failed]
+        started_at: { type: string, format: date-time }
+        ended_at: { type: [string, "null"], format: date-time }
+        total_score:
+          type: [number, "null"]
+          description: Set only when the latest evaluation is done.
+        critical_missed: { type: boolean }
+        evaluation_status: { type: string, enum: [none, pending, done, failed] }
+
+    SessionSummaryPage:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/SessionSummary" }
+        next_cursor: { type: [string, "null"] }
+
+    ProgressAttempt:
+      type: object
+      required: [session_id, started_at, critical_missed, rubric_version]
+      properties:
+        session_id: { type: string, format: uuid }
+        started_at: { type: string, format: date-time }
+        total_score: { type: [number, "null"] }
+        critical_missed: { type: boolean }
+        rubric_version: { type: integer }
+
+    ProgressCriterion:
+      type: object
+      required: [criterion_id, criterion, attempts, met, partial]
+      properties:
+        criterion_id: { type: string }
+        criterion: { type: string }
+        attempts: { type: integer }
+        met: { type: integer }
+        partial: { type: integer }
+
+    ProgressRubricGroup:
+      type: object
+      required: [rubric_version, criteria]
+      properties:
+        rubric_version: { type: integer }
+        criteria:
+          type: array
+          items: { $ref: "#/components/schemas/ProgressCriterion" }
+
+    ProgressResponse:
+      type: object
+      required: [attempts, rubric_groups, practice_feedback_only, notice]
+      properties:
+        attempts:
+          type: array
+          items: { $ref: "#/components/schemas/ProgressAttempt" }
+        rubric_groups:
+          type: array
+          items: { $ref: "#/components/schemas/ProgressRubricGroup" }
+        practice_feedback_only: { type: boolean, const: true }
+        notice: { type: string }
 
     TurnCreate:
       type: object
