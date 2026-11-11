@@ -20,6 +20,7 @@ export default function ScoreSummaryCard({ evaluation }: { evaluation: Evaluatio
       <div
         className="mt-3 h-3 w-full overflow-hidden rounded-full bg-gray-100"
         role="progressbar"
+        aria-label={vi.debrief.score.title}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}

@@ -130,14 +130,15 @@ export default function VitalsMonitor({
           label={vi.monitor.hr}
           value={v ? `${v.heart_rate_bpm}` : "—"}
           unit={vi.monitor.unitBpm}
-          className={`animate-pulse motion-reduce:animate-none ${hrHigh ? "text-amber-300" : "text-emerald-400"}`}
+          className={hrHigh ? "text-amber-300" : "text-emerald-300"}
+          pulse
         />
         <Metric
           icon="🌡"
           label={vi.monitor.temp}
           value={v ? v.temperature_c.toFixed(1) : "—"}
           unit="°C"
-          className="text-red-400"
+          className="text-red-300"
           warn={feverHigh}
           warnText={vi.monitor.feverWarning}
         />
@@ -191,6 +192,7 @@ export default function VitalsMonitor({
 }
 
 function Metric({
+  pulse,
   icon,
   label,
   value,
@@ -199,6 +201,7 @@ function Metric({
   warn,
   warnText,
 }: {
+  pulse?: boolean;
   icon?: string;
   label: string;
   value: string;
@@ -210,14 +213,18 @@ function Metric({
   return (
     <div
       className={`rounded-md border p-2 ${
-        warn
-          ? "animate-pulse border-red-500 bg-red-950 motion-reduce:animate-none"
-          : "border-gray-700 bg-gray-800"
+        warn ? "border-red-500 bg-red-950 ring-1 ring-red-500" : "border-gray-700 bg-gray-800"
       }`}
     >
-      <div className="text-xs text-gray-300">
-        {icon && <span aria-hidden="true">{icon} </span>}
+      <div className="flex items-center gap-1 text-xs text-gray-300">
+        {icon && <span aria-hidden="true">{icon}</span>}
         {label}
+        {pulse && (
+          <span
+            className="ml-auto h-2 w-2 animate-pulse rounded-full bg-emerald-400 motion-reduce:animate-none"
+            aria-hidden="true"
+          />
+        )}
       </div>
       <div className={`text-2xl font-bold tabular-nums ${className ?? ""}`}>
         {value}
