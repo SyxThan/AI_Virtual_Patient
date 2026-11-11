@@ -246,12 +246,64 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
 
+  /me:
+    get:
+      tags: [me]
+      summary: Current user's profile (created on first sight, role student). Signed-in only (AVP-108).
+      responses:
+        "200":
+          description: Profile. The email is never returned.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Error" }
+    patch:
+      tags: [me]
+      summary: Update display_name (stripped, at most 80 characters; empty clears it).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MeUpdate" }
+      responses:
+        "200":
+          description: Updated profile.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+        "401": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+
+  /sessions/{session_id}/claim:
+    parameters:
+      - name: session_id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - $ref: "#/components/parameters/GuestToken"
+    post:
+      tags: [me]
+      summary: >
+        Move a guest session to the signed-in caller (needs the session's X-Guest-Token).
+        One transaction sets user_id and clears guest_token_hash. Idempotent for the owner;
+        a wrong token or another user's session is 404 and nothing changes (T-AUTH-02).
+      responses:
+        "200":
+          description: Claimed (or already owned by the caller).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ClaimResponse" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
 # WebSocket is not expressible in OpenAPI; documented here as the agreed contract.
 x-websocket:
   /ws/sessions/{id}:
     summary: Voice/text turn loop (ADR-0011).
-    auth: First message after connecting is the bearer token (never in the URL).
-    note: Guest sessions send the guest token in that first message instead.
+    auth: >
+      First message after connecting (never in the URL): {"type":"auth","access_token":"<JWT>"}
+      when signed in, or {"type":"auth","token":"<guest token>"} for a guest session.
+    note: A bad token or a session the caller does not own closes the socket with 1008.
 
 components:
   securitySchemes:
@@ -462,6 +514,29 @@ components:
         image_url: { type: string, nullable: true }
         audio_url: { type: string, nullable: true }
         turn_recorded: { type: integer, description: Associated turn index. }
+
+    Me:
+      type: object
+      required: [user_id, display_name, role, created_at]
+      properties:
+        user_id: { type: string, format: uuid }
+        display_name: { type: [string, "null"], maxLength: 80 }
+        role: { type: string, enum: [student, instructor, admin] }
+        created_at: { type: string, format: date-time }
+
+    MeUpdate:
+      type: object
+      required: [display_name]
+      additionalProperties: false
+      properties:
+        display_name: { type: [string, "null"], maxLength: 80 }
+
+    ClaimResponse:
+      type: object
+      required: [session_id, status]
+      properties:
+        session_id: { type: string, format: uuid }
+        status: { type: string, enum: [claimed, already_owned] }
 
     VitalsSnapshot:
       type: object

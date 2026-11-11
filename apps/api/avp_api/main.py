@@ -18,6 +18,7 @@ from avp_api.routers import (
     debriefs,
     evaluations,
     health,
+    me,
     sessions,
     turns,
     vitals,
@@ -70,6 +71,7 @@ def create_app() -> FastAPI:
     app.include_router(actions.router, prefix=settings.api_prefix)
     app.include_router(evaluations.router, prefix=settings.api_prefix)
     app.include_router(debriefs.router, prefix=settings.api_prefix)
+    app.include_router(me.router, prefix=settings.api_prefix)
     # WebSocket voice/text loop at /ws/sessions/{id} (no REST prefix; not in OpenAPI).
     app.include_router(websocket.router)
     return app
