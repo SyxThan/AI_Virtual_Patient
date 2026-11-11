@@ -1,5 +1,6 @@
 import Link from "next/link";
 import vi from "../../../messages/vi.json";
+import DeleteSessionButton from "@/components/privacy/DeleteSessionButton";
 import type { SessionSummary } from "@/hooks/useSessionHistory";
 import { fmt } from "@/lib/sessionAuth";
 import { evaluationLabel, formatDate, formatScore, modeLabel, statusLabel } from "./format";
@@ -14,7 +15,9 @@ const EVAL_BADGE: Record<string, string> = {
   failed: "border-red-200 bg-red-50 text-red-800",
 };
 
-export default function SessionCard({ session }: { session: SessionSummary }) {
+type Props = { session: SessionSummary; onDeleted?: () => void };
+
+export default function SessionCard({ session, onDeleted }: Props) {
   const scored = session.evaluation_status === "done" && session.total_score != null;
   return (
     <li className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
@@ -70,6 +73,7 @@ export default function SessionCard({ session }: { session: SessionSummary }) {
               {vi.history.viewFeedback}
             </Link>
           )}
+          {onDeleted && <DeleteSessionButton sessionId={session.id} onDeleted={onDeleted} />}
         </div>
       </div>
     </li>
