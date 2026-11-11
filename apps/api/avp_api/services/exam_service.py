@@ -18,7 +18,7 @@ from fastapi import HTTPException
 from avp_api.db.repositories.session_repo import SessionRepository
 from avp_api.db.repositories.turn_repo import TurnRepository
 from avp_api.schemas.action import ExamActionRequest, ExamActionResponse
-from avp_api.services import session_service
+from avp_api.services import guide_service, session_service
 
 # THE single UI-region -> case-region mapping. ASSUMPTION pending human/clinician
 # confirmation (see PR): the HFMD case has one "skin" entry covering hands, feet,
@@ -61,6 +61,8 @@ def perform_action(
             status_code=409,
             detail={"code": "SESSION_FINISHED", "message": "This session has ended."},
         )
+    # Exam time limit applies to examination actions too (AVP-112 follow-up).
+    guide_service.ensure_within_time_limit(sess.mode, sess.created_at)
     case = session_repo.get_case_content(sess.case_id, sess.case_version)
     if case is None:
         raise HTTPException(

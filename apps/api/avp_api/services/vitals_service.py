@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 
 from avp_api.db.repositories.session_repo import SessionRepository
 from avp_api.schemas.vitals import ClinicalState, VitalsEvent, VitalsSnapshot
-from avp_api.services import session_service
+from avp_api.services import guide_service, session_service
 
 INITIAL_STATE: ClinicalState = "GRADE_2A_BASELINE"
 
@@ -105,7 +105,9 @@ def apply_event(
     user_id: str | None,
     guest_token: str | None,
 ) -> VitalsSnapshot:
-    session_service.get_session(session_id, repo, user_id, guest_token)  # ownership (404 on miss)
+    sess = session_service.get_session(session_id, repo, user_id, guest_token)  # 404 on miss
+    # Orders after the exam time limit are refused like turns (AVP-112 follow-up).
+    guide_service.ensure_within_time_limit(sess.mode, sess.created_at)
     rec = repo.get(session_id)
     state = rec.state if rec else {}
     new_state = transition(_current_state(state), event)
