@@ -1,47 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState, type Ref } from "react";
 import vi from "../../../messages/vi.json";
+import { FOCUS_RING } from "@/components/ui/focus";
 
+export const MAX_TURN_CHARS = 2000;
+
+/**
+ * Text turn input (always available; the fallback whenever voice is not).
+ * `busy` blocks sending while a reply is pending; `lockedReason` disables the
+ * input for good (time limit reached / session over) and says why.
+ */
 export default function ChatInput({
   onSend,
-  loading,
+  busy,
+  lockedReason,
+  inputRef,
 }: {
   onSend: (text: string) => void;
-  loading: boolean;
+  busy: boolean;
+  lockedReason?: string | null;
+  inputRef?: Ref<HTMLInputElement>;
 }) {
   const [text, setText] = useState("");
+  const id = useId();
+  const locked = !!lockedReason;
 
   function submit() {
     const t = text.trim();
-    if (!t || loading) return;
+    if (!t || busy || locked) return;
     onSend(t);
     setText("");
   }
 
   return (
-    <div className="flex items-center gap-2 border-t border-gray-200 p-3">
-      <input
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            submit();
-          }
-        }}
-        placeholder={vi.session.inputPlaceholder}
-        disabled={loading}
-        className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm disabled:bg-gray-100"
-      />
-      <button
-        type="button"
-        onClick={submit}
-        disabled={loading || !text.trim()}
-        className="rounded-md bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-      >
-        {loading ? vi.session.sending : vi.session.send}
-      </button>
-    </div>
+    <form
+      className="flex flex-col gap-1 border-t border-gray-200 p-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        submit();
+      }}
+    >
+      <label htmlFor={id} className="sr-only">
+        {vi.workspace.inputLabel}
+      </label>
+      <div className="flex items-center gap-2">
+        <input
+          id={id}
+          ref={inputRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={locked ? (lockedReason ?? "") : vi.session.inputPlaceholder}
+          disabled={locked}
+          maxLength={MAX_TURN_CHARS}
+          autoComplete="off"
+          aria-describedby={locked ? `${id}-locked` : undefined}
+          className={`min-w-0 flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 disabled:bg-gray-100 ${FOCUS_RING}`}
+        />
+        <button
+          type="submit"
+          disabled={busy || locked || !text.trim()}
+          className={`shrink-0 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 ${FOCUS_RING}`}
+        >
+          {vi.session.send}
+        </button>
+      </div>
+      {locked && (
+        <p id={`${id}-locked`} className="text-xs text-gray-700">
+          {lockedReason}
+        </p>
+      )}
+    </form>
   );
 }

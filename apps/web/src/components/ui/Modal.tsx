@@ -1,16 +1,14 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
+import { useId, useRef, type ReactNode, type RefObject } from "react";
 import vi from "../../../messages/vi.json";
 import { FOCUS_RING } from "./focus";
-
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+import { useFocusTrap } from "./useFocusTrap";
 
 /**
- * Accessible modal dialog: role="dialog" + aria-modal, labelled by its title,
- * focus moved inside on open and trapped (Tab / Shift+Tab), Escape closes,
- * focus restored to the opener on close, page scroll locked while open.
+ * Accessible modal dialog: role="dialog" + aria-modal, labelled by its title and
+ * described by `description`; focus is moved inside and trapped, Escape closes,
+ * focus returns to the opener on close, page scroll is locked while open.
  */
 export default function Modal({
   open,
@@ -36,61 +34,13 @@ export default function Modal({
   const titleId = useId();
   const descId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
-  const onCloseRef = useRef(onClose);
-
-  useEffect(() => {
-    onCloseRef.current = onClose;
-  }, [onClose]);
-
-  useEffect(() => {
-    if (!open) return;
-    const opener = document.activeElement as HTMLElement | null;
-    const panel = panelRef.current;
-    const first = initialFocusRef?.current ?? panel?.querySelector<HTMLElement>(FOCUSABLE) ?? panel;
-    first?.focus();
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.stopPropagation();
-        onCloseRef.current();
-        return;
-      }
-      if (e.key !== "Tab" || !panel) return;
-      const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
-        (el) => el.offsetParent !== null || el === document.activeElement,
-      );
-      if (items.length === 0) {
-        e.preventDefault();
-        panel.focus();
-        return;
-      }
-      const firstEl = items[0];
-      const lastEl = items[items.length - 1];
-      const active = document.activeElement;
-      if (e.shiftKey && (active === firstEl || !panel.contains(active))) {
-        e.preventDefault();
-        lastEl.focus();
-      } else if (!e.shiftKey && (active === lastEl || !panel.contains(active))) {
-        e.preventDefault();
-        firstEl.focus();
-      }
-    };
-    document.addEventListener("keydown", onKey, true);
-    return () => {
-      document.removeEventListener("keydown", onKey, true);
-      document.body.style.overflow = prevOverflow;
-      if (opener && document.contains(opener)) opener.focus();
-    };
-  }, [open, initialFocusRef]);
+  useFocusTrap(open, panelRef, onClose, initialFocusRef);
 
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
       onMouseDown={(e) => {
         if (closeOnBackdrop && e.target === e.currentTarget) onClose();
       }}
@@ -127,7 +77,7 @@ export default function Modal({
           )}
         </div>
         {description && (
-          <div id={descId} className="mt-2 text-sm text-gray-700">
+          <div id={descId} className="mt-2 text-sm leading-relaxed text-gray-700">
             {description}
           </div>
         )}
