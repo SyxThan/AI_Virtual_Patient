@@ -1,6 +1,6 @@
 # Báo cáo tiến độ — nhiệm vụ đã hoàn thành
 
-Cập nhật: 2026-11-12 (sau Slice 9; lập kế hoạch Giai đoạn 2). Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
+Cập nhật: 2026-11-12 (Giai đoạn 2: Slice 10–13). Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
 
 ## Bảng trạng thái
 
@@ -35,6 +35,12 @@ Cập nhật: 2026-11-12 (sau Slice 9; lập kế hoạch Giai đoạn 2). Chỉ
 | AVP-015 (S9-01) | Màn hình Debrief `/debrief/[id]`: polling, cảnh báo red flag, bảng kiểm + bằng chứng → transcript, phản hồi 5 tầng, trích dẫn, xuất PDF | ✅ Merged | **PR #20** | — |
 | AVP-025 (pt1) | Test API luồng đầy đủ + phân quyền 11 route (agy viết, Claude review) | 🟡 Chờ merge | **PR #21** | 105 test pass; chưa có Playwright / staging |
 | AVP-042 | Kế hoạch Giai đoạn 2 (Slice 10–14) trong `docs/tasks.md` + cập nhật scope, quality gates, open questions, risks | 🟡 Chờ merge | PR (docs) | Chỉ tài liệu |
+| AVP-106/107/108 (S10) | Đăng nhập Supabase: FastAPI xác thực JWT qua JWKS (RS256/ES256) cho HTTP + WS, `/login`, `/profile`, `GET/PATCH /me`, nhận phiên khách vào tài khoản, tên trên PDF | ✅ Merged | PR #24 | Đăng nhập thật trên trình duyệt: người dùng tự test |
+| AVP-109/110/111 (S11) | `GET /sessions` (keyset, 1 SQL), `GET /sessions/progress`, trang `/history` + biểu đồ tiến bộ | ✅ Merged | PR #23 | Verify Postgres thật (EXPLAIN dùng index) |
+| AVP-120 | Test chéo Slice 10–11 (agy viết, Claude review) | ✅ Merged | PR #25 | 170 test |
+| AVP-112/113/114 + AVP-022/036 (S12) | Trang chủ, 404/error/loading, menu mobile, xử lý micro/WS/provider lỗi, xác nhận kết thúc, khôi phục phiên, đồng hồ, chế độ Luyện tập/Thi thử (`/guide`, giới hạn thời gian), hướng dẫn lần đầu, responsive + axe | 🟡 Chờ merge | PR #27 | Browser check 62/62 + WS 4/4, axe không còn lỗi serious/critical |
+| AVP-115 (S13) | `DELETE /sessions/{id}`, `DELETE /me` (+ xoá tài khoản Supabase nếu có `SUPABASE_SECRET_KEY` ở server), dọn phiên khách (`jobs.cleanup`), trang `/privacy`, nút xoá | 🟡 Chờ merge | PR #26 | Verify Postgres thật: 0 dòng con sau khi xoá; nội dung `/privacy` là bản nháp |
+| AVP-121 | Tích hợp S12+S13: giới hạn thời gian cho thao tác khám/y lệnh, worker không crash khi phiên bị xoá, `hide_parameters` cho log SQL (T-SEC-02), nút xoá trên `/debrief`, sửa câu đồng ý, gen-client | 🟡 Chờ merge (sau #26, #27) | PR #28 | — |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -135,7 +141,7 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - ⚠ Người quét mã QR chỉ xem được trang nếu có quyền với phiên (cùng trình duyệt với phiên khách, hoặc đăng nhập). Chưa có trang xác thực công khai: nếu cần thì phải thiết kế riêng, vì transcript là dữ liệu cá nhân.
 
 ## Tổng kết
-**9/9 vertical slice của Giai đoạn 1 đã merge.** Giai đoạn 2 (Slice 10–14: tài khoản, lịch sử, hoàn thiện UX, quyền riêng tư, triển khai & đo lường) đã lên kế hoạch trong `docs/tasks.md`; chưa bắt đầu code. Chưa phải bản phát hành: ca bệnh và corpus RAG vẫn là bản nháp chờ bác sĩ duyệt; chưa chạy với Gemini/Google thật; các chỉ số (latency, kappa, T-OSCE-04) chưa đo.
+**9/9 vertical slice của Giai đoạn 1 đã merge.** Giai đoạn 2: Slice 10–11 đã merge; Slice 12–13 code xong, chờ merge PR #26, #27, #28; Slice 14 (triển khai & đo lường) chưa làm. Chưa phải bản phát hành: ca bệnh và corpus RAG vẫn là bản nháp chờ bác sĩ duyệt; chưa chạy với Gemini/Google thật; các chỉ số (latency, kappa, T-OSCE-04) chưa đo.
 
 ## Thứ tự merge (bạn thực hiện)
 1. **PR #21** (AVP-025 test). 2. PR docs AVP-042 (kế hoạch Giai đoạn 2). Hai PR độc lập, merge thứ tự nào cũng được.
