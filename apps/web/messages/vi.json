@@ -56,6 +56,23 @@
     "loadError": "Không tải được hội thoại.",
     "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
+  "voice": {
+    "hold": "Giữ để nói",
+    "recording": "Đang ghi âm… thả ra để gửi",
+    "connecting": "Đang kết nối…",
+    "processing": "Đang xử lý giọng nói…",
+    "hint": "Giữ nút (hoặc phím Space) trong khi nói, thả ra để gửi. Bạn vẫn có thể gõ câu hỏi bên dưới.",
+    "micDenied": "Trình duyệt chưa cho phép dùng micro. Hãy cấp quyền micro hoặc gõ câu hỏi.",
+    "unsupported": "Trình duyệt này không hỗ trợ ghi âm. Bạn hãy gõ câu hỏi.",
+    "disconnected": "Mất kết nối giọng nói. Nhấn nút để kết nối lại hoặc gõ câu hỏi.",
+    "authFailed": "Không xác thực được phiên giọng nói. Hãy tải lại trang.",
+    "sttFailed": "Không nhận diện được giọng nói. Bạn hãy nói lại hoặc gõ câu hỏi.",
+    "ttsFailed": "Không phát được giọng người mẹ; câu trả lời hiển thị dạng chữ.",
+    "tooLarge": "Đoạn ghi âm quá dài. Bạn hãy nói ngắn hơn.",
+    "patientUnavailable": "Người bệnh tạm thời không phản hồi được, vui lòng thử lại.",
+    "playbackFailed": "Không phát được âm thanh; câu trả lời hiển thị dạng chữ.",
+    "genericError": "Có lỗi với giọng nói. Bạn hãy thử lại hoặc gõ câu hỏi."
+  },
   "avatar": {
     "title": "Người mẹ bế bé",
     "loading": "Đang tải mô hình 3D…",

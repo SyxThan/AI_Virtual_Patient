@@ -22,9 +22,11 @@ Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-012 (fix) | Sửa 500 turn loop (async→sync, tránh pool xuyên thread) | ✅ Merged | PR #10 | — |
 | AVP-009 (fix) | Retry lỗi Gemini tạm thời (503/429) + `make check-llm` | ✅ Merged | PR #11 | — |
 | AVP-102 | **Vitals State Machine** (5 trạng thái HFMD) + Patient Monitor UI | ✅ Merged | PR #12 | Slice 4; draft lâm sàng; jsonb verify DB thật (cùng PR #14) |
-| AVP-104 (S5-01) | Avatar 3D SSR-safe (rig procedural mẹ bế bé, OrbitControls) | ✅ Code xong & verify, 🟡 chờ merge | **PR #13** | Slice 5 |
-| AVP-104 (S5-02) | Raycasting khám 4 vùng → `POST /sessions/{id}/actions` → ghi turn → panel kết quả | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #14** | Mapping vùng + ảnh minh hoạ cần duyệt |
-| AVP-104 (S5-03) | Lip-sync theo biên độ audio (no-op khi chưa có voice) | ✅ Code xong & verify logic, 🟡 chờ merge | **PR #15** | P1; nối với Slice 6 |
+| AVP-104 (S5-01) | Avatar 3D SSR-safe (rig procedural mẹ bế bé, OrbitControls) | ✅ Merged | PR #13 | Slice 5 |
+| AVP-104 (S5-02) | Raycasting khám 4 vùng → `POST /sessions/{id}/actions` → ghi turn → panel kết quả | ✅ Merged | PR #14 | Mapping vùng + ảnh minh hoạ cần duyệt |
+| AVP-104 (S5-03) | Lip-sync theo biên độ audio | ✅ Merged | PR #15 | Đã nối với voice ở PR #17 |
+| AVP-020 (S6-01) | Adapter STT/TTS + Fake offline + lỗi có kiểu + đo latency | ✅ Code xong & verify, 🟡 chờ merge | **PR #16** | Real provider (Google Cloud) **chưa bật** |
+| AVP-022 (S6-02) | WebSocket `/ws/sessions/{id}` + `useVoiceSession` + nút giữ-để-nói | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #17** | Phụ thuộc #16 |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -75,8 +77,18 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - Lip-sync: kiểm logic với AnalyserNode giả (đóng → mở → đóng).
 - Mục tiêu "60fps", "<1s" trong tasks là **mục tiêu thiết kế, chưa đo**.
 
+## Slice 6 (Voice-to-voice) — hoàn tất về mặt code (PR #16, #17)
+- **S6-01 (#16):** `providers/stt.py`, `providers/tts.py` theo đúng khuôn `llm.py` (ABC → Fake → 1 provider thật lazy → selector fallback Fake). Provider thật: Google Cloud Speech-to-Text / Text-to-Speech qua REST (stdlib, **không thêm dependency**), key ở header. Mọi lỗi/timeout → `VoiceProviderError`; log chỉ có provider, kết quả, `elapsed_ms` đo được.
+- **S6-02 (#17):** WS auth bằng tin nhắn đầu (guest token, không để trong URL), kiểm Origin, giới hạn 5 MB/lượt. Giữa lượt dùng lại `turns_service.submit_turn` (guardrail + lưu DB), gọi qua `run_in_threadpool`. STT lỗi → báo lỗi, socket vẫn mở, gõ chữ vẫn chạy; TTS lỗi/timeout → vẫn có transcript chữ. Web: `useVoiceSession` (MediaRecorder, phát qua AnalyserNode → lip-sync), nút giữ-để-nói (chuột/chạm/phím Space).
+
+### Kiểm thử Slice 6 (exit 0)
+- apps/api: `pytest` 47 passed (11 adapter + 8 WS), `ruff` sạch — không mạng, không key.
+- apps/web: `tsc`, eslint sạch; build OK.
+- Postgres thật (Docker tạm, TestClient, provider Fake): tạo session → WS auth → audio → transcript SV + mẹ + audio WAV + timing → lượt gõ chữ qua WS → transcript `[(0,student),(1,patient),(2,student),(3,patient)]`; sai token → đóng 1008.
+- ⚠ Chưa thử micro thật trên trình duyệt và chưa gọi API Google thật (chưa có key). Mục tiêu "< 2.5 s" chưa đo.
+
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #13** (S5-01) → 2. **PR #14** (S5-02) → 3. **PR #15** (S5-03). Tất cả base `main`; merge theo thứ tự thì mỗi diff tự gọn lại.
+1. **PR #16** (S6-01) → 2. **PR #17** (S6-02). Base `main`; merge theo thứ tự thì diff #17 tự gọn lại.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.

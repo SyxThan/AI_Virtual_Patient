@@ -7,7 +7,10 @@ import type { ExamRegionId } from "@/components/avatar/AnatomyColliders";
 import AvatarCanvas from "@/components/avatar/AvatarCanvas";
 import ExamFindingPanel, { type ExamActionResponse } from "@/components/avatar/ExamFindingPanel";
 import type { components } from "@/lib/api-client/schema";
+import { patientLipSync } from "@/components/avatar/LipSyncController";
+import { useVoiceSession, type VoiceTranscript } from "@/hooks/useVoiceSession";
 import ChatInput from "@/components/workspace/ChatInput";
+import PushToTalk from "@/components/workspace/PushToTalk";
 import TranscriptBox, { type Turn } from "@/components/workspace/TranscriptBox";
 import VitalsMonitor from "@/components/workspace/VitalsMonitor";
 
@@ -26,6 +29,22 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [examResult, setExamResult] = useState<ExamActionResponse | null>(null);
   const [examLoading, setExamLoading] = useState(false);
   const [examError, setExamError] = useState<string | null>(null);
+
+  // Voice turns land in the same transcript list as typed turns.
+  const onVoiceTranscript = useCallback((t: VoiceTranscript) => {
+    setTurns((cur) => [
+      ...cur,
+      { turn_idx: t.turn_idx ?? cur.length, speaker: t.speaker, text: t.text },
+    ]);
+  }, []);
+  const voice = useVoiceSession({ sessionId: id, onTranscript: onVoiceTranscript });
+
+  // Lip-sync follows the patient's voice playback once audio output exists.
+  useEffect(() => {
+    if (!voice.analyser) return;
+    patientLipSync.attachAnalyser(voice.analyser);
+    return () => patientLipSync.detach();
+  }, [voice.analyser]);
 
   const authHeaders = useCallback((): Record<string, string> => {
     const h: Record<string, string> = {};
@@ -146,7 +165,18 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
               {error}
             </div>
           )}
-          <ChatInput onSend={handleSend} loading={sending} />
+          <PushToTalk
+            status={voice.status}
+            error={voice.error}
+            notice={voice.notice}
+            disabled={sending}
+            onStart={() => void voice.start()}
+            onStop={voice.stop}
+          />
+          <ChatInput
+            onSend={handleSend}
+            loading={sending || voice.status === "processing" || voice.status === "recording"}
+          />
         </section>
       </div>
 
