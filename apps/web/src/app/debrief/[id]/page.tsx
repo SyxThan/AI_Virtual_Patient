@@ -11,13 +11,17 @@ import RedFlagAlertBanner from "@/components/debrief/RedFlagAlertBanner";
 import RubricEvidenceList from "@/components/debrief/RubricEvidenceList";
 import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
+import { FOCUS_RING } from "@/components/ui/focus";
 import { useDebriefData } from "@/hooks/useDebriefData";
 
 function Skeleton({ message }: { message: string }) {
   return (
     <div className="space-y-4" aria-busy="true">
       <p className="flex items-center gap-2 text-sm text-gray-600" role="status">
-        <span className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" aria-hidden />
+        <span
+          className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-700 motion-reduce:animate-none"
+          aria-hidden
+        />
         {message}
       </p>
       {[0, 1, 2].map((i) => (
@@ -30,7 +34,11 @@ function Skeleton({ message }: { message: string }) {
 function Notice({ tone, children }: { tone: "error" | "info"; children: React.ReactNode }) {
   const cls =
     tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-gray-200 bg-gray-50 text-gray-800";
-  return <div className={`rounded-lg border px-4 py-4 text-sm ${cls}`}>{children}</div>;
+  return (
+    <div role={tone === "error" ? "alert" : "status"} className={`rounded-lg border px-4 py-4 text-sm ${cls}`}>
+      {children}
+    </div>
+  );
 }
 
 export default function DebriefPage({ params }: { params: Promise<{ id: string }> }) {
@@ -60,7 +68,11 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="info">
         <p>{vi.debrief.timeout}</p>
-        <button type="button" onClick={refresh} className="mt-3 rounded-md bg-gray-800 px-3 py-1.5 text-white">
+        <button
+          type="button"
+          onClick={refresh}
+          className={`mt-3 rounded-md bg-gray-800 px-3 py-1.5 text-white ${FOCUS_RING}`}
+        >
           {vi.debrief.reload}
         </button>
       </Notice>
@@ -73,7 +85,10 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="info">
         <p>{vi.debrief.notFinished}</p>
-        <Link href={`/session/${id}`} className="mt-3 inline-block text-indigo-700 underline">
+        <Link
+          href={`/session/${id}`}
+          className={`mt-3 inline-block rounded text-indigo-800 underline ${FOCUS_RING}`}
+        >
           {vi.debrief.backToSession}
         </Link>
       </Notice>
@@ -82,7 +97,11 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="error">
         <p>{vi.debrief.loadError}</p>
-        <button type="button" onClick={refresh} className="mt-3 rounded-md bg-red-700 px-3 py-1.5 text-white">
+        <button
+          type="button"
+          onClick={refresh}
+          className={`mt-3 rounded-md bg-red-700 px-3 py-1.5 text-white ${FOCUS_RING}`}
+        >
           {vi.debrief.reload}
         </button>
       </Notice>
@@ -97,7 +116,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
           type="button"
           onClick={onRetry}
           disabled={retrying}
-          className="mt-3 rounded-md bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 disabled:opacity-60"
+          className={`mt-3 rounded-md bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 disabled:opacity-60 ${FOCUS_RING}`}
         >
           {retrying ? vi.debrief.retrying : vi.debrief.retry}
         </button>
@@ -129,7 +148,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <main className="mx-auto max-w-5xl space-y-5 p-4 sm:p-8">
+    <main className="mx-auto w-full max-w-5xl space-y-5 px-4 py-6 sm:p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-gray-900">{vi.debrief.title}</h1>
         <ExportPdfButton sessionId={id} disabled={!(evDone && dbDone)} />
@@ -137,15 +156,21 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
       <PracticeNoticeBanner sourcesReviewed={dbDone ? (db?.sources_reviewed ?? false) : null} />
       {body}
       <footer className="flex flex-wrap gap-3 border-t border-gray-200 pt-5">
-        <Link href="/setup" className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+        <Link
+          href="/setup"
+          className={`rounded-md bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800 ${FOCUS_RING}`}
+        >
           {vi.debrief.actions.newCase}
         </Link>
-        <Link
-          href={`/session/${id}`}
-          className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        {/* A finished session redirects away from /session/{id}, so review the transcript here. */}
+        <button
+          type="button"
+          onClick={() => setFocusTurn(turns[0]?.turn_idx ?? 0)}
+          disabled={turns.length === 0}
+          className={`rounded-md border border-gray-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50 ${FOCUS_RING}`}
         >
-          {vi.debrief.actions.reviewSession}
-        </Link>
+          {vi.debriefUx.reviewTranscript}
+        </button>
       </footer>
       {focusTurn !== null && <TranscriptDrawer turns={turns} focusIdx={focusTurn} onClose={closeDrawer} />}
     </main>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
+import { FOCUS_RING } from "@/components/ui/focus";
 import type { Debrief } from "@/hooks/useDebriefData";
 
 type Claim = NonNullable<Debrief["items"]>[number];
@@ -26,9 +27,9 @@ function ClaimRow({ claim }: { claim: Claim }) {
               type="button"
               aria-expanded={open === c.chunk_id}
               onClick={() => setOpen(open === c.chunk_id ? null : c.chunk_id)}
-              className={`rounded-md border px-2 py-0.5 text-xs font-medium ${
+              className={`rounded-md border px-2 py-0.5 text-xs font-medium ${FOCUS_RING} ${
                 open === c.chunk_id
-                  ? "border-indigo-500 bg-indigo-600 text-white"
+                  ? "border-indigo-700 bg-indigo-700 text-white"
                   : "border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
               }`}
             >
@@ -64,7 +65,7 @@ export default function CitedClaimsSection({ items }: { items: Claim[] }) {
     <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">{vi.debrief.claims.title}</h2>
       {items.length === 0 ? (
-        <p className="mt-2 text-sm italic text-gray-400">{vi.debrief.claims.empty}</p>
+        <p className="mt-2 text-sm italic text-gray-600">{vi.debrief.claims.empty}</p>
       ) : (
         <ul className="mt-1 divide-y divide-gray-100">
           {items.map((c, i) => (

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useFocusTrap } from "@/components/ui/useFocusTrap";
 import vi from "../../../messages/vi.json";
+import { FOCUS_RING } from "@/components/ui/focus";
 import type { TurnRow } from "@/hooks/useDebriefData";
 import { fmt } from "@/lib/sessionAuth";
 
@@ -23,25 +25,23 @@ export default function TranscriptDrawer({
 }) {
   const refs = useRef(new Map<number, HTMLLIElement>());
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  // Focus starts on "close", stays inside the drawer, Escape closes, focus returns.
+  useFocusTrap(true, panelRef, onClose, closeRef);
 
   useEffect(() => {
     refs.current.get(focusIdx)?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [focusIdx, turns]);
 
-  useEffect(() => {
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/30" onClick={onClose}>
       <aside
+        ref={panelRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={vi.debrief.transcript.title}
-        className="flex h-full w-full max-w-lg flex-col bg-white shadow-xl"
+        className="flex h-full w-full max-w-lg flex-col bg-white shadow-xl outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
@@ -50,13 +50,13 @@ export default function TranscriptDrawer({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            className="rounded-md px-2 py-1 text-sm text-gray-600 hover:bg-gray-100"
+            className={`rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-gray-100 ${FOCUS_RING}`}
           >
             {vi.debrief.transcript.close}
           </button>
         </header>
         <ol className="flex-1 space-y-2 overflow-y-auto p-4">
-          {turns.length === 0 && <p className="text-sm text-gray-500">{vi.debrief.transcript.empty}</p>}
+          {turns.length === 0 && <p className="text-sm text-gray-600">{vi.debrief.transcript.empty}</p>}
           {turns.map((t) => {
             const focused = t.turn_idx === focusIdx;
             return (
@@ -74,7 +74,7 @@ export default function TranscriptDrawer({
                       : "border-gray-200 bg-gray-50"
                 }`}
               >
-                <span className="mb-0.5 block text-[11px] text-gray-500">
+                <span className="mb-0.5 block text-xs text-gray-600">
                   {fmt(vi.debrief.rubric.turn, { idx: t.turn_idx })} · {SPEAKER[t.speaker] ?? t.speaker}
                 </span>
                 {t.text}
