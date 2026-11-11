@@ -876,6 +876,89 @@
           }
         }
       }
+    },
+    "/api/v1/sessions/{session_id}/debrief/pdf": {
+      "get": {
+        "tags": [
+          "debrief"
+        ],
+        "summary": "Get Debrief Pdf",
+        "operationId": "get_debrief_pdf_api_v1_sessions__session_id__debrief_pdf_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Practice report PDF.",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "202": {
+            "description": "Evaluation or debrief pending.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DebriefResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Session not finished, or evaluation/debrief failed."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {

@@ -41,7 +41,10 @@
     "title": "Phiên hỏi bệnh",
     "patientName": "Bệnh nhi 18 tháng tuổi — Tay chân miệng",
     "modeLabel": "Chế độ",
-    "mode": { "guided": "Luyện tập", "exam": "Thi thử" },
+    "mode": {
+      "guided": "Luyện tập",
+      "exam": "Thi thử"
+    },
     "finish": "Kết thúc buổi khám",
     "finishing": "Đang kết thúc…",
     "finishError": "Không kết thúc được buổi khám. Vui lòng thử lại.",
@@ -119,7 +122,84 @@
     "error": "Không lấy được sinh hiệu."
   },
   "debrief": {
-    "title": "Kết quả và phản hồi"
+    "title": "Kết quả và phản hồi",
+    "practiceNotice": "Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ.",
+    "draftSources": "Nội dung nguồn đang ở bản nháp chờ bác sĩ thẩm định.",
+    "pending": "Hệ thống đang chấm điểm Auto-OSCE & trích dẫn hướng dẫn Bộ Y tế...",
+    "debriefPending": "Đang tạo phản hồi sư phạm và trích dẫn nguồn...",
+    "timeout": "Việc xử lý đang lâu hơn bình thường. Bạn có thể tải lại trang sau ít phút.",
+    "reload": "Tải lại",
+    "loadError": "Không tải được kết quả. Kiểm tra kết nối rồi thử lại.",
+    "notFound": "Không tìm thấy phiên khám này, hoặc bạn không có quyền xem (hãy mở trên cùng trình duyệt đã dùng để khám).",
+    "notFinished": "Buổi khám chưa kết thúc nên chưa có kết quả.",
+    "backToSession": "Quay lại phòng khám",
+    "failedTitle": "Chưa chấm được buổi khám",
+    "retry": "Thử chấm lại",
+    "retrying": "Đang gửi yêu cầu chấm lại...",
+    "retryError": "Không gửi được yêu cầu chấm lại. Vui lòng thử lại.",
+    "debriefFailed": "Chưa tạo được phản hồi sư phạm cho buổi khám này.",
+    "redFlag": "CẢNH BÁO DẤU HIỆU NGUY HIỂM: Bạn đã bỏ sót hoặc chưa đạt tiêu chí tối quan trọng (Giật mình chới với / Phân độ Tay chân miệng)",
+    "score": {
+      "title": "Điểm Auto-OSCE",
+      "outOf": "/ 100",
+      "versions": "Bảng kiểm v{rubric} · cách tính {scoring} · {model}"
+    },
+    "status": {
+      "met": "Đạt",
+      "partial": "Đạt một phần",
+      "unmet": "Chưa đạt",
+      "insufficient_evidence": "Thiếu bằng chứng"
+    },
+    "rubric": {
+      "title": "Bảng kiểm OSCE",
+      "critical": "Trọng yếu",
+      "flagged": "Bằng chứng bị bác bỏ",
+      "flaggedHint": "Đề xuất của AI không khớp nguyên văn lời bạn nói nên không được tính.",
+      "lowReliability": "Độ tin cậy thấp",
+      "weight": "Trọng số {weight}",
+      "evidence": "Bằng chứng nguyên văn",
+      "noEvidence": "Không có bằng chứng trong transcript.",
+      "turn": "Lượt #{idx}",
+      "openTranscript": "Xem trong transcript"
+    },
+    "transcript": {
+      "title": "Transcript buổi khám",
+      "close": "Đóng",
+      "empty": "Không có lượt thoại nào.",
+      "student": "Bạn",
+      "patient": "Người mẹ",
+      "system": "Ghi nhận khám"
+    },
+    "summary": {
+      "title": "Phản hồi sư phạm",
+      "expected_approach": "Tiếp cận chuẩn",
+      "rationale": "Lý giải lâm sàng",
+      "learning_points": "Điểm cần ghi nhớ",
+      "acceptable_alternatives": "Phương án thay thế",
+      "important_errors": "Sai sót cần tránh",
+      "none": "Không có."
+    },
+    "claims": {
+      "title": "Nhận xét chi tiết và trích dẫn",
+      "unverified": "Chưa đối chiếu được nguồn trích dẫn",
+      "section": "Mục",
+      "draft": "Bản tóm tắt nháp",
+      "empty": "Không có nhận xét bổ sung."
+    },
+    "sourceLabels": {
+      "moh-qd-1003-2012": "QĐ 1003/QĐ-BYT",
+      "htd-hcm-2023-bai20": "BV Bệnh Nhiệt đới 2023"
+    },
+    "pdf": {
+      "export": "Xuất báo cáo PDF",
+      "exporting": "Đang xuất PDF...",
+      "notReady": "Báo cáo chưa sẵn sàng, vui lòng đợi chấm xong.",
+      "error": "Không xuất được PDF. Vui lòng thử lại."
+    },
+    "actions": {
+      "newCase": "Luyện tập ca mới",
+      "reviewSession": "Xem lại phòng khám"
+    }
   },
   "common": {
     "placeholder": "Màn hình này sẽ được hoàn thiện ở các task sau."
