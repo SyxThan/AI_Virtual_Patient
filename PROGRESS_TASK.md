@@ -1,6 +1,6 @@
 # Báo cáo tiến độ — nhiệm vụ đã hoàn thành
 
-Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
+Cập nhật: 2026-11-11. Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
 
 ## Bảng trạng thái
 
@@ -25,8 +25,10 @@ Cập nhật: 2026-11-10. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-104 (S5-01) | Avatar 3D SSR-safe (rig procedural mẹ bế bé, OrbitControls) | ✅ Merged | PR #13 | Slice 5 |
 | AVP-104 (S5-02) | Raycasting khám 4 vùng → `POST /sessions/{id}/actions` → ghi turn → panel kết quả | ✅ Merged | PR #14 | Mapping vùng + ảnh minh hoạ cần duyệt |
 | AVP-104 (S5-03) | Lip-sync theo biên độ audio | ✅ Merged | PR #15 | Đã nối với voice ở PR #17 |
-| AVP-020 (S6-01) | Adapter STT/TTS + Fake offline + lỗi có kiểu + đo latency | ✅ Code xong & verify, 🟡 chờ merge | **PR #16** | Real provider (Google Cloud) **chưa bật** |
-| AVP-022 (S6-02) | WebSocket `/ws/sessions/{id}` + `useVoiceSession` + nút giữ-để-nói | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #17** | Phụ thuộc #16 |
+| AVP-020 (S6-01) | Adapter STT/TTS + Fake offline + lỗi có kiểu + đo latency | ✅ Merged | PR #16 | Real provider (Google Cloud) **chưa bật** |
+| AVP-022 (S6-02) | WebSocket `/ws/sessions/{id}` + `useVoiceSession` + nút giữ-để-nói | ✅ Merged | PR #17 | — |
+| AVP-013 (S7-02) | Evidence verifier (NFC, chỉ lời student, giáng cấp) + scoring engine thuần | ✅ Code xong & verify, 🟡 chờ merge | **PR #18** | Có giới hạn điểm khi trượt critical hay không: chờ bác sĩ (AVP-016) |
+| AVP-014 (S7-01) | Evaluator Agent + job queue (`SKIP LOCKED`) + `/finish`, `/evaluation`, `/evaluation/retry` + nút Kết thúc | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #18** | Chưa chạy Evaluator với Gemini thật |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -87,8 +89,21 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - Postgres thật (Docker tạm, TestClient, provider Fake): tạo session → WS auth → audio → transcript SV + mẹ + audio WAV + timing → lượt gõ chữ qua WS → transcript `[(0,student),(1,patient),(2,student),(3,patient)]`; sai token → đóng 1008.
 - ⚠ Chưa thử micro thật trên trình duyệt và chưa gọi API Google thật (chưa có key). Mục tiêu "< 2.5 s" chưa đo.
 
+## Slice 7 (Evaluator & Auto-OSCE) — hoàn tất về mặt code (PR #18)
+- **LLM đề xuất, code chấm (Hard Rule 4):** Evaluator trả `level` + trích dẫn theo từng tiêu chí; `evidence_verifier` chỉ nhận trích dẫn có thật trong lượt **student** (NFC + gộp khoảng trắng + casefold); met/partial mất hết bằng chứng → `insufficient_evidence`, `flagged`. Tiêu chí LLM bỏ sót → `insufficient_evidence` + flagged; id lạ bị bỏ. `scoring_engine` (thuần): `level/2`, tổng có trọng số 0–100, `critical_missed` khi `r-startle-hx`/`r-dx-grade` unmet/insufficient.
+- **Evaluator:** prompt `evaluator-v1`, temperature 0.1, JSON sai → thử lại 1 lần rồi `failed`. Model đọc từ `LLM_MODEL_EVALUATOR` (rơi về `LLM_MODEL_PATIENT`). Không có key → heuristic từ khoá offline (model lưu là `fake-heuristic`, **không phải evaluator đã kiểm định**).
+- **Job queue:** bảng `jobs`, claim `FOR UPDATE SKIP LOCKED`; chạy bằng `python -m avp_api.jobs.worker [--once]` hoặc tự chạy qua BackgroundTasks sau `/finish`.
+- **API:** `POST /finish` idempotent và nguyên tử (chuyển trạng thái + enqueue trong 1 transaction); `GET /evaluation` 409 nếu chưa kết thúc, 202 khi đang chấm, 200 `done`/`failed` (thông báo an toàn, không stack trace, không hiện điểm dở dang); `POST /evaluation/retry` chỉ khi `failed`. Sau khi kết thúc, gửi lượt hỏi/khám → 409. Luôn kèm thông báo "Học liệu phản hồi để luyện tập…".
+- **Web:** nút "Kết thúc buổi khám" gọi `/finish` rồi mới sang `/debrief/{id}`; `gen-client` đã chạy lại.
+
+### Kiểm thử Slice 7 (exit 0)
+- apps/api: `pytest` 65 passed (6 verifier, 5 scoring, 7 API/E2E), `ruff` sạch.
+- apps/web: `tsc`, eslint sạch; build OK.
+- Postgres thật (Docker tạm): tạo session → 3 câu hỏi → khám lòng bàn tay → finish ×2 (1 job) → evaluation `done`, 8 tiêu chí, `critical_missed=true`; sai token → 404. CHECK của DB từ chối `met` không bằng chứng và `insufficient_evidence` có level. `SKIP LOCKED`: job đang bị khoá thì worker khác lấy job kế tiếp. `make db-check-rls` OK.
+- ⚠ Chưa chạy Evaluator với Gemini thật; độ lặp lại T-OSCE-04 và kappa (AVP-026) **chưa đo**.
+
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #16** (S6-01) → 2. **PR #17** (S6-02). Base `main`; merge theo thứ tự thì diff #17 tự gọn lại.
+1. **PR #18** (Slice 7). Base `main`.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.

@@ -19,6 +19,9 @@ _GEMINI_BACKOFF_S = 0.8
 
 
 class LLMProvider(ABC):
+    # Stored with every evaluation so a result can be explained later.
+    model_id: str = "unknown"
+
     @abstractmethod
     def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
@@ -61,6 +64,8 @@ _FAKE_FALLBACK = "Dạ em không rõ ạ, em chưa để ý thấy bác sĩ ơi.
 class FakeLLMProvider(LLMProvider):
     """Offline, deterministic. Matches the student's question against keywords."""
 
+    model_id = "fake"
+
     def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
     ) -> str:
@@ -78,6 +83,7 @@ class GeminiProvider(LLMProvider):
     def __init__(self, api_key: str, model: str) -> None:
         self._api_key = api_key
         self._model = model
+        self.model_id = model
 
     def generate(
         self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
@@ -113,4 +119,14 @@ def get_llm_provider() -> LLMProvider:
     s = get_settings()
     if s.llm_provider == "gemini" and s.llm_api_key and s.llm_model_patient:
         return GeminiProvider(s.llm_api_key, s.llm_model_patient)
+    return FakeLLMProvider()
+
+
+def get_evaluator_provider() -> LLMProvider:
+    """Cold-path Evaluator model (LLM_MODEL_EVALUATOR, falling back to the patient
+    model id from env). Fake when no provider/key is configured."""
+    s = get_settings()
+    model = s.llm_model_evaluator or s.llm_model_patient
+    if s.llm_provider == "gemini" and s.llm_api_key and model:
+        return GeminiProvider(s.llm_api_key, model)
     return FakeLLMProvider()

@@ -43,6 +43,8 @@
     "modeLabel": "Chế độ",
     "mode": { "guided": "Luyện tập", "exam": "Thi thử" },
     "finish": "Kết thúc buổi khám",
+    "finishing": "Đang kết thúc…",
+    "finishError": "Không kết thúc được buổi khám. Vui lòng thử lại.",
     "patientCard": {
       "title": "Người mẹ bế bé",
       "desc": "Bé 18 tháng tuổi, mẹ bế đến khám. (Khu vực này sẽ hiển thị avatar 3D ở giai đoạn sau.)"

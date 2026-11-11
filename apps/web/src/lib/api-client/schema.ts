@@ -124,10 +124,149 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Finish Session */
+        post: operations["finish_session_api_v1_sessions__session_id__finish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/evaluation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Evaluation */
+        get: operations["get_evaluation_api_v1_sessions__session_id__evaluation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/evaluation/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Retry Evaluation */
+        post: operations["retry_evaluation_api_v1_sessions__session_id__evaluation_retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CriterionResultResponse */
+        CriterionResultResponse: {
+            /** Criterion Id */
+            criterion_id: string;
+            /** Criterion */
+            criterion: string;
+            /** Domain */
+            domain?: string | null;
+            /** Weight */
+            weight: number;
+            /** Critical */
+            critical: boolean;
+            /** Level */
+            level: number | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "met" | "partial" | "unmet" | "insufficient_evidence";
+            /** Score */
+            score: number;
+            /** Evidence */
+            evidence: components["schemas"]["EvidenceItem"][];
+            /** Feedback */
+            feedback: string | null;
+            /** Flagged */
+            flagged: boolean;
+            /**
+             * Low Reliability
+             * @default false
+             */
+            low_reliability: boolean;
+        };
+        /** EvaluationResponse */
+        EvaluationResponse: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "done" | "failed";
+            /** Session Id */
+            session_id: string;
+            /** Evaluation Id */
+            evaluation_id?: string | null;
+            /** Rubric Version */
+            rubric_version?: number | null;
+            /** Scoring Version */
+            scoring_version?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Prompt Version */
+            prompt_version?: string | null;
+            /** Total Score */
+            total_score?: number | null;
+            /**
+             * Max Score
+             * @default 100
+             */
+            max_score: number;
+            /**
+             * Critical Missed
+             * @default false
+             */
+            critical_missed: boolean;
+            /** Criteria */
+            criteria?: components["schemas"]["CriterionResultResponse"][];
+            /** Error */
+            error?: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /**
+             * Practice Feedback Only
+             * @default true
+             */
+            practice_feedback_only: boolean;
+            /**
+             * Notice
+             * @default Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ.
+             */
+            notice: string;
+        };
+        /** EvidenceItem */
+        EvidenceItem: {
+            /** Turn Idx */
+            turn_idx: number;
+            /** Quote */
+            quote: string;
+        };
         /** ExamActionRequest */
         ExamActionRequest: {
             /**
@@ -554,6 +693,117 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ExamActionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    finish_session_api_v1_sessions__session_id__finish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_evaluation_api_v1_sessions__session_id__evaluation_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluationResponse"];
+                };
+            };
+            /** @description Evaluation pending. */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvaluationResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_evaluation_api_v1_sessions__session_id__evaluation_retry_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionResponse"];
                 };
             };
             /** @description Validation Error */

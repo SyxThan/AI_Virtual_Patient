@@ -56,6 +56,11 @@ def perform_action(
     guest_token: str | None,
 ) -> ExamActionResponse:
     sess = session_service.get_session(session_id, session_repo, user_id, guest_token)
+    if sess.status != "active":
+        raise HTTPException(
+            status_code=409,
+            detail={"code": "SESSION_FINISHED", "message": "This session has ended."},
+        )
     case = session_repo.get_case_content(sess.case_id, sess.case_version)
     if case is None:
         raise HTTPException(
