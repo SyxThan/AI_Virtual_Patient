@@ -12,6 +12,9 @@ dependencies = [
     "alembic>=1.13",
     "psycopg[binary]>=3.2",
     "pgvector>=0.3",
+    # Practice-report PDF + QR (Slice 9, AVP-105).
+    "fpdf2>=2.8",
+    "qrcode[pil]>=7.4",
 ]
 
 [project.optional-dependencies]

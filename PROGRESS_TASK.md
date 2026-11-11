@@ -1,6 +1,6 @@
 # Báo cáo tiến độ — nhiệm vụ đã hoàn thành
 
-Cập nhật: 2026-11-11. Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
+Cập nhật: 2026-11-11 (Slice 9). Chỉ ghi ✅ khi đã verify (build/test/migration chạy thật); PR đang mở = "code xong, chờ bạn merge" (branch protection yêu cầu 1 approval nên agent không tự merge).
 
 ## Bảng trạng thái
 
@@ -29,8 +29,10 @@ Cập nhật: 2026-11-11. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-022 (S6-02) | WebSocket `/ws/sessions/{id}` + `useVoiceSession` + nút giữ-để-nói | ✅ Merged | PR #17 | — |
 | AVP-013 (S7-02) | Evidence verifier (NFC, chỉ lời student, giáng cấp) + scoring engine thuần | ✅ Merged | PR #18 | Có giới hạn điểm khi trượt critical hay không: chờ bác sĩ (AVP-016) |
 | AVP-014 (S7-01) | Evaluator Agent + job queue (`SKIP LOCKED`) + `/finish`, `/evaluation`, `/evaluation/retry` + nút Kết thúc | ✅ Merged | PR #18 | Chưa chạy Evaluator với Gemini thật |
-| AVP-017/018 (S8-01) | Embedding adapter (Fake 768d + Gemini lazy), corpus HFMD (QĐ 1003 + BV BNĐ 2023), rights gate, pgvector repo, migration 0002 (HNSW), `ingest_guidelines.py` | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #19** | Corpus là **bản tóm tắt nháp**, chưa đối chiếu nguyên văn, chưa có số trang: chờ bác sĩ |
-| AVP-019 (S8-02) | Debriefing Agent 5 tầng + citation verifier + chuỗi job evaluate→debrief + `GET /debrief` | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #19** | Chưa chạy với Gemini thật; ngưỡng liên quan cho Gemini chưa hiệu chỉnh |
+| AVP-017/018 (S8-01) | Embedding adapter (Fake 768d + Gemini lazy), corpus HFMD (QĐ 1003 + BV BNĐ 2023), rights gate, pgvector repo, migration 0002 (HNSW), `ingest_guidelines.py` | ✅ Merged | PR #19 | Corpus là **bản tóm tắt nháp**, chưa đối chiếu nguyên văn, chưa có số trang: chờ bác sĩ |
+| AVP-019 (S8-02) | Debriefing Agent 5 tầng + citation verifier + chuỗi job evaluate→debrief + `GET /debrief` | ✅ Merged | PR #19 | Chưa chạy với Gemini thật; ngưỡng liên quan cho Gemini chưa hiệu chỉnh |
+| AVP-105 (S9-02) | PDF báo cáo phản hồi + QR (`GET /sessions/{id}/debrief/pdf`), chặn từ ngữ ADR-0010, font Unicode + fallback ASCII | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #20** | Thêm dependency `fpdf2`, `qrcode[pil]` (theo brief) |
+| AVP-015 (S9-01) | Màn hình Debrief `/debrief/[id]`: polling, cảnh báo red flag, bảng kiểm + bằng chứng → transcript, phản hồi 5 tầng, trích dẫn, xuất PDF | ✅ Code xong & **chạy thật trên trình duyệt**, 🟡 chờ merge | **PR #20** | — |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -119,8 +121,22 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - Postgres thật (Docker pgvector tạm, provider Fake): `alembic upgrade` 0001→0002 → `load-cases` → `ingest_guidelines.py` (inserted; chạy lại = unchanged) → index HNSW tồn tại → "giật mình độ 2a" trả đúng đoạn "Phân độ lâm sàng - Độ 2a" → rights gate từ chối → finish → jobs `evaluate done`, `debrief done` → `GET /debrief` 200 với trích dẫn trỏ đúng chunk có thật; sai token 404. Downgrade 0001 → upgrade lại OK; `db-check-rls` OK.
 - ⚠ Chưa chạy debrief/embedding với Gemini thật; ngưỡng liên quan Gemini (0.5) là giá trị tạm, chưa đo.
 
+## Slice 9 (Debriefing Screen & PDF + QR) — hoàn tất về mặt code (PR #20)
+- **PDF (`services/pdf_service.py`):** tiêu đề "BÁO CÁO PHẢN HỒI THỰC HÀNH LÂM SÀNG"; thông tin phiên, điểm, khung cảnh báo red flag, bảng 8 tiêu chí, phản hồi 5 tầng, nhận xét kèm nguồn, danh mục tài liệu tham chiếu, mã QR và câu miễn trừ ở chân mọi trang. Từ ngữ kiểu "chứng chỉ/certificate" trong nội dung sinh tự động bị thay thế; nếu xuất hiện trong chữ cố định thì báo lỗi, không in ra. Font: tìm TTF Unicode của hệ thống (Arial/Segoe trên Windows, DejaVu/Liberation/Noto trên Linux, hoặc `PDF_FONT_PATH`); không có thì bỏ dấu sang ASCII để không bao giờ lỗi. QR chỉ chứa `{WEB_BASE_URL}/debrief/{id}`, không chứa token.
+- **API:** `GET /sessions/{id}/debrief/pdf`: sai chủ → 404, chưa kết thúc hoặc chấm/phản hồi lỗi → 409, đang xử lý → 202, xong → PDF.
+- **Web `/debrief/[id]`:** poll 1,5 s khi 202 (tối đa ~3 phút); hiện kết quả chấm ngay, phần phản hồi tải sau; lỗi chấm → nút "Thử chấm lại". Banner luyện tập + nhãn nguồn nháp, banner red flag, thẻ điểm, bảng kiểm (huy hiệu trạng thái, trọng yếu, bằng chứng bị bác bỏ), bấm bằng chứng → ngăn transcript tô sáng đúng lượt, phản hồi 5 tầng, nhận xét kèm nút trích dẫn mở đoạn nguồn. Xuất PDF bằng `fetch` + Blob để gửi kèm `X-Guest-Token`.
+
+### Kiểm thử Slice 9 (exit 0)
+- apps/api: `pytest` 91 passed (11 test PDF), `ruff` sạch.
+- apps/web: `gen-client`, `typecheck`, `lint`, `build` OK.
+- Chạy thật (Docker Postgres + API + `next start`, provider Fake, Chrome qua Playwright): hỏi 3 câu + khám miệng → finish → trang debrief hiện đủ các phần; bấm bằng chứng mở transcript đúng lượt; bấm trích dẫn hiện đoạn nguồn có nhãn "Bản tóm tắt nháp"; nút PDF tải được file `%PDF-` ~70 KB; đổi sang token sai → hiện thông báo không tìm thấy.
+- ⚠ Người quét mã QR chỉ xem được trang nếu có quyền với phiên (cùng trình duyệt với phiên khách, hoặc đăng nhập). Chưa có trang xác thực công khai: nếu cần thì phải thiết kế riêng, vì transcript là dữ liệu cá nhân.
+
+## Tổng kết
+**9/9 vertical slice đã hoàn tất về mặt code** (Slice 9 chờ merge PR #20). Chưa phải bản phát hành: ca bệnh và corpus RAG vẫn là bản nháp chờ bác sĩ duyệt; chưa chạy với Gemini/Google thật; các chỉ số (latency, kappa, T-OSCE-04) chưa đo.
+
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #19** (Slice 8). Base `main`. Sau khi merge: `make db-migrate` rồi `python scripts/ingest_guidelines.py` trên DB dev.
+1. **PR #20** (Slice 9). Base `main`. Sau khi merge: `pip install -e ".[dev]"` trong `apps/api` (thêm `fpdf2`, `qrcode`); đặt `WEB_BASE_URL` khi deploy.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.

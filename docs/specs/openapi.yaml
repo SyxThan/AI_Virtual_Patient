@@ -203,7 +203,9 @@ paths:
                 type: string
                 format: binary
         "202":
-          description: Report not ready yet.
+          description: Report not ready yet (evaluation or debrief pending).
+        "409":
+          description: Session not finished, or the evaluation/debrief failed (REPORT_UNAVAILABLE).
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
 
