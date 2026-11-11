@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { API_URL, authHeaders, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const CASE_ID = "case-01-hfmd";
 
 type Role = "student" | "resident" | "practitioner";
@@ -15,6 +17,7 @@ const MODES: Mode[] = ["guided", "exam"];
 
 export default function SetupPage() {
   const router = useRouter();
+  const { status } = useAuth();
   const [role, setRole] = useState<Role>("student");
   const [mode, setMode] = useState<Mode>("guided");
   const [consent, setConsent] = useState(false);
@@ -25,16 +28,15 @@ export default function SetupPage() {
     setLoading(true);
     setError(null);
     try {
+      await whenAuthReady(); // a signed-in user's session is created under their account
       const res = await fetch(`${API_URL}/api/v1/sessions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ case_id: CASE_ID, mode, role, consent: true }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: { id: string; guest_token?: string | null } = await res.json();
-      if (data.guest_token) {
-        sessionStorage.setItem("avp_guest_token", data.guest_token);
-      }
+      if (data.guest_token) rememberGuestSession(data.id, data.guest_token);
       router.push(`/session/${data.id}`);
     } catch {
       setError(vi.setup.error.generic);
@@ -45,6 +47,19 @@ export default function SetupPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-8">
       <h1 className="text-2xl font-semibold">{vi.setup.title}</h1>
+
+      {status === "signedIn" ? (
+        <p className="text-sm text-gray-600">{vi.auth.setupSignedIn}</p>
+      ) : status !== "loading" ? (
+        <p className="text-sm text-gray-600">
+          {vi.auth.setupGuest}{" "}
+          {status === "signedOut" && (
+            <Link href="/login?next=/setup" className="underline">
+              {vi.auth.setupSignIn}
+            </Link>
+          )}
+        </p>
+      ) : null}
 
       {error && (
         <div

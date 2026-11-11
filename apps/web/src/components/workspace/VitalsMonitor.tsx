@@ -2,8 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import vi from "../../../messages/vi.json";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 type Vitals = {
   temperature_c: number;
@@ -16,16 +15,6 @@ type Vitals = {
   clinical_label: string;
   active_symptoms: string[];
 };
-
-function authHeaders(): Record<string, string> {
-  try {
-    const t = sessionStorage.getItem("avp_guest_token");
-    if (t) return { "X-Guest-Token": t };
-  } catch {
-    /* ignore */
-  }
-  return {};
-}
 
 export default function VitalsMonitor({ sessionId }: { sessionId: string }) {
   const [v, setV] = useState<Vitals | null>(null);
@@ -73,6 +62,7 @@ export default function VitalsMonitor({ sessionId }: { sessionId: string }) {
     let cancelled = false;
     (async () => {
       try {
+        await whenAuthReady();
         const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/vitals`, {
           headers: authHeaders(),
         });

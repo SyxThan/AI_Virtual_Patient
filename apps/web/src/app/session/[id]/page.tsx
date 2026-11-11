@@ -13,8 +13,7 @@ import ChatInput from "@/components/workspace/ChatInput";
 import PushToTalk from "@/components/workspace/PushToTalk";
 import TranscriptBox, { type Turn } from "@/components/workspace/TranscriptBox";
 import VitalsMonitor from "@/components/workspace/VitalsMonitor";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 type ExamActionRequest = components["schemas"]["ExamActionRequest"];
 
@@ -47,21 +46,11 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     return () => patientLipSync.detach();
   }, [voice.analyser]);
 
-  const authHeaders = useCallback((): Record<string, string> => {
-    const h: Record<string, string> = {};
-    try {
-      const t = sessionStorage.getItem("avp_guest_token");
-      if (t) h["X-Guest-Token"] = t;
-    } catch {
-      /* sessionStorage may be unavailable */
-    }
-    return h;
-  }, []);
-
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
+        await whenAuthReady(); // the first request must carry the restored bearer token
         const [sRes, tRes] = await Promise.all([
           fetch(`${API_URL}/api/v1/sessions/${id}`, { headers: authHeaders() }),
           fetch(`${API_URL}/api/v1/sessions/${id}/turns`, { headers: authHeaders() }),
@@ -76,7 +65,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     return () => {
       cancelled = true;
     };
-  }, [id, authHeaders]);
+  }, [id]);
 
   async function handleSend(text: string) {
     setSending(true);

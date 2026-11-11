@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
-import { API_URL, authHeaders } from "@/lib/sessionAuth";
+import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 /**
  * Downloads the practice-report PDF. A plain <a href> would not send the
- * X-Guest-Token header, so we fetch with auth, turn the body into a Blob and
+ * Bearer / X-Guest-Token header, so we fetch with auth, turn the body into a Blob and
  * trigger the download from an object URL.
  */
 export default function ExportPdfButton({ sessionId, disabled }: { sessionId: string; disabled?: boolean }) {
@@ -17,6 +17,7 @@ export default function ExportPdfButton({ sessionId, disabled }: { sessionId: st
     setBusy(true);
     setError(null);
     try {
+      await whenAuthReady();
       const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/debrief/pdf`, {
         headers: authHeaders(),
       });
