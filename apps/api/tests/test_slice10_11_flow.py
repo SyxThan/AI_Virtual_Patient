@@ -7,6 +7,7 @@ In-process only, synthetic users and transcripts only.
 from __future__ import annotations
 
 import time
+from datetime import timedelta
 
 import pytest
 
@@ -89,16 +90,22 @@ def test_guest_session_claimed_appears_in_history(h) -> None:
 
 def test_after_claim_guest_token_alone_is_denied(h) -> None:
     sid, guest = h.new_session()
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/turns",
-        json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
-        headers=guest,
-    ).status_code == 200
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/turns",
-        json={"text": "Bé có giật mình khi ngủ không chị?"},
-        headers=guest,
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/turns",
+            json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
+            headers=guest,
+        ).status_code
+        == 200
+    )
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/turns",
+            json={"text": "Bé có giật mình khi ngủ không chị?"},
+            headers=guest,
+        ).status_code
+        == 200
+    )
     assert h.client.post(f"/api/v1/sessions/{sid}/finish", headers=guest).status_code == 200
 
     r_claim = h.client.post(
@@ -124,22 +131,31 @@ def test_after_claim_guest_token_alone_is_denied(h) -> None:
 
 def test_user_b_cannot_see_or_claim(h) -> None:
     sid, guest = h.new_session()
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/turns",
-        json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
-        headers=guest,
-    ).status_code == 200
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/turns",
-        json={"text": "Bé có nốt phát ban ở lòng bàn tay không chị?"},
-        headers=guest,
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/turns",
+            json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
+            headers=guest,
+        ).status_code
+        == 200
+    )
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/turns",
+            json={"text": "Bé có nốt phát ban ở lòng bàn tay không chị?"},
+            headers=guest,
+        ).status_code
+        == 200
+    )
     assert h.client.post(f"/api/v1/sessions/{sid}/finish", headers=guest).status_code == 200
 
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/claim",
-        headers={**_bearer(USER_A), **guest},
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/claim",
+            headers={**_bearer(USER_A), **guest},
+        ).status_code
+        == 200
+    )
 
     b = _bearer(USER_B)
     # B's list is empty
@@ -167,11 +183,14 @@ def test_signed_in_sessions_ordered_and_progress_matches(h) -> None:
     r1 = h.client.post("/api/v1/sessions", json={"consent": True}, headers=a)
     assert r1.status_code == 201
     sid1 = r1.json()["id"]
-    assert h.client.post(
-        f"/api/v1/sessions/{sid1}/turns",
-        json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
-        headers=a,
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid1}/turns",
+            json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
+            headers=a,
+        ).status_code
+        == 200
+    )
     assert h.client.post(f"/api/v1/sessions/{sid1}/finish", headers=a).status_code == 200
 
     time.sleep(0.02)
@@ -179,12 +198,18 @@ def test_signed_in_sessions_ordered_and_progress_matches(h) -> None:
     r2 = h.client.post("/api/v1/sessions", json={"consent": True}, headers=a)
     assert r2.status_code == 201
     sid2 = r2.json()["id"]
-    assert h.client.post(
-        f"/api/v1/sessions/{sid2}/turns",
-        json={"text": "Bé có giật mình khi thiu thiu ngủ không chị?"},
-        headers=a,
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid2}/turns",
+            json={"text": "Bé có giật mình khi thiu thiu ngủ không chị?"},
+            headers=a,
+        ).status_code
+        == 200
+    )
     assert h.client.post(f"/api/v1/sessions/{sid2}/finish", headers=a).status_code == 200
+
+    if h.store.sessions[sid2].started_at <= h.store.sessions[sid1].started_at:
+        h.store.sessions[sid2].started_at = h.store.sessions[sid1].started_at + timedelta(seconds=1)
 
     # the list is newest first
     r_list = h.client.get("/api/v1/sessions", headers=a)
@@ -192,7 +217,7 @@ def test_signed_in_sessions_ordered_and_progress_matches(h) -> None:
     items = r_list.json()["items"]
     assert [it["id"] for it in items] == [sid2, sid1]
 
-    # /sessions/progress has 2 attempts in chronological order, each score equal to that session's GET /evaluation total_score
+    # progress: 2 attempts, chronological, scores equal each GET /evaluation total_score
     r_eval1 = h.client.get(f"/api/v1/sessions/{sid1}/evaluation", headers=a)
     r_eval2 = h.client.get(f"/api/v1/sessions/{sid2}/evaluation", headers=a)
     assert r_eval1.status_code == 200 and r_eval2.status_code == 200
@@ -232,11 +257,14 @@ def test_pdf_uses_display_name_after_claim(h) -> None:
     assert r_patch.json()["display_name"] == "Người học thử"
 
     sid, guest = h.new_session()
-    assert h.client.post(
-        f"/api/v1/sessions/{sid}/turns",
-        json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
-        headers=guest,
-    ).status_code == 200
+    assert (
+        h.client.post(
+            f"/api/v1/sessions/{sid}/turns",
+            json={"text": "Chào chị, bé sốt mấy ngày rồi ạ?"},
+            headers=guest,
+        ).status_code
+        == 200
+    )
     assert h.client.post(f"/api/v1/sessions/{sid}/finish", headers=guest).status_code == 200
 
     r_claim = h.client.post(
