@@ -26,6 +26,80 @@
         }
       }
     },
+    "/api/v1/sessions/{session_id}/guide": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Get Guide",
+        "operationId": "get_guide_api_v1_sessions__session_id__guide_get",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuideResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/sessions": {
       "post": {
         "tags": [
@@ -68,6 +142,131 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "List My Sessions",
+        "operationId": "list_my_sessions_api_v1_sessions_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 512
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionSummaryPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/progress": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "My Progress",
+        "operationId": "my_progress_api_v1_sessions_progress_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProgressResponse"
                 }
               }
             }
@@ -145,6 +344,72 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Delete Session",
+        "description": "Owner deletes the session; turns, evaluations, debriefs and jobs go by FK\ncascade (T-PRIV-01). A non-owner or unknown id gets 404.",
+        "operationId": "delete_session_api_v1_sessions__session_id__delete",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -959,6 +1224,234 @@
           }
         }
       }
+    },
+    "/api/v1/me": {
+      "get": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Get Me",
+        "operationId": "get_me_api_v1_me_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Update Me",
+        "operationId": "update_me_api_v1_me_patch",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Delete Me",
+        "description": "Delete all of the caller's sessions and their profile; the Supabase Auth\nuser too when the server holds a secret key (else account_deleted=false).",
+        "operationId": "delete_me_api_v1_me_delete",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteMeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/sessions/{session_id}/claim": {
+      "post": {
+        "tags": [
+          "me"
+        ],
+        "summary": "Claim Session",
+        "operationId": "claim_session_api_v1_sessions__session_id__claim_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1026,6 +1519,28 @@
           "review_status"
         ],
         "title": "CitationItem"
+      },
+      "ClaimResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "claimed",
+              "already_owned"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "status"
+        ],
+        "title": "ClaimResponse"
       },
       "CriterionResultResponse": {
         "properties": {
@@ -1303,6 +1818,30 @@
           "session_id"
         ],
         "title": "DebriefResponse"
+      },
+      "DeleteMeResponse": {
+        "properties": {
+          "sessions_deleted": {
+            "type": "integer",
+            "title": "Sessions Deleted"
+          },
+          "profile_deleted": {
+            "type": "boolean",
+            "title": "Profile Deleted"
+          },
+          "account_deleted": {
+            "type": "boolean",
+            "title": "Account Deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions_deleted",
+          "profile_deleted",
+          "account_deleted"
+        ],
+        "title": "DeleteMeResponse",
+        "description": "Result of DELETE /me. `account_deleted` is false when the server cannot\ndelete the Supabase Auth user (no server-side secret key configured, or the\nAdmin API call failed): the login account then still exists and the UI says so."
       },
       "EvaluationResponse": {
         "properties": {
@@ -1586,6 +2125,125 @@
         ],
         "title": "ExamActionResponse"
       },
+      "GuideItem": {
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "title": "Criterion Id",
+            "description": "Rubric criterion id from the case JSON."
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain",
+            "description": "Rubric domain id, e.g. 'history'."
+          },
+          "title": {
+            "type": "string",
+            "title": "Title",
+            "description": "Rubric criterion title, verbatim from the case JSON."
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion_id",
+          "domain",
+          "title"
+        ],
+        "title": "GuideItem"
+      },
+      "GuideResponse": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "checklist_enabled": {
+            "type": "boolean",
+            "title": "Checklist Enabled"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GuideItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "rubric_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rubric Version"
+          },
+          "review_status": {
+            "type": "string",
+            "const": "draft",
+            "title": "Review Status",
+            "default": "draft"
+          },
+          "notice": {
+            "type": "string",
+            "title": "Notice"
+          },
+          "time_limit_s": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Limit S"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "server_now": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Server Now"
+          },
+          "deadline_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deadline At"
+          },
+          "time_limit_reached": {
+            "type": "boolean",
+            "title": "Time Limit Reached",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "mode",
+          "checklist_enabled",
+          "items",
+          "notice",
+          "started_at",
+          "server_now"
+        ],
+        "title": "GuideResponse"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -1611,6 +2269,63 @@
           "status"
         ],
         "title": "HealthResponse"
+      },
+      "MeResponse": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "title": "User Id"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "display_name",
+          "role",
+          "created_at"
+        ],
+        "title": "MeResponse"
+      },
+      "MeUpdate": {
+        "properties": {
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "display_name"
+        ],
+        "title": "MeUpdate"
       },
       "PedagogicalSummary": {
         "properties": {
@@ -1649,6 +2364,130 @@
         ],
         "title": "PedagogicalSummary",
         "description": "The 5-tier feedback frame."
+      },
+      "ProgressAttempt": {
+        "properties": {
+          "session_id": {
+            "type": "string",
+            "title": "Session Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          },
+          "critical_missed": {
+            "type": "boolean",
+            "title": "Critical Missed"
+          },
+          "rubric_version": {
+            "type": "integer",
+            "title": "Rubric Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "started_at",
+          "total_score",
+          "critical_missed",
+          "rubric_version"
+        ],
+        "title": "ProgressAttempt"
+      },
+      "ProgressCriterion": {
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "title": "Criterion Id"
+          },
+          "criterion": {
+            "type": "string",
+            "title": "Criterion"
+          },
+          "attempts": {
+            "type": "integer",
+            "title": "Attempts"
+          },
+          "met": {
+            "type": "integer",
+            "title": "Met"
+          },
+          "partial": {
+            "type": "integer",
+            "title": "Partial"
+          }
+        },
+        "type": "object",
+        "required": [
+          "criterion_id",
+          "criterion",
+          "attempts",
+          "met",
+          "partial"
+        ],
+        "title": "ProgressCriterion"
+      },
+      "ProgressResponse": {
+        "properties": {
+          "attempts": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressAttempt"
+            },
+            "type": "array",
+            "title": "Attempts"
+          },
+          "rubric_groups": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressRubricGroup"
+            },
+            "type": "array",
+            "title": "Rubric Groups"
+          },
+          "practice_feedback_only": {
+            "type": "boolean",
+            "title": "Practice Feedback Only",
+            "default": true
+          },
+          "notice": {
+            "type": "string",
+            "title": "Notice",
+            "default": "Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ."
+          }
+        },
+        "type": "object",
+        "title": "ProgressResponse"
+      },
+      "ProgressRubricGroup": {
+        "properties": {
+          "rubric_version": {
+            "type": "integer",
+            "title": "Rubric Version"
+          },
+          "criteria": {
+            "items": {
+              "$ref": "#/components/schemas/ProgressCriterion"
+            },
+            "type": "array",
+            "title": "Criteria"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rubric_version"
+        ],
+        "title": "ProgressRubricGroup"
       },
       "SessionCreate": {
         "properties": {
@@ -1741,6 +2580,117 @@
           "created_at"
         ],
         "title": "SessionResponse"
+      },
+      "SessionSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "case_id": {
+            "type": "string",
+            "title": "Case Id"
+          },
+          "case_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Title"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "ended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ended At"
+          },
+          "total_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Score"
+          },
+          "critical_missed": {
+            "type": "boolean",
+            "title": "Critical Missed",
+            "default": false
+          },
+          "evaluation_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "pending",
+              "done",
+              "failed"
+            ],
+            "title": "Evaluation Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "case_id",
+          "mode",
+          "status",
+          "started_at",
+          "evaluation_status"
+        ],
+        "title": "SessionSummary"
+      },
+      "SessionSummaryPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SessionSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "SessionSummaryPage"
       },
       "TurnCreate": {
         "properties": {
