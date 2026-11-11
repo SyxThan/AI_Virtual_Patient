@@ -34,6 +34,14 @@ class Settings(BaseSettings):
     # --- Auth (ADR-0008, AVP-106). Public JWKS only; no Supabase secret is needed. ---
     supabase_jwt_audience: str = "authenticated"
     jwks_cache_ttl_s: float = 600.0
+    # --- Privacy (Slice 13, AVP-115) ---
+    # Server-side only: lets DELETE /me also remove the Supabase Auth user via the
+    # Admin API. Never logged, never sent to apps/web. Unset = profile and sessions
+    # are deleted, the login account itself stays (the response says so).
+    supabase_secret_key: str | None = Field(default=None, repr=False)
+    # Guest sessions older than this are deleted by `python -m avp_api.jobs.cleanup`.
+    # 30 is a proposed default only: OPEN_QUESTIONS Q7 (retention) is undecided.
+    guest_retention_days: int = Field(default=30, ge=1)
 
     # --- Provider adapters (ADR-0006). Optional until the agents land. ---
     llm_provider: str | None = None

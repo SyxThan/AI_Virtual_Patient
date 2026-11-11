@@ -1,5 +1,5 @@
 """Session routes (thin): POST /sessions, GET /sessions (my history),
-GET /sessions/progress, GET /sessions/{id}. ADR-0011."""
+GET /sessions/progress, GET /sessions/{id}, DELETE /sessions/{id}. ADR-0011."""
 
 from __future__ import annotations
 
@@ -7,11 +7,12 @@ from fastapi import APIRouter, Depends, Header, Query, Response
 
 from avp_api.auth import current_user_id
 from avp_api.db.repositories.history_repo import HistoryRepository, SqlHistoryRepository
+from avp_api.db.repositories.privacy_repo import PrivacyRepository, SqlPrivacyRepository
 from avp_api.db.repositories.session_repo import SessionRepository, SqlSessionRepository
 from avp_api.db.session import get_db
 from avp_api.schemas.session import SessionCreate, SessionResponse
 from avp_api.schemas.session_list import ProgressResponse, SessionSummaryPage
-from avp_api.services import history_service, session_service
+from avp_api.services import history_service, privacy_service, session_service
 
 router = APIRouter(tags=["sessions"])
 
@@ -22,6 +23,10 @@ def get_session_repo(db=Depends(get_db)) -> SessionRepository:
 
 def get_history_repo(db=Depends(get_db)) -> HistoryRepository:
     return SqlHistoryRepository(db)
+
+
+def get_privacy_repo(db=Depends(get_db)) -> PrivacyRepository:
+    return SqlPrivacyRepository(db)
 
 
 @router.post("/sessions", status_code=201, response_model=SessionResponse)
@@ -64,3 +69,17 @@ def get_session(
     x_guest_token: str | None = Header(default=None),
 ) -> SessionResponse:
     return session_service.get_session(session_id, repo, user_id, x_guest_token)
+
+
+@router.delete("/sessions/{session_id}", status_code=204, response_class=Response)
+def delete_session(
+    session_id: str,
+    repo: SessionRepository = Depends(get_session_repo),
+    privacy_repo: PrivacyRepository = Depends(get_privacy_repo),
+    user_id: str | None = Depends(current_user_id),
+    x_guest_token: str | None = Header(default=None),
+) -> Response:
+    """Owner deletes the session; turns, evaluations, debriefs and jobs go by FK
+    cascade (T-PRIV-01). A non-owner or unknown id gets 404."""
+    privacy_service.delete_session(session_id, repo, privacy_repo, user_id, x_guest_token)
+    return Response(status_code=204)
