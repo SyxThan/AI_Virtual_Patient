@@ -27,8 +27,10 @@ Cập nhật: 2026-11-11. Chỉ ghi ✅ khi đã verify (build/test/migration ch
 | AVP-104 (S5-03) | Lip-sync theo biên độ audio | ✅ Merged | PR #15 | Đã nối với voice ở PR #17 |
 | AVP-020 (S6-01) | Adapter STT/TTS + Fake offline + lỗi có kiểu + đo latency | ✅ Merged | PR #16 | Real provider (Google Cloud) **chưa bật** |
 | AVP-022 (S6-02) | WebSocket `/ws/sessions/{id}` + `useVoiceSession` + nút giữ-để-nói | ✅ Merged | PR #17 | — |
-| AVP-013 (S7-02) | Evidence verifier (NFC, chỉ lời student, giáng cấp) + scoring engine thuần | ✅ Code xong & verify, 🟡 chờ merge | **PR #18** | Có giới hạn điểm khi trượt critical hay không: chờ bác sĩ (AVP-016) |
-| AVP-014 (S7-01) | Evaluator Agent + job queue (`SKIP LOCKED`) + `/finish`, `/evaluation`, `/evaluation/retry` + nút Kết thúc | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #18** | Chưa chạy Evaluator với Gemini thật |
+| AVP-013 (S7-02) | Evidence verifier (NFC, chỉ lời student, giáng cấp) + scoring engine thuần | ✅ Merged | PR #18 | Có giới hạn điểm khi trượt critical hay không: chờ bác sĩ (AVP-016) |
+| AVP-014 (S7-01) | Evaluator Agent + job queue (`SKIP LOCKED`) + `/finish`, `/evaluation`, `/evaluation/retry` + nút Kết thúc | ✅ Merged | PR #18 | Chưa chạy Evaluator với Gemini thật |
+| AVP-017/018 (S8-01) | Embedding adapter (Fake 768d + Gemini lazy), corpus HFMD (QĐ 1003 + BV BNĐ 2023), rights gate, pgvector repo, migration 0002 (HNSW), `ingest_guidelines.py` | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #19** | Corpus là **bản tóm tắt nháp**, chưa đối chiếu nguyên văn, chưa có số trang: chờ bác sĩ |
+| AVP-019 (S8-02) | Debriefing Agent 5 tầng + citation verifier + chuỗi job evaluate→debrief + `GET /debrief` | ✅ Code xong & **verify DB thật**, 🟡 chờ merge | **PR #19** | Chưa chạy với Gemini thật; ngưỡng liên quan cho Gemini chưa hiệu chỉnh |
 
 ## Slice 1 (Foundation) — ✅ đã lên `main`
 AVP-035 + AVP-007 (validator, typed client, migration 11 bảng + RLS, load-cases) đã merged qua PR #7. `.env.example` đầy đủ sẵn.
@@ -102,8 +104,23 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 - Postgres thật (Docker tạm): tạo session → 3 câu hỏi → khám lòng bàn tay → finish ×2 (1 job) → evaluation `done`, 8 tiêu chí, `critical_missed=true`; sai token → 404. CHECK của DB từ chối `met` không bằng chứng và `insufficient_evidence` có level. `SKIP LOCKED`: job đang bị khoá thì worker khác lấy job kế tiếp. `make db-check-rls` OK.
 - ⚠ Chưa chạy Evaluator với Gemini thật; độ lặp lại T-OSCE-04 và kappa (AVP-026) **chưa đo**.
 
+## Slice 8 (RAG y tế & Debriefing) — hoàn tất về mặt code (PR #19)
+- **Corpus** `data/guidelines/hfmd_moh_chunks.json`: 11 đoạn (8 từ QĐ 1003/QĐ-BYT, 3 từ BV Bệnh Nhiệt đới 2023 Bài 20). Đây là **bản tóm tắt do tác giả viết, trạng thái draft**, không phải trích nguyên văn; chưa có số trang (không đoán). Đoạn BV BNĐ chỉ diễn lại nội dung đã có trong `case-01-hfmd.json`. `rights_checked=true` theo chỉ đạo trong brief.
+- **Rights gate (T-RAG-03):** ingest từ chối tài liệu `rights_checked != true`; truy vấn cũng chỉ lấy tài liệu đã kiểm quyền.
+- **Embedding:** `FakeEmbeddingProvider` (hash n-gram âm tiết, 768 chiều, offline) và `GeminiEmbeddingProvider` (đọc `EMBEDDING_MODEL`, chỉ dùng khi có key). Mỗi chunk lưu tên model; truy vấn chỉ so vector cùng model, đổi model thì phải ingest lại.
+- **Migration 0002:** `source_key` (unique), `review_status`, `content_hash`, `embedding_model`, index HNSW `vector_cosine_ops`. Không thêm bảng; RLS giữ nguyên.
+- **Debriefing Agent:** truy vấn RAG cho từng tiêu chí chưa đạt hoặc trọng yếu, đưa chunk cho LLM dưới mã S1, S2…; **citation verifier** chỉ giữ mã đã truy xuất thật, lấy metadata trích dẫn từ DB; không còn trích dẫn → `verified=false`. Chế độ offline ghép phản hồi 5 tầng từ rubric + kết quả chấm (không sinh nội dung lâm sàng mới).
+- **Worker:** evaluate xong → tự enqueue job debrief; chạy nối tiếp trong BackgroundTasks.
+- **API:** `GET /sessions/{id}/debrief`: sai chủ → 404, chưa kết thúc → 409, đang xử lý → 202, xong → 200 (hoặc `failed` với thông báo an toàn). Luôn trả `sources_reviewed=false` khi nguồn còn là bản nháp.
+
+### Kiểm thử Slice 8 (exit 0)
+- apps/api: `pytest` 80 passed (10 RAG: T-RAG-01/02/03; 5 debrief API/E2E), `ruff` sạch.
+- apps/web: `gen-client`, eslint, `tsc`, build OK.
+- Postgres thật (Docker pgvector tạm, provider Fake): `alembic upgrade` 0001→0002 → `load-cases` → `ingest_guidelines.py` (inserted; chạy lại = unchanged) → index HNSW tồn tại → "giật mình độ 2a" trả đúng đoạn "Phân độ lâm sàng - Độ 2a" → rights gate từ chối → finish → jobs `evaluate done`, `debrief done` → `GET /debrief` 200 với trích dẫn trỏ đúng chunk có thật; sai token 404. Downgrade 0001 → upgrade lại OK; `db-check-rls` OK.
+- ⚠ Chưa chạy debrief/embedding với Gemini thật; ngưỡng liên quan Gemini (0.5) là giá trị tạm, chưa đo.
+
 ## Thứ tự merge (bạn thực hiện)
-1. **PR #18** (Slice 7). Base `main`.
+1. **PR #19** (Slice 8). Base `main`. Sau khi merge: `make db-migrate` rồi `python scripts/ingest_guidelines.py` trên DB dev.
 
 ## Việc cần bạn làm tiếp
 - **AVP-034 (Supabase):** tạo project, bật `vector`, đặt `DATABASE_URL` (session pooler) vào `apps/api/.env`. Khi có, chạy `make db-migrate` lên Supabase dev; migration & RLS đã sẵn sàng.
@@ -113,4 +130,5 @@ Máy trạng thái sinh hiệu 5 độ (GRADE_1 → 2a baseline → 2a sốt cao
 ## Rủi ro / nợ kỹ thuật
 - Migration tham chiếu `auth.users` + role `anon`/`authenticated` (Supabase); verify local cần dựng 2 role + schema `auth` (đã làm khi test). Trên Supabase thật sẽ có sẵn.
 - Clinical content (ca HFMD) vẫn **chưa được bác sĩ duyệt** — không trình như "đã thẩm định".
+- Corpus RAG là bản tóm tắt nháp: bác sĩ cần đối chiếu nguyên văn QĐ 1003, sửa ngưỡng nếu sai, thêm số trang. Brief ghi độ 2a là "sốt > 39°C kéo dài > 2 ngày" và độ 2b "mạch > 150"; corpus ghi "sốt trên 2 ngày, HOẶC trên 39°C", 2b nhóm 1 mạch > 130, nhóm 2 > 150 → cần bác sĩ chốt.
 - `git_task.py` trên Windows cần `PYTHONUTF8=1` (bug decode UTF-8).
