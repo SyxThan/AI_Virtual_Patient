@@ -11,7 +11,7 @@ from avp_api.db.repositories.session_repo import SessionRepository
 from avp_api.db.repositories.turn_repo import TurnRecord, TurnRepository
 from avp_api.providers.llm import LLMProvider
 from avp_api.schemas.turn import TurnResponse
-from avp_api.services import patient_agent, session_service
+from avp_api.services import guide_service, patient_agent, session_service
 
 _MAX_TEXT = 2000
 
@@ -52,6 +52,8 @@ def submit_turn(
             status_code=409,
             detail={"code": "SESSION_FINISHED", "message": "This session has ended."},
         )
+    # Exam mode only, and only when EXAM_TIME_LIMIT_S is set (AVP-112): 409 TIME_LIMIT_REACHED.
+    guide_service.ensure_within_time_limit(sess.mode, sess.created_at)
     case = session_repo.get_case_content(sess.case_id, sess.case_version)
     if case is None:
         raise HTTPException(

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -55,6 +55,16 @@ class Settings(BaseSettings):
     tts_voice_id: str | None = None
     tts_language: str = "vi-VN"
     tts_timeout_s: float = 8.0
+    # --- Exam mode (Slice 12, AVP-112). Seconds per exam session; None = no limit.
+    # The value is undecided (docs/OPEN_QUESTIONS.md Q9), so the default is no limit.
+    # Guided (practice) sessions are never time-limited.
+    exam_time_limit_s: int | None = Field(default=None, ge=1)
+
+    @field_validator("exam_time_limit_s", mode="before")
+    @classmethod
+    def _blank_is_none(cls, v: object) -> object:
+        # `EXAM_TIME_LIMIT_S=` (blank, as in .env.example) means "no limit".
+        return None if isinstance(v, str) and not v.strip() else v
 
     @property
     def cors_origins(self) -> list[str]:
