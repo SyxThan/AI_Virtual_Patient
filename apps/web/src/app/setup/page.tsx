@@ -35,7 +35,18 @@ export default function SetupPage() {
         headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ case_id: CASE_ID, mode, role, consent: true }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        // 503 = the API could not reach Supabase to check the sign-in; 401 = token rejected.
+        setError(
+          res.status === 503
+            ? vi.setup.error.authUnavailable
+            : res.status === 401
+              ? vi.setup.error.authExpired
+              : vi.setup.error.generic,
+        );
+        setLoading(false);
+        return;
+      }
       const data: { id: string; guest_token?: string | null } = await res.json();
       if (data.guest_token) rememberGuestSession(data.id, data.guest_token);
       router.push(`/session/${data.id}`);
