@@ -190,6 +190,8 @@
     "starting": "Đang khởi tạo phiên…",
     "error": {
       "generic": "Không tạo được phiên. Vui lòng thử lại.",
+      "authUnavailable": "Máy chủ tạm thời chưa xác thực được tài khoản của bạn. Vui lòng thử lại sau ít phút.",
+      "authExpired": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
       "dismiss": "Đóng"
     }
   },

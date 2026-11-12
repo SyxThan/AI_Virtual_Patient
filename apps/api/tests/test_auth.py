@@ -84,6 +84,7 @@ def make_token(
 
 def make_verifier(jwks: FakeJwks | None = None, **kw) -> tuple[SupabaseJwtVerifier, FakeJwks]:
     jwks = jwks or FakeJwks(_jwk(RSA_KEY.public_key(), "rsa-1", "RS256"))
+    kw.setdefault("sleep", lambda _s: None)  # retries never really wait in tests
     return SupabaseJwtVerifier(SUPABASE_URL, fetch=jwks, **kw), jwks
 
 
@@ -192,6 +193,49 @@ def test_jwks_unreachable_is_503_and_stale_keys_keep_working() -> None:
     jwks.fail = True
     clock.now += 10_000  # TTL expired and the endpoint is down: stale keys still verify
     assert v.verify(make_token()) == USER_A
+
+
+class FlakyJwks(FakeJwks):
+    """Fails the first `failures` calls, then serves the keys."""
+
+    def __init__(self, failures: int, *keys: dict) -> None:
+        super().__init__(*keys)
+        self.failures = failures
+
+    def __call__(self, url: str) -> dict:
+        self.fail = self.calls < self.failures
+        return super().__call__(url)
+
+
+def test_cold_jwks_fetch_retries_transient_failure() -> None:
+    sleeps: list[float] = []
+    jwks = FlakyJwks(2, _jwk(RSA_KEY.public_key(), "rsa-1", "RS256"))
+    v, _ = make_verifier(jwks, sleep=sleeps.append)
+    assert v.verify(make_token()) == USER_A  # 2 failures, then success: no 503
+    assert jwks.calls == 3
+    assert len(sleeps) == 2
+
+
+def test_cold_jwks_fetch_gives_up_after_retries_with_503() -> None:
+    sleeps: list[float] = []
+    v, jwks = make_verifier(sleep=sleeps.append)
+    jwks.fail = True
+    with pytest.raises(HTTPException) as ei:
+        v.verify(make_token())
+    assert _code(ei) == (503, "AUTH_UNAVAILABLE")
+    assert jwks.calls == 3
+
+
+def test_warm_cache_refetch_does_not_retry_or_sleep() -> None:
+    sleeps: list[float] = []
+    clock = Clock()
+    v, jwks = make_verifier(clock=clock, sleep=sleeps.append)
+    v.verify(make_token())
+    jwks.fail = True
+    clock.now += 10_000
+    assert v.verify(make_token()) == USER_A  # stale keys, one failed refetch, no waiting
+    assert jwks.calls == 2
+    assert sleeps == []
 
 
 def test_first_seen_sub_creates_profile_once() -> None:

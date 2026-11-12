@@ -31,6 +31,9 @@ ALLOWED_ALGORITHMS = ("RS256", "ES256")  # never HS256 / "none" (no shared secre
 JWKS_FETCH_TIMEOUT_S = 5.0
 MIN_REFETCH_INTERVAL_S = 30.0  # unknown-kid refetch rate limit (random kids cannot DoS us)
 LEEWAY_S = 10  # clock skew tolerance for exp/iat
+# With no keys cached yet, a failed JWKS fetch would turn every signed-in request into
+# a 503, so the first fetch retries a transient network error before giving up (AVP-124).
+COLD_FETCH_BACKOFF_S = (0.3, 1.0)
 
 
 class TokenVerifier(Protocol):
@@ -66,6 +69,15 @@ def fetch_jwks(url: str) -> dict[str, Any]:
         return json.loads(resp.read().decode("utf-8"))
 
 
+def _describe(exc: BaseException) -> str:
+    """Exception type plus, for URL errors, the underlying reason type (no secrets)."""
+    reason = getattr(exc, "reason", None)
+    if isinstance(reason, BaseException):
+        return f"{type(exc).__name__}({type(reason).__name__})"
+    code = getattr(exc, "code", None)
+    return f"{type(exc).__name__}({code})" if isinstance(code, int) else type(exc).__name__
+
+
 class SupabaseJwtVerifier:
     """Verify Supabase access tokens with the project's JWKS (cached with a TTL)."""
 
@@ -77,6 +89,7 @@ class SupabaseJwtVerifier:
         *,
         fetch: Callable[[str], dict[str, Any]] = fetch_jwks,
         clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], None] = time.sleep,
         on_first_seen: Callable[[str], None] | None = None,
     ) -> None:
         base = supabase_url.rstrip("/")
@@ -86,6 +99,7 @@ class SupabaseJwtVerifier:
         self.cache_ttl_s = cache_ttl_s
         self._fetch = fetch
         self._clock = clock
+        self._sleep = sleep
         self._on_first_seen = on_first_seen
         self._lock = threading.Lock()
         self._keys: dict[str, jwt.PyJWK] = {}
@@ -94,8 +108,19 @@ class SupabaseJwtVerifier:
 
     # --- JWKS cache -------------------------------------------------------------
 
+    def _fetch_doc(self) -> Any:
+        if self._fetched_at is not None:  # stale keys still verify: no need to wait here
+            return self._fetch(self.jwks_url)
+        for delay in COLD_FETCH_BACKOFF_S:
+            try:
+                return self._fetch(self.jwks_url)
+            except Exception as exc:  # noqa: BLE001 - network/JSON: retry, then report
+                logger.warning("jwks fetch failed, retrying: %s", _describe(exc))
+                self._sleep(delay)
+        return self._fetch(self.jwks_url)
+
     def _refresh(self) -> None:
-        doc = self._fetch(self.jwks_url)
+        doc = self._fetch_doc()
         keys: dict[str, jwt.PyJWK] = {}
         for jwk in doc.get("keys", []) if isinstance(doc, dict) else []:
             if not isinstance(jwk, dict) or not jwk.get("kid"):
@@ -120,7 +145,11 @@ class SupabaseJwtVerifier:
                 try:
                     self._refresh()
                 except Exception as exc:  # noqa: BLE001 - network/JSON: keep stale keys
-                    logger.warning("jwks fetch failed: %s", type(exc).__name__)
+                    logger.warning(
+                        "jwks fetch failed: %s (url %s; check network access to Supabase)",
+                        _describe(exc),
+                        self.jwks_url,
+                    )
                     if self._fetched_at is None:
                         raise HTTPException(
                             status_code=503,
