@@ -140,10 +140,22 @@ class SupabaseJwtVerifier:
             raise _invalid() from None
         alg, kid = header.get("alg"), header.get("kid")
         if alg not in ALLOWED_ALGORITHMS or not isinstance(kid, str) or not kid:
+            # e.g. HS256: the project still signs with the legacy shared secret.
+            logger.info("bearer token rejected: alg %s not allowed", alg)
             raise _invalid()
         key = self._key_for(kid)
+        if key is None:
+            # Usual cause: the web app signs in against a different Supabase project
+            # than SUPABASE_URL here, so its key id is not in this JWKS.
+            logger.warning(
+                "bearer token rejected: key id not in JWKS of %s "
+                "(check that SUPABASE_URL matches NEXT_PUBLIC_SUPABASE_URL)",
+                self.issuer,
+            )
+            raise _invalid()
         # The key's own algorithm must match the header (no algorithm confusion).
-        if key is None or key.algorithm_name != alg:
+        if key.algorithm_name != alg:
+            logger.info("bearer token rejected: key/alg mismatch")
             raise _invalid()
         try:
             claims = jwt.decode(
