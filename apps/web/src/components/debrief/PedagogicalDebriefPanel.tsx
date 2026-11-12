@@ -18,7 +18,7 @@ function Tier({ n, title, children }: { n: number; title: string; children: Reac
 }
 
 function List({ items, danger = false }: { items: string[]; danger?: boolean }) {
-  if (items.length === 0) return <p className="italic text-gray-400">{vi.debrief.summary.none}</p>;
+  if (items.length === 0) return <p className="italic text-gray-600">{vi.debrief.summary.none}</p>;
   return (
     <ul className={`list-disc space-y-1 pl-5 ${danger ? "text-red-800" : ""}`}>
       {items.map((x) => (

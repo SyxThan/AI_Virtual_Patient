@@ -12,14 +12,15 @@ export default function ScoreSummaryCard({ evaluation }: { evaluation: Evaluatio
 
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-sm font-medium text-gray-500">{vi.debrief.score.title}</h2>
+      <h2 className="text-sm font-medium text-gray-600">{vi.debrief.score.title}</h2>
       <p className="mt-1 text-4xl font-bold text-gray-900">
         {score.toLocaleString("vi-VN", { maximumFractionDigits: 2 })}
-        <span className="ml-1 text-lg font-medium text-gray-500">{vi.debrief.score.outOf}</span>
+        <span className="ml-1 text-lg font-medium text-gray-600">{vi.debrief.score.outOf}</span>
       </p>
       <div
         className="mt-3 h-3 w-full overflow-hidden rounded-full bg-gray-100"
         role="progressbar"
+        aria-label={vi.debrief.score.title}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
@@ -33,7 +34,7 @@ export default function ScoreSummaryCard({ evaluation }: { evaluation: Evaluatio
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-xs text-gray-400">
+      <p className="mt-3 text-xs text-gray-600">
         {fmt(vi.debrief.score.versions, {
           rubric: evaluation.rubric_version ?? "?",
           scoring: evaluation.scoring_version ?? "?",

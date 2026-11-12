@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
+import { FOCUS_RING } from "@/components/ui/focus";
 import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 /**
@@ -52,7 +53,7 @@ export default function ExportPdfButton({ sessionId, disabled }: { sessionId: st
         type="button"
         onClick={exportPdf}
         disabled={disabled || busy}
-        className="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className={`inline-flex items-center gap-2 rounded-md bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
       >
         {busy && (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />

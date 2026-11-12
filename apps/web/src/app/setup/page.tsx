@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { FOCUS_RING } from "@/components/ui/focus";
 import { API_URL, authHeaders, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
 
 const CASE_ID = "case-01-hfmd";
@@ -45,16 +46,16 @@ export default function SetupPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-8">
-      <h1 className="text-2xl font-semibold">{vi.setup.title}</h1>
+    <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-8 sm:px-6">
+      <h1 className="text-2xl font-semibold text-gray-900">{vi.setup.title}</h1>
 
       {status === "signedIn" ? (
-        <p className="text-sm text-gray-600">{vi.auth.setupSignedIn}</p>
+        <p className="text-sm text-gray-700">{vi.auth.setupSignedIn}</p>
       ) : status !== "loading" ? (
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-700">
           {vi.auth.setupGuest}{" "}
           {status === "signedOut" && (
-            <Link href="/login?next=/setup" className="underline">
+            <Link href="/login?next=/setup" className={`rounded underline ${FOCUS_RING}`}>
               {vi.auth.setupSignIn}
             </Link>
           )}
@@ -70,7 +71,7 @@ export default function SetupPage() {
           <button
             type="button"
             onClick={() => setError(null)}
-            className="shrink-0 text-sm underline"
+            className={`shrink-0 rounded text-sm underline ${FOCUS_RING}`}
           >
             {vi.setup.error.dismiss}
           </button>
@@ -79,12 +80,15 @@ export default function SetupPage() {
 
       {/* Case card */}
       <section className="rounded-lg border border-gray-200 p-5">
-        <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+        <p className="text-xs font-medium uppercase tracking-wide text-gray-600">
           {vi.setup.case.label}
         </p>
-        <h2 className="mt-1 text-lg font-semibold">{vi.setup.case.title}</h2>
-        <p className="mt-2 text-gray-600">{vi.setup.case.summary}</p>
-        <p className="mt-3 text-xs text-amber-700">⚠ {vi.setup.case.draftNotice}</p>
+        <h2 className="mt-1 text-lg font-semibold text-gray-900">{vi.setup.case.title}</h2>
+        <p className="mt-2 text-gray-700">{vi.setup.case.summary}</p>
+        <p className="mt-3 text-xs text-amber-800">
+          <span aria-hidden="true">⚠ </span>
+          {vi.setup.case.draftNotice}
+        </p>
       </section>
 
       {/* Role */}
@@ -97,8 +101,10 @@ export default function SetupPage() {
               type="button"
               aria-pressed={role === r}
               onClick={() => setRole(r)}
-              className={`rounded-md border px-4 py-2 text-sm ${
-                role === r ? "border-black bg-black text-white" : "border-gray-300"
+              className={`rounded-md border px-4 py-2 text-sm ${FOCUS_RING} ${
+                role === r
+                  ? "border-gray-900 bg-gray-900 text-white"
+                  : "border-gray-400 text-gray-900 hover:bg-gray-50"
               }`}
             >
               {vi.setup.role[r]}
@@ -117,13 +123,15 @@ export default function SetupPage() {
               type="button"
               aria-pressed={mode === m}
               onClick={() => setMode(m)}
-              className={`rounded-md border p-4 text-left ${
-                mode === m ? "border-black ring-1 ring-black" : "border-gray-300"
+              className={`rounded-md border p-4 text-left ${FOCUS_RING} ${
+                mode === m
+                  ? "border-gray-900 ring-1 ring-gray-900"
+                  : "border-gray-400 hover:bg-gray-50"
               }`}
             >
-              <span className="font-medium">{vi.setup.mode[m]}</span>
-              <span className="mt-1 block text-sm text-gray-600">
-                {m === "guided" ? vi.setup.mode.guidedDesc : vi.setup.mode.examDesc}
+              <span className="font-medium text-gray-900">{vi.setup.mode[m]}</span>
+              <span className="mt-1 block text-sm text-gray-700">
+                {m === "guided" ? vi.setupUx.guidedDesc : vi.setupUx.examDesc}
               </span>
             </button>
           ))}
@@ -131,25 +139,41 @@ export default function SetupPage() {
       </fieldset>
 
       {/* Consent */}
-      <label className="flex items-start gap-3 text-sm">
-        <input
-          type="checkbox"
-          checked={consent}
-          onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1"
-        />
-        <span>{vi.setup.consent.label}</span>
-      </label>
+      <div className="flex flex-col gap-1">
+        <label className="flex items-start gap-3 text-sm text-gray-900">
+          <input
+            type="checkbox"
+            checked={consent}
+            onChange={(e) => setConsent(e.target.checked)}
+            className={`mt-1 h-4 w-4 shrink-0 accent-gray-900 ${FOCUS_RING}`}
+          />
+          <span>{vi.setup.consent.label}</span>
+        </label>
+        <Link
+          href="/privacy"
+          className={`ml-7 w-fit rounded text-sm text-blue-800 underline ${FOCUS_RING}`}
+        >
+          {vi.setupUx.privacyLink}
+        </Link>
+      </div>
 
       {/* Start */}
-      <button
-        type="button"
-        disabled={!consent || loading}
-        onClick={handleStart}
-        className="w-fit rounded-md bg-black px-5 py-2.5 text-white disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {loading ? vi.setup.starting : vi.setup.start}
-      </button>
+      <div className="flex flex-col gap-1">
+        <button
+          type="button"
+          disabled={!consent || loading}
+          aria-describedby={!consent ? "consent-hint" : undefined}
+          onClick={handleStart}
+          className={`w-fit rounded-md bg-gray-900 px-5 py-2.5 text-white hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
+        >
+          {loading ? vi.setup.starting : vi.setup.start}
+        </button>
+        {!consent && (
+          <p id="consent-hint" className="text-xs text-gray-700">
+            {vi.setupUx.consentHint}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import vi from "../../messages/vi.json";
 import { AuthProvider } from "@/components/auth/AuthProvider";
@@ -7,8 +7,16 @@ import SiteFooter from "@/components/shell/SiteFooter";
 import SiteHeader from "@/components/shell/SiteHeader";
 
 export const metadata: Metadata = {
-  title: vi.app.title,
+  // Pages set a short title; the template appends the app name.
+  title: { default: vi.app.title, template: `%s · ${vi.app.title}` },
   description: vi.app.description,
+  applicationName: vi.app.title,
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({

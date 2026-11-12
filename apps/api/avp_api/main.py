@@ -17,6 +17,7 @@ from avp_api.routers import (
     actions,
     debriefs,
     evaluations,
+    guide,
     health,
     me,
     sessions,
@@ -65,6 +66,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(health.router, prefix=settings.api_prefix)
+    app.include_router(guide.router, prefix=settings.api_prefix)
     app.include_router(sessions.router, prefix=settings.api_prefix)
     app.include_router(turns.router, prefix=settings.api_prefix)
     app.include_router(vitals.router, prefix=settings.api_prefix)

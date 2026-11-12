@@ -270,6 +270,30 @@ paths:
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
 
+  /sessions/{id}/guide:
+    parameters:
+      - $ref: "#/components/parameters/SessionId"
+      - $ref: "#/components/parameters/GuestToken"
+    get:
+      tags: [sessions]
+      summary: Guided-mode reminder checklist and exam-mode time limit (AVP-112).
+      description: >
+        Guided mode returns a checklist built only from the case rubric (criterion
+        id, domain id and criterion title, verbatim; never anchors, expected
+        questions, weights or critical flags), always labelled `draft` until a
+        clinician reviews the wording. Exam mode returns no items (hidden by the
+        API, not only the UI) plus `time_limit_s` from EXAM_TIME_LIMIT_S (unset =
+        no limit). Past the limit, POST /turns returns 409 TIME_LIMIT_REACHED.
+        Ownership is checked like every session route (404 on any miss).
+      responses:
+        "200":
+          description: Session guide.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GuideResponse" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+
   /sessions/{id}/vitals:
     parameters:
       - $ref: "#/components/parameters/SessionId"
@@ -650,6 +674,34 @@ components:
       properties:
         session_id: { type: string, format: uuid }
         status: { type: string, enum: [claimed, already_owned] }
+
+    GuideItem:
+      type: object
+      required: [criterion_id, domain, title]
+      properties:
+        criterion_id: { type: string, description: Rubric criterion id from the case JSON. }
+        domain: { type: string, description: Rubric domain id, e.g. history. }
+        title: { type: string, description: Rubric criterion title, verbatim. }
+
+    GuideResponse:
+      type: object
+      required: [session_id, mode, checklist_enabled, items, review_status, notice, started_at, server_now]
+      properties:
+        session_id: { type: string, format: uuid }
+        mode: { type: string, enum: [guided, exam] }
+        checklist_enabled: { type: boolean, description: True only in guided mode. }
+        items:
+          type: array
+          description: Always empty in exam mode.
+          items: { $ref: "#/components/schemas/GuideItem" }
+        rubric_version: { type: [integer, "null"] }
+        review_status: { type: string, enum: [draft] }
+        notice: { type: string }
+        time_limit_s: { type: [integer, "null"], description: Exam mode only; null = no limit. }
+        started_at: { type: string, format: date-time }
+        server_now: { type: string, format: date-time }
+        deadline_at: { type: [string, "null"], format: date-time }
+        time_limit_reached: { type: boolean }
 
     VitalsSnapshot:
       type: object

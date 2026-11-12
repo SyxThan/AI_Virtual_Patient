@@ -1,4 +1,5 @@
 import vi from "../../../messages/vi.json";
+import { FOCUS_RING } from "@/components/ui/focus";
 import type { Evaluation } from "@/hooks/useDebriefData";
 import { fmt } from "@/lib/sessionAuth";
 import { STATUS_BADGE, statusLabel, type CriterionStatus } from "./statusStyle";
@@ -42,7 +43,7 @@ export default function RubricEvidenceList({
                   {vi.debrief.rubric.lowReliability}
                 </span>
               )}
-              <span className="ml-auto text-xs text-gray-400">
+              <span className="ml-auto text-xs text-gray-600">
                 {fmt(vi.debrief.rubric.weight, { weight: c.weight })}
               </span>
             </div>
@@ -51,11 +52,11 @@ export default function RubricEvidenceList({
             {c.flagged && <p className="mt-1 text-xs text-orange-700">{vi.debrief.rubric.flaggedHint}</p>}
 
             <div className="mt-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+              <p className="text-xs font-medium uppercase tracking-wide text-gray-600">
                 {vi.debrief.rubric.evidence}
               </p>
               {c.evidence.length === 0 ? (
-                <p className="mt-1 text-sm italic text-gray-400">{vi.debrief.rubric.noEvidence}</p>
+                <p className="mt-1 text-sm italic text-gray-600">{vi.debrief.rubric.noEvidence}</p>
               ) : (
                 <ul className="mt-1 flex flex-col gap-1.5">
                   {c.evidence.map((e) => (
@@ -63,10 +64,10 @@ export default function RubricEvidenceList({
                       <button
                         type="button"
                         onClick={() => onOpenTurn(e.turn_idx)}
-                        className="w-full rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-left text-sm text-blue-900 hover:border-blue-300 hover:bg-blue-100"
+                        className={`w-full rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-left text-sm text-blue-900 hover:border-blue-300 hover:bg-blue-100 ${FOCUS_RING}`}
                         title={vi.debrief.rubric.openTranscript}
                       >
-                        <span className="mr-2 font-mono text-xs text-blue-600">
+                        <span className="mr-2 font-mono text-xs text-blue-800">
                           {fmt(vi.debrief.rubric.turn, { idx: e.turn_idx })}
                         </span>
                         “{e.quote}”
