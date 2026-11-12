@@ -15,7 +15,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(".env", "../../.env"),  # local dev convenience; real env wins
+        # Local dev convenience. pydantic-settings gives LATER files priority, so the
+        # repo-root file comes first and apps/api/.env (cwd) overrides it. Real
+        # environment variables still win over both (AVP-123).
+        env_file=("../../.env", ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
     )
