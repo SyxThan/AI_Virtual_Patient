@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { use, useCallback, useState } from "react";
 import vi from "../../../../messages/vi.json";
 import CitedClaimsSection from "@/components/debrief/CitedClaimsSection";
@@ -12,6 +13,8 @@ import RubricEvidenceList from "@/components/debrief/RubricEvidenceList";
 import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
 import { FOCUS_RING } from "@/components/ui/focus";
+import { useAuth } from "@/components/auth/AuthProvider";
+import DeleteSessionButton from "@/components/privacy/DeleteSessionButton";
 import { useDebriefData } from "@/hooks/useDebriefData";
 
 function Skeleton({ message }: { message: string }) {
@@ -43,6 +46,8 @@ function Notice({ tone, children }: { tone: "error" | "info"; children: React.Re
 
 export default function DebriefPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
+  const auth = useAuth();
   const { evaluation, debrief, turns, timedOut, retry, refresh } = useDebriefData(id);
   const [focusTurn, setFocusTurn] = useState<number | null>(null);
   const [retrying, setRetrying] = useState(false);
@@ -171,6 +176,12 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
         >
           {vi.debriefUx.reviewTranscript}
         </button>
+        {/* Owner-only delete (Slice 13): afterwards every route of this session is 404. */}
+        <DeleteSessionButton
+          sessionId={id}
+          onDeleted={() => router.replace(auth.status === "signedIn" ? "/history" : "/")}
+          className="ml-auto"
+        />
       </footer>
       {focusTurn !== null && <TranscriptDrawer turns={turns} focusIdx={focusTurn} onClose={closeDrawer} />}
     </main>

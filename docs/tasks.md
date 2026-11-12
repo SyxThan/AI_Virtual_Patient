@@ -31,17 +31,17 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-019** | **Slice 8** (`TASK-S8-02`) | Debriefing Agent 5 tầng & RAG citations | **P1** | ✅ Merged (PR #19) |
 | **AVP-015, AVP-023** | **Slice 9** (`TASK-S9-01`) | Debriefing Screen (`/debrief/[id]`), Red Flags | **P0** | ✅ Merged (PR #20) |
 | **AVP-105** | **Slice 9** (`TASK-S9-02`) | PDF báo cáo phản hồi A4 + mã QR | **P0** | ✅ Merged (PR #20) |
-| **AVP-024, AVP-106** | **Slice 10** (`TASK-S10-01`) | FastAPI xác thực JWT Supabase (JWKS) cho HTTP + WebSocket | **P0** | ❌ Chưa làm |
-| **AVP-107** | **Slice 10** (`TASK-S10-02`) | Màn hình Đăng nhập / Đăng ký (`/login`), menu tài khoản | **P0** | ❌ Chưa làm |
-| **AVP-108** | **Slice 10** (`TASK-S10-03`) | Hồ sơ (`GET/PATCH /me`) + nhận phiên khách vào tài khoản | **P1** | ❌ Chưa làm |
-| **AVP-109** | **Slice 11** (`TASK-S11-01`) | API danh sách phiên của tôi (`GET /sessions`) | **P0** | ❌ Chưa làm |
-| **AVP-110** | **Slice 11** (`TASK-S11-02`) | Màn hình Lịch sử luyện tập (`/history`) | **P0** | ❌ Chưa làm |
-| **AVP-111** | **Slice 11** (`TASK-S11-03`) | Tiến bộ theo tiêu chí qua các lần luyện | **P2** | ❌ Chưa làm |
-| **AVP-112** | **Slice 12** (`TASK-S12-01`) | App shell: trang chủ, header/nav, 404, error, loading | **P0** | ❌ Chưa làm |
-| **AVP-022, AVP-036** | **Slice 12** (`TASK-S12-02`) | Trạng thái chậm/lỗi, từ chối micro, xác nhận kết thúc, tiếp tục phiên | **P0** | ❌ Chưa làm |
-| **AVP-113** | **Slice 12** (`TASK-S12-03`) | Khác biệt chế độ Luyện tập / Thi thử + hướng dẫn lần đầu | **P1** | ❌ Chưa làm |
-| **AVP-114** | **Slice 12** (`TASK-S12-04`) | Responsive (mobile/tablet) + accessibility cơ bản | **P1** | ❌ Chưa làm |
-| **AVP-115** | **Slice 13** (`TASK-S13-01`) | Trang Quyền riêng tư, xoá phiên / xoá dữ liệu của tôi | **P0** | ❌ Chưa làm |
+| **AVP-024, AVP-106** | **Slice 10** (`TASK-S10-01`) | FastAPI xác thực JWT Supabase (JWKS) cho HTTP + WebSocket | **P0** | ✅ Merged (PR #24) |
+| **AVP-107** | **Slice 10** (`TASK-S10-02`) | Màn hình Đăng nhập / Đăng ký (`/login`), menu tài khoản | **P0** | ✅ Merged (PR #24) |
+| **AVP-108** | **Slice 10** (`TASK-S10-03`) | Hồ sơ (`GET/PATCH /me`) + nhận phiên khách vào tài khoản | **P1** | ✅ Merged (PR #24) |
+| **AVP-109** | **Slice 11** (`TASK-S11-01`) | API danh sách phiên của tôi (`GET /sessions`) | **P0** | ✅ Merged (PR #23) |
+| **AVP-110** | **Slice 11** (`TASK-S11-02`) | Màn hình Lịch sử luyện tập (`/history`) | **P0** | ✅ Merged (PR #23) |
+| **AVP-111** | **Slice 11** (`TASK-S11-03`) | Tiến bộ theo tiêu chí qua các lần luyện | **P2** | ✅ Merged (PR #23) |
+| **AVP-112** | **Slice 12** (`TASK-S12-01`) | App shell: trang chủ, header/nav, 404, error, loading | **P0** | 🟡 PR #27 + #28 |
+| **AVP-022, AVP-036** | **Slice 12** (`TASK-S12-02`) | Trạng thái chậm/lỗi, từ chối micro, xác nhận kết thúc, tiếp tục phiên | **P0** | 🟡 PR #27 + #28 |
+| **AVP-113** | **Slice 12** (`TASK-S12-03`) | Khác biệt chế độ Luyện tập / Thi thử + hướng dẫn lần đầu | **P1** | 🟡 PR #27 + #28 |
+| **AVP-114** | **Slice 12** (`TASK-S12-04`) | Responsive (mobile/tablet) + accessibility cơ bản | **P1** | 🟡 PR #27 + #28 |
+| **AVP-115** | **Slice 13** (`TASK-S13-01`) | Trang Quyền riêng tư, xoá phiên / xoá dữ liệu của tôi | **P0** | 🟡 PR #26 + #28 |
 | **AVP-116** | **Slice 13** (`TASK-S13-02`) | Trang xác thực báo cáo công khai qua QR (`/verify/[code]`) | **P2** | ⏸ Chờ quyết định (OPEN_QUESTIONS Q6) |
 | **AVP-037** | **Slice 14** (`TASK-S14-01`) | Deploy staging (API + worker + web), Dockerfile, CORS | **P0** | ⏸ Chờ chọn hosting (OPEN_QUESTIONS Q5) |
 | **AVP-025** | **Slice 14** (`TASK-S14-02`) | Test luồng đầy đủ: API in-process (pt1) + Playwright & 3 lần trên staging (pt2) | **P0** | 🟡 pt1 PR #21 chờ merge |
@@ -64,10 +64,10 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 7** | Evaluator Agent & Auto-OSCE | **P0** | ✅ Hoàn tất |
 | **Slice 8** | RAG Y tế & Trích dẫn Bộ Y tế | **P1** | ✅ Hoàn tất (corpus draft) |
 | **Slice 9** | Debriefing Screen & Xuất PDF + QR | **P0** | ✅ Hoàn tất |
-| **Slice 10** | Tài khoản & Đăng nhập (Supabase Auth) | **P0** | ❌ Chưa làm |
-| **Slice 11** | Lịch sử luyện tập & Tiến bộ | **P0** | ❌ Chưa làm |
-| **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | ❌ Chưa làm |
-| **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ❌ Chưa làm |
+| **Slice 10** | Tài khoản & Đăng nhập (Supabase Auth) | **P0** | ✅ Hoàn tất (PR #24, test chéo PR #25) |
+| **Slice 11** | Lịch sử luyện tập & Tiến bộ | **P0** | ✅ Hoàn tất (PR #23, test chéo PR #25) |
+| **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | 🟡 Code xong, chờ merge (PR #27, #28) |
+| **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | 🟡 Code xong, chờ merge (PR #26, #28); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
@@ -321,7 +321,7 @@ Hiện tại mọi phiên là phiên khách (guest token trong `sessionStorage`)
 * **Tiêu chí hoàn thành:** checklist thủ công T-UX-01/02 và T-VOICE-03 ghi vào release checklist; Playwright: chặn quyền micro → ô nhập chữ vẫn gửi được.
 
 #### `TASK-S12-03` [P1] 🧠: Khác biệt chế độ Luyện tập / Thi thử + hướng dẫn lần đầu
-* **Mô tả:** Hiện `mode` (guided/exam) chỉ được lưu và hiển thị nhãn. Luyện tập: danh sách nhắc việc dựa trên **tên các miền rubric** (không thêm nội dung lâm sàng mới, không tiết lộ đáp án), tick khi tiêu chí có dấu hiệu đã hỏi (heuristic phía server, không phải chấm điểm). Thi thử: ẩn nhắc việc, có giới hạn thời gian (giá trị cấu hình, mặc định do người quyết định). Lớp hướng dẫn lần đầu (overlay 4 bước: hỏi bệnh, khám, sinh hiệu, kết thúc), lưu "đã xem" trong `localStorage`.
+* **Mô tả (đã làm, PR #27):** `GET /sessions/{id}/guide`. Chế độ Luyện tập trả danh sách nhắc việc lấy nguyên văn từ rubric của case (nhãn draft, chờ bác sĩ duyệt câu chữ); chế độ Thi thử không trả mục nào (kiểm ở mức API). Người học **tự đánh dấu**: không có tick tự động, không chấm điểm. Giới hạn thời gian thi thử `EXAM_TIME_LIMIT_S` (mặc định tắt vì Câu hỏi 9 chưa chốt): hết giờ thì lượt hỏi, thao tác khám và y lệnh sinh hiệu bị từ chối 409 `TIME_LIMIT_REACHED` (PR #28). Lớp hướng dẫn 4 bước lần đầu, lưu "đã xem" trong `localStorage`.
 * **Phụ thuộc:** `TASK-S12-02`.
 * **File liên quan:** `apps/web/src/components/workspace/GuidedChecklist.tsx`, `apps/web/src/components/workspace/Onboarding.tsx`, `apps/api/avp_api/routers/sessions.py`.
 * **Tiêu chí hoàn thành:** chế độ thi không trả nhắc việc qua API (kiểm bằng test, không chỉ ẩn trên UI); văn bản nhắc việc được bác sĩ duyệt trước khi bỏ nhãn draft.

@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/guide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Guide */
+        get: operations["get_guide_api_v1_sessions__session_id__guide_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions": {
         parameters: {
             query?: never;
@@ -28,10 +45,28 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List My Sessions */
+        get: operations["list_my_sessions_api_v1_sessions_get"];
         put?: never;
         /** Create Session */
         post: operations["create_session_api_v1_sessions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sessions/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Progress */
+        get: operations["my_progress_api_v1_sessions_progress_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -49,7 +84,12 @@ export interface paths {
         get: operations["get_session_api_v1_sessions__session_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Session
+         * @description Owner deletes the session; turns, evaluations, debriefs and jobs go by FK
+         *     cascade (T-PRIV-01). A non-owner or unknown id gets 404.
+         */
+        delete: operations["delete_session_api_v1_sessions__session_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -209,6 +249,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Me */
+        get: operations["get_me_api_v1_me_get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Me
+         * @description Delete all of the caller's sessions and their profile; the Supabase Auth
+         *     user too when the server holds a secret key (else account_deleted=false).
+         */
+        delete: operations["delete_me_api_v1_me_delete"];
+        options?: never;
+        head?: never;
+        /** Update Me */
+        patch: operations["update_me_api_v1_me_patch"];
+        trace?: never;
+    };
+    "/api/v1/sessions/{session_id}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim Session */
+        post: operations["claim_session_api_v1_sessions__session_id__claim_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -234,6 +314,16 @@ export interface components {
              * @enum {string}
              */
             review_status: "draft" | "clinician_reviewed";
+        };
+        /** ClaimResponse */
+        ClaimResponse: {
+            /** Session Id */
+            session_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "claimed" | "already_owned";
         };
         /** CriterionResultResponse */
         CriterionResultResponse: {
@@ -322,6 +412,20 @@ export interface components {
              * @default Học liệu phản hồi để luyện tập, không thay thế giảng viên và không phải chứng chỉ. Chỉ các nhận xét có trích dẫn mới được đối chiếu với tài liệu hướng dẫn; tài liệu nguồn hiện là bản tóm tắt nháp, chưa được bác sĩ duyệt.
              */
             notice: string;
+        };
+        /**
+         * DeleteMeResponse
+         * @description Result of DELETE /me. `account_deleted` is false when the server cannot
+         *     delete the Supabase Auth user (no server-side secret key configured, or the
+         *     Admin API call failed): the login account then still exists and the UI says so.
+         */
+        DeleteMeResponse: {
+            /** Sessions Deleted */
+            sessions_deleted: number;
+            /** Profile Deleted */
+            profile_deleted: boolean;
+            /** Account Deleted */
+            account_deleted: boolean;
         };
         /** EvaluationResponse */
         EvaluationResponse: {
@@ -412,6 +516,64 @@ export interface components {
             /** Turn Idx */
             turn_idx: number;
         };
+        /** GuideItem */
+        GuideItem: {
+            /**
+             * Criterion Id
+             * @description Rubric criterion id from the case JSON.
+             */
+            criterion_id: string;
+            /**
+             * Domain
+             * @description Rubric domain id, e.g. 'history'.
+             */
+            domain: string;
+            /**
+             * Title
+             * @description Rubric criterion title, verbatim from the case JSON.
+             */
+            title: string;
+        };
+        /** GuideResponse */
+        GuideResponse: {
+            /** Session Id */
+            session_id: string;
+            /** Mode */
+            mode: string;
+            /** Checklist Enabled */
+            checklist_enabled: boolean;
+            /** Items */
+            items: components["schemas"]["GuideItem"][];
+            /** Rubric Version */
+            rubric_version?: number | null;
+            /**
+             * Review Status
+             * @default draft
+             * @constant
+             */
+            review_status: "draft";
+            /** Notice */
+            notice: string;
+            /** Time Limit S */
+            time_limit_s?: number | null;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /**
+             * Server Now
+             * Format: date-time
+             */
+            server_now: string;
+            /** Deadline At */
+            deadline_at?: string | null;
+            /**
+             * Time Limit Reached
+             * @default false
+             */
+            time_limit_reached: boolean;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -421,6 +583,25 @@ export interface components {
         HealthResponse: {
             /** Status */
             status: string;
+        };
+        /** MeResponse */
+        MeResponse: {
+            /** User Id */
+            user_id: string;
+            /** Display Name */
+            display_name: string | null;
+            /** Role */
+            role: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MeUpdate */
+        MeUpdate: {
+            /** Display Name */
+            display_name: string | null;
         };
         /**
          * PedagogicalSummary
@@ -437,6 +618,59 @@ export interface components {
             acceptable_alternatives: string;
             /** Important Errors */
             important_errors?: string[];
+        };
+        /** ProgressAttempt */
+        ProgressAttempt: {
+            /** Session Id */
+            session_id: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Total Score */
+            total_score: number | null;
+            /** Critical Missed */
+            critical_missed: boolean;
+            /** Rubric Version */
+            rubric_version: number;
+        };
+        /** ProgressCriterion */
+        ProgressCriterion: {
+            /** Criterion Id */
+            criterion_id: string;
+            /** Criterion */
+            criterion: string;
+            /** Attempts */
+            attempts: number;
+            /** Met */
+            met: number;
+            /** Partial */
+            partial: number;
+        };
+        /** ProgressResponse */
+        ProgressResponse: {
+            /** Attempts */
+            attempts?: components["schemas"]["ProgressAttempt"][];
+            /** Rubric Groups */
+            rubric_groups?: components["schemas"]["ProgressRubricGroup"][];
+            /**
+             * Practice Feedback Only
+             * @default true
+             */
+            practice_feedback_only: boolean;
+            /**
+             * Notice
+             * @default Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ.
+             */
+            notice: string;
+        };
+        /** ProgressRubricGroup */
+        ProgressRubricGroup: {
+            /** Rubric Version */
+            rubric_version: number;
+            /** Criteria */
+            criteria?: components["schemas"]["ProgressCriterion"][];
         };
         /** SessionCreate */
         SessionCreate: {
@@ -481,6 +715,45 @@ export interface components {
             created_at: string;
             /** Guest Token */
             guest_token?: string | null;
+        };
+        /** SessionSummary */
+        SessionSummary: {
+            /** Id */
+            id: string;
+            /** Case Id */
+            case_id: string;
+            /** Case Title */
+            case_title?: string | null;
+            /** Mode */
+            mode: string;
+            /** Status */
+            status: string;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Ended At */
+            ended_at?: string | null;
+            /** Total Score */
+            total_score?: number | null;
+            /**
+             * Critical Missed
+             * @default false
+             */
+            critical_missed: boolean;
+            /**
+             * Evaluation Status
+             * @enum {string}
+             */
+            evaluation_status: "none" | "pending" | "done" | "failed";
+        };
+        /** SessionSummaryPage */
+        SessionSummaryPage: {
+            /** Items */
+            items: components["schemas"]["SessionSummary"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
         };
         /** TurnCreate */
         TurnCreate: {
@@ -582,6 +855,74 @@ export interface operations {
             };
         };
     };
+    get_guide_api_v1_sessions__session_id__guide_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GuideResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_my_sessions_api_v1_sessions_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionSummaryPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_session_api_v1_sessions_post: {
         parameters: {
             query?: never;
@@ -617,6 +958,37 @@ export interface operations {
             };
         };
     };
+    my_progress_api_v1_sessions_progress_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProgressResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_session_api_v1_sessions__session_id__get: {
         parameters: {
             query?: never;
@@ -639,6 +1011,38 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["SessionResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_session_api_v1_sessions__session_id__delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -1025,6 +1429,137 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_me_api_v1_me_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_me_api_v1_me_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteMeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_me_api_v1_me_patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    claim_session_api_v1_sessions__session_id__claim_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClaimResponse"];
+                };
             };
             /** @description Validation Error */
             422: {

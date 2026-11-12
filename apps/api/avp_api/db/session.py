@@ -21,7 +21,13 @@ def get_engine() -> Engine:
     if not settings.database_url:
         raise RuntimeError("DATABASE_URL is not set; configure .env (see .env.example)")
     # Session-mode pooler: small pool, pre-ping (docs/specs/database.md).
-    return create_engine(settings.database_url, pool_pre_ping=True, pool_size=5, max_overflow=5)
+    return create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=5,
+        hide_parameters=True,  # SQL errors must not log student quotes (T-SEC-02)
+    )
 
 
 @lru_cache

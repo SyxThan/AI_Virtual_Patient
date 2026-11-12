@@ -209,7 +209,11 @@ def execute_job(
         return None
     job_repo.mark_done(job.id)
     if job.kind == EVALUATE:
-        return job_repo.enqueue_job(DEBRIEF, job.session_id)
+        try:
+            return job_repo.enqueue_job(DEBRIEF, job.session_id)
+        except Exception as exc:  # noqa: BLE001 - e.g. session deleted meanwhile (AVP-115)
+            rollback()
+            logger.warning("debrief enqueue skipped for job %s: %s", job.id, type(exc).__name__)
     return None
 
 

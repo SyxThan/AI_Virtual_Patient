@@ -181,12 +181,10 @@
     "mode": {
       "label": "Chế độ",
       "guided": "Luyện tập",
-      "guidedDesc": "Hiển thị gợi ý khám và phản hồi sư phạm ngay khi xử trí.",
-      "exam": "Thi thử (OSCE)",
-      "examDesc": "Giới hạn thời gian 15 phút, ẩn gợi ý, chấm điểm chặt chẽ."
+      "exam": "Thi thử (OSCE)"
     },
     "consent": {
-      "label": "Tôi đồng ý ẩn danh lưu trữ lịch sử hỏi bệnh phục vụ mục đích đào tạo và chấm điểm OSCE."
+      "label": "Tôi đồng ý lưu transcript của phiên luyện tập này để chấm điểm OSCE và tạo phản hồi học tập. Phiên khách không gắn với danh tính; nếu đã đăng nhập, phiên gắn với tài khoản của tôi và tôi có thể xoá bất cứ lúc nào."
     },
     "start": "Bắt đầu khám bệnh",
     "starting": "Đang khởi tạo phiên…",
