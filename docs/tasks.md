@@ -53,7 +53,10 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-127** | **Slice 15** (`TASK-S15-03`) | Setup + Clinical Workspace theo bento (giữ nguyên cảnh 3D) | **P0** | ✅ Merged (PR #35) |
 | **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | ✅ Merged (PR #33) |
 | **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | ✅ Merged (PR #36) |
-| **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | 🟡 PR #37 |
+| **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | ✅ Merged (PR #37) |
+| **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | 🟡 Đang làm |
+| **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | ❌ Chưa làm |
+| **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | ❌ Chưa làm |
 
 ---
 
@@ -75,7 +78,8 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | ✅ Hoàn tất (PR #27, #28, #29) |
 | **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ✅ Hoàn tất (PR #26, #28, #29); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
-| **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | 🟡 Đã merge PR #32–#36; chờ PR #37 |
+| **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | ✅ Hoàn tất (PR #32–#37) |
+| **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | 🟡 Đang làm |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -411,6 +415,24 @@ Người dùng chọn hướng C (lưới bento) ngày 2026-11-14 từ 4 phươn
 #### `TASK-S15-06` [P0]: Tích hợp & kiểm tra (AVP-130)
 * **Mô tả:** Gộp các PR S15-02..05, sửa chỗ lệch hệ thiết kế, kiểm tra trình duyệt (Playwright) ở 3 độ rộng + axe trên mọi trang, cập nhật tài liệu.
 * **Tiêu chí hoàn thành:** build + lint pass; báo cáo kiểm tra không còn lỗi serious/critical.
+
+---
+
+### Slice 16: Giọng nói người bệnh bằng VieNeu-TTS
+
+Người dùng chọn VieNeu-TTS (github.com/pnnbao97/VieNeu-TTS, code và weights v3 Turbo theo Apache-2.0) ngày 2026-11-14: chạy trên máy, miễn phí, không cần tài khoản đám mây, âm thanh không rời máy chủ. VieNeu chạy như một tiến trình riêng (server tương thích OpenAI `POST /v1/audio/speech`), nên `apps/api` không thêm thư viện nặng; nó chỉ là một provider TTS sau adapter (ADR-0006). Chỉ dùng giọng có sẵn của VieNeu; không clone giọng người thật (điều khoản model card). Độ trễ chỉ báo khi đo bằng script trong `evals/` (Hard Rule 3). Phần STT (micro) không nằm trong slice này.
+
+#### `TASK-S16-01` [P0]: Adapter TTS VieNeu (AVP-132)
+* **Mô tả:** `VieNeuTTSProvider` trong `providers/tts.py`, chọn bằng `TTS_PROVIDER=vieneu` + `TTS_BASE_URL`; giọng từ `TTS_VOICE_ID` (tên giọng có sẵn), `TTS_API_KEY` tuỳ chọn. Xin PCM 24 kHz rồi tự bọc WAV có độ dài thật (WAV stream của VieNeu không ghi độ dài). Lỗi HTTP chỉ giữ mã trạng thái, giới hạn kích thước âm thanh, timeout như adapter cũ.
+* **Tiêu chí hoàn thành:** test với server giả trên 127.0.0.1 (đúng request, WAV hợp lệ, lỗi/timeout/rỗng/quá lớn đều thành `VoiceProviderError`, không lộ key); `make test` + `make lint` pass; thử với server VieNeu thật trên máy.
+
+#### `TASK-S16-02` [P0]: Đọc to câu trả lời của câu hỏi gõ chữ (AVP-133)
+* **Mô tả:** Endpoint `POST /api/v1/sessions/{id}/turns/{turn_idx}/speech` tổng hợp giọng cho một lượt **của người bệnh** đã lưu (kiểm tra quyền sở hữu như các endpoint khác; 404 với lượt không tồn tại hoặc không phải của người bệnh; `204` khi chưa cấu hình TTS thật). Trang `/session/[id]` gọi nó sau khi câu gõ chữ có trả lời, phát qua cùng AnalyserNode để avatar nhép môi; lỗi giọng nói chỉ là thông báo, chữ vẫn hiện. Chạy `make gen-client`.
+* **Tiêu chí hoàn thành:** test API (quyền, 404, 204, lỗi TTS), tsc + lint + build pass, kiểm tra trình duyệt.
+
+#### `TASK-S16-03` [P1]: Chạy VieNeu cùng dự án (AVP-134)
+* **Mô tả:** `run.bat` mở thêm cửa sổ VieNeu (cổng 8880) khi `TTS_PROVIDER=vieneu` và biết thư mục cài VieNeu; README hướng dẫn cài (CPU/GPU, đặt cache ngoài ổ C nếu cần) và cấu hình `.env`.
+* **Tiêu chí hoàn thành:** chạy `run.bat` mở đủ 3 cửa sổ; khi không cấu hình VieNeu thì hành vi như cũ.
 
 ---
 

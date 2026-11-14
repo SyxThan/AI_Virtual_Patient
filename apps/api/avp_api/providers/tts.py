@@ -11,8 +11,12 @@ from __future__ import annotations
 import asyncio
 import base64
 import io
+import json
 import math
 import struct
+import urllib.error
+import urllib.parse
+import urllib.request
 import wave
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -21,6 +25,11 @@ from avp_api.config import get_settings
 from avp_api.providers.voice_common import Timed, VoiceProviderError, post_json, run_timed
 
 _GOOGLE_TTS_URL = "https://texttospeech.googleapis.com/v1/text:synthesize"
+# VieNeu resamples on the server; 24 kHz mono s16le keeps a reply small over the
+# WebSocket (48 kHz native would double it) and is still clear speech.
+VIENEU_SAMPLE_RATE = 24_000
+# 2 minutes of 24 kHz s16le mono: far above one patient reply, bounds memory.
+_VIENEU_MAX_BYTES = VIENEU_SAMPLE_RATE * 2 * 120
 
 
 @dataclass(frozen=True)
@@ -97,10 +106,85 @@ class GoogleTTSProvider(TTSProvider):
         return await asyncio.to_thread(self._synthesize, text, voice_id)
 
 
+def pcm16_to_wav(pcm: bytes, rate: int) -> bytes:
+    """Wrap raw s16le mono PCM in a WAV header with the real length, so every
+    browser's `decodeAudioData` accepts it (a streamed WAV header has no length)."""
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(rate)
+        w.writeframes(pcm)
+    return buf.getvalue()
+
+
+class VieNeuTTSProvider(TTSProvider):
+    """Self-hosted VieNeu-TTS (Apache-2.0) through its OpenAI-compatible server
+    (`POST {TTS_BASE_URL}/v1/audio/speech`, apps/openai_speech.py upstream).
+
+    Asks for headerless PCM at a fixed rate and wraps it in a WAV with the real
+    length. The voice is a preset name from TTS_VOICE_ID (unset = server default).
+    TTS_API_KEY is optional and only sent when the server sets VIENEU_API_KEY.
+    Only used when TTS_PROVIDER=vieneu and TTS_BASE_URL are set by the human."""
+
+    name = "vieneu"
+    mime = "audio/wav"
+
+    def __init__(
+        self, base_url: str, api_key: str | None, voice_id: str | None, timeout_s: float
+    ) -> None:
+        self._url = base_url.rstrip("/") + "/v1/audio/speech"
+        self._api_key = api_key
+        self._voice_id = voice_id
+        self._timeout_s = timeout_s
+
+    def _synthesize(self, text: str, voice_id: str | None) -> bytes:
+        payload: dict = {
+            "input": text,
+            "response_format": "pcm",
+            "sample_rate": VIENEU_SAMPLE_RATE,
+        }
+        voice = voice_id or self._voice_id
+        if voice:
+            payload["voice"] = voice
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        req = urllib.request.Request(
+            self._url, data=json.dumps(payload).encode("utf-8"), headers=headers, method="POST"
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self._timeout_s) as resp:  # noqa: S310 - scheme checked
+                pcm = resp.read(_VIENEU_MAX_BYTES + 1)
+        except urllib.error.HTTPError as exc:
+            raise RuntimeError(f"HTTP {exc.code}") from None  # status only, never the body
+        if len(pcm) > _VIENEU_MAX_BYTES:
+            raise RuntimeError("audio too large")
+        if len(pcm) % 2:
+            pcm = pcm[:-1]  # s16le: drop a trailing half sample
+        if not pcm:
+            return b""  # synthesize_timed turns this into empty_result
+        return pcm16_to_wav(pcm, VIENEU_SAMPLE_RATE)
+
+    async def synthesize(self, text: str, voice_id: str | None = None) -> bytes:
+        return await asyncio.to_thread(self._synthesize, text, voice_id)
+
+
+def _valid_base_url(url: str | None) -> bool:
+    if not url:
+        return False
+    parts = urllib.parse.urlparse(url)
+    return parts.scheme in ("http", "https") and bool(parts.netloc)
+
+
 def get_tts_provider() -> TTSProvider:
     s = get_settings()
     if s.tts_provider == "google" and s.tts_api_key:
         return GoogleTTSProvider(s.tts_api_key, s.tts_voice_id, s.tts_language, s.tts_timeout_s)
+    if s.tts_provider == "vieneu" and _valid_base_url(s.tts_base_url):
+        return VieNeuTTSProvider(
+            s.tts_base_url or "", s.tts_api_key, s.tts_voice_id, s.tts_timeout_s
+        )
     return FakeTTSProvider()
 
 
