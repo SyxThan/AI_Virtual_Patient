@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { buttonClass } from "@/components/ui/Button";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
@@ -86,12 +87,12 @@ export default function ClaimGuestSession() {
   if (phase === "hidden") return null;
   const tone =
     phase === "failed"
-      ? "border-red-300 bg-red-50 text-red-800"
+      ? "border-warning-soft bg-warning-soft text-warning"
       : phase === "done"
-        ? "border-green-300 bg-green-50 text-green-800"
-        : "border-indigo-200 bg-indigo-50 text-indigo-900";
+        ? "border-success-soft bg-success-soft text-success"
+        : "border-info-soft bg-info-soft text-ink";
   return (
-    <div role="status" className={`border-b px-4 py-2 text-sm ${tone}`}>
+    <div role="status" className={`mx-3 mt-3 rounded-card border px-4 py-2 text-sm sm:mx-6 ${tone}`}>
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
         <span>
           {phase === "done"
@@ -107,16 +108,20 @@ export default function ClaimGuestSession() {
                 type="button"
                 onClick={claim}
                 disabled={phase === "working"}
-                className="rounded-md bg-indigo-600 px-3 py-1 text-white disabled:opacity-50"
+                className={buttonClass({ variant: "primary", size: "sm" })}
               >
                 {phase === "working" ? vi.auth.claim.working : vi.auth.claim.accept}
               </button>
-              <button type="button" onClick={dismiss} className="underline">
+              <button type="button" onClick={dismiss} className={buttonClass({ variant: "ghost", size: "sm" })}>
                 {vi.auth.claim.dismiss}
               </button>
             </>
           ) : (
-            <button type="button" onClick={() => setPhase("hidden")} className="underline">
+            <button
+              type="button"
+              onClick={() => setPhase("hidden")}
+              className={buttonClass({ variant: "ghost", size: "sm" })}
+            >
               {vi.setup.error.dismiss}
             </button>
           )}
