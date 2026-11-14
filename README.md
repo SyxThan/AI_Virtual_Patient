@@ -65,7 +65,41 @@ On Windows, double-click `run.bat` (or run `run` from the repo root): it opens
 one window for the API (http://127.0.0.1:8000, auto-reload) and one for the web
 (http://localhost:3000), installs web packages on first run, then opens the
 browser. Close a window to stop that part. `set API_PORT=8001` / `set WEB_PORT=3001`
-change the ports, `set NO_BROWSER=1` skips the browser.
+change the ports, `set NO_BROWSER=1` skips the browser, `set DRY_RUN=1` only
+prints the commands. With VieNeu configured (below) it opens a third window for it.
+
+## Giọng nói người bệnh: VieNeu-TTS (Slice 16)
+The patient's replies (voice and typed turns) can be spoken by
+[VieNeu-TTS](https://github.com/pnnbao97/VieNeu-TTS) (Apache-2.0), self-hosted:
+free, no cloud account, audio never leaves your machine. It runs as its own
+process; `apps/api` only calls its HTTP API. Use its built-in voices only; do not
+clone a real person's voice (model card terms).
+
+1. Install [uv](https://docs.astral.sh/uv/), then (any folder outside this repo):
+   ```powershell
+   git clone https://github.com/pnnbao97/VieNeu-TTS.git D:\VieNeu-TTS
+   cd D:\VieNeu-TTS
+   uv sync                 # CPU (ONNX). NVIDIA GPU: uv sync --extra cuda
+   ```
+   The model (about 600 MB) downloads on first start into `HF_HOME`. If drive C:
+   is short on space, set `VIENEU_HF_HOME` below to a folder on another drive.
+2. In `apps/api/.env`:
+   ```
+   TTS_PROVIDER=vieneu
+   TTS_BASE_URL=http://127.0.0.1:8880
+   TTS_VOICE_ID=           # a built-in voice name; blank = server default
+   TTS_TIMEOUT_S=30        # CPU synthesizes the whole reply first
+   VIENEU_DIR=D:\VieNeu-TTS
+   VIENEU_HF_HOME=D:\VieNeu-TTS\hf-home
+   ```
+   No quotes around values. Port 8880 (not 8000, which is this API); change both
+   `TTS_BASE_URL` and `set VIENEU_PORT=...` together.
+3. Run `run.bat`. List the voices (name, gender, region) once the VieNeu window
+   says it is ready: `curl http://127.0.0.1:8880/v1/voices`.
+
+Without `TTS_PROVIDER=vieneu`, nothing changes: voice turns use the offline fake
+(a beep) and typed turns stay text only. Microphone input (STT) is separate and
+still needs `STT_PROVIDER`/`STT_API_KEY`.
 
 Windows equivalents (no make):
 ```powershell
