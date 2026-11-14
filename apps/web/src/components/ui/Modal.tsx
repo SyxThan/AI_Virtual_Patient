@@ -40,7 +40,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 sm:items-center sm:p-4"
       onMouseDown={(e) => {
         if (closeOnBackdrop && e.target === e.currentTarget) onClose();
       }}
@@ -52,10 +52,10 @@ export default function Modal({
         aria-labelledby={titleId}
         aria-describedby={description ? descId : undefined}
         tabIndex={-1}
-        className={`max-h-[90vh] w-full overflow-y-auto rounded-t-xl bg-white p-5 text-gray-900 shadow-xl outline-none sm:rounded-xl ${className}`}
+        className={`max-h-[90vh] w-full overflow-y-auto rounded-t-tile bg-surface p-6 text-ink shadow-xl outline-none sm:rounded-tile ${className}`}
       >
         <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-lg font-semibold">
+          <h2 id={titleId} className="text-lg font-bold tracking-tight">
             {title}
           </h2>
           {showClose && (
@@ -63,7 +63,7 @@ export default function Modal({
               type="button"
               onClick={onClose}
               aria-label={vi.a11y.close}
-              className={`-m-1 rounded-md p-1 text-gray-600 hover:bg-gray-100 hover:text-gray-900 ${FOCUS_RING}`}
+              className={`-m-2 flex h-11 w-11 items-center justify-center rounded-full text-ink-muted hover:bg-canvas hover:text-ink ${FOCUS_RING}`}
             >
               <svg viewBox="0 0 20 20" className="h-5 w-5" aria-hidden="true">
                 <path
@@ -77,7 +77,7 @@ export default function Modal({
           )}
         </div>
         {description && (
-          <div id={descId} className="mt-2 text-sm leading-relaxed text-gray-700">
+          <div id={descId} className="mt-2 text-sm leading-relaxed text-ink-muted">
             {description}
           </div>
         )}

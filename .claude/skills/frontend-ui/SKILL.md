@@ -14,6 +14,7 @@ goes through FastAPI. Next.js route handlers hold no business logic.
 3. `/debrief/[id]` — OSCE result + cited debrief.
 
 ## Conventions
+- Visual system (Slice 15, "Bento Clinical"): read `docs/specs/ui-design.md` first. Use the tokens (`bg-canvas`, `text-ink`, `bg-primary`…) and the primitives in `components/ui/` (`Button`/`buttonClass`, `Tile`, `Card`, `Badge`, `PageShell`); never raw `gray-*`/`blue-*` palettes. No new npm dependencies.
 - TypeScript **strict**. Server Components by default; add `"use client"` only when needed. Dynamic route params are a Promise in Next 16 — `const { id } = await params`.
 - Styling: **Tailwind v4** (`@import "tailwindcss"` in `globals.css`, `@tailwindcss/postcss`). 
 - i18n: all Vietnamese strings in `apps/web/messages/vi.json`; import and reference keys — no hard-coded UI text in components.

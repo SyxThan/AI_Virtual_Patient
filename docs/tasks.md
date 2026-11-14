@@ -1,6 +1,6 @@
 # Danh mục Nhiệm vụ Kỹ thuật theo Vertical Slices (TASKS.md)
 
-> **Phương pháp quản lý:** Chia nhỏ công việc theo **14 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web) (từ Data/Backend tới UI/UX Frontend).
+> **Phương pháp quản lý:** Chia nhỏ công việc theo **15 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web; Giai đoạn 3: Slice 15 làm lại giao diện) (từ Data/Backend tới UI/UX Frontend).
 > **Nguyên tắc triển khai:** Mỗi slice thực hiện trên branch `<type>/avp-xxx-slug` (xem `docs/git-workflow.md`), vượt qua build/typecheck/lint và được **Reviewer** độc lập kiểm duyệt trước khi merge vào `main`.
 
 ---
@@ -37,17 +37,23 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-109** | **Slice 11** (`TASK-S11-01`) | API danh sách phiên của tôi (`GET /sessions`) | **P0** | ✅ Merged (PR #23) |
 | **AVP-110** | **Slice 11** (`TASK-S11-02`) | Màn hình Lịch sử luyện tập (`/history`) | **P0** | ✅ Merged (PR #23) |
 | **AVP-111** | **Slice 11** (`TASK-S11-03`) | Tiến bộ theo tiêu chí qua các lần luyện | **P2** | ✅ Merged (PR #23) |
-| **AVP-112** | **Slice 12** (`TASK-S12-01`) | App shell: trang chủ, header/nav, 404, error, loading | **P0** | 🟡 PR #27 + #28 |
-| **AVP-022, AVP-036** | **Slice 12** (`TASK-S12-02`) | Trạng thái chậm/lỗi, từ chối micro, xác nhận kết thúc, tiếp tục phiên | **P0** | 🟡 PR #27 + #28 |
-| **AVP-113** | **Slice 12** (`TASK-S12-03`) | Khác biệt chế độ Luyện tập / Thi thử + hướng dẫn lần đầu | **P1** | 🟡 PR #27 + #28 |
-| **AVP-114** | **Slice 12** (`TASK-S12-04`) | Responsive (mobile/tablet) + accessibility cơ bản | **P1** | 🟡 PR #27 + #28 |
-| **AVP-115** | **Slice 13** (`TASK-S13-01`) | Trang Quyền riêng tư, xoá phiên / xoá dữ liệu của tôi | **P0** | 🟡 PR #26 + #28 |
+| **AVP-112** | **Slice 12** (`TASK-S12-01`) | App shell: trang chủ, header/nav, 404, error, loading | **P0** | ✅ Merged (PR #27, #28) |
+| **AVP-022, AVP-036** | **Slice 12** (`TASK-S12-02`) | Trạng thái chậm/lỗi, từ chối micro, xác nhận kết thúc, tiếp tục phiên | **P0** | ✅ Merged (PR #27, #28) |
+| **AVP-113** | **Slice 12** (`TASK-S12-03`) | Khác biệt chế độ Luyện tập / Thi thử + hướng dẫn lần đầu | **P1** | ✅ Merged (PR #27, #28) |
+| **AVP-114** | **Slice 12** (`TASK-S12-04`) | Responsive (mobile/tablet) + accessibility cơ bản | **P1** | ✅ Merged (PR #27, #28) |
+| **AVP-115** | **Slice 13** (`TASK-S13-01`) | Trang Quyền riêng tư, xoá phiên / xoá dữ liệu của tôi | **P0** | ✅ Merged (PR #26, #28) |
 | **AVP-116** | **Slice 13** (`TASK-S13-02`) | Trang xác thực báo cáo công khai qua QR (`/verify/[code]`) | **P2** | ⏸ Chờ quyết định (OPEN_QUESTIONS Q6) |
 | **AVP-037** | **Slice 14** (`TASK-S14-01`) | Deploy staging (API + worker + web), Dockerfile, CORS | **P0** | ⏸ Chờ chọn hosting (OPEN_QUESTIONS Q5) |
-| **AVP-025** | **Slice 14** (`TASK-S14-02`) | Test luồng đầy đủ: API in-process (pt1) + Playwright & 3 lần trên staging (pt2) | **P0** | 🟡 pt1 PR #21 chờ merge |
+| **AVP-025** | **Slice 14** (`TASK-S14-02`) | Test luồng đầy đủ: API in-process (pt1) + Playwright & 3 lần trên staging (pt2) | **P0** | 🟡 pt1 merged (PR #21); pt2 chờ staging |
 | **AVP-026, AVP-117** | **Slice 14** (`TASK-S14-03`) | Script đo latency, độ lặp lại, độ đồng thuận evaluator | **P1** | ❌ Chưa làm |
 | **AVP-118** | **Slice 14** (`TASK-S14-04`) | Giới hạn tần suất & trần chi phí LLM/STT/TTS, log không PII | **P0** | ❌ Chưa làm |
 | **AVP-038, AVP-119** | **Slice 14** (`TASK-S14-05`) | Thử nghiệm người dùng + form góp ý trong app | **P2** | ❌ Chưa làm |
+| **AVP-125** | **Slice 15** (`TASK-S15-01`) | Nền thiết kế "Bento Clinical": token màu y tế, font, component UI, header/footer | **P0** | 🟡 Đang làm |
+| **AVP-126** | **Slice 15** (`TASK-S15-02`) | Landing page dạng bento | **P0** | ❌ Chưa làm |
+| **AVP-127** | **Slice 15** (`TASK-S15-03`) | Setup + Clinical Workspace theo bento (giữ nguyên cảnh 3D) | **P0** | ❌ Chưa làm |
+| **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | ❌ Chưa làm |
+| **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | ❌ Chưa làm |
+| **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | ❌ Chưa làm |
 
 ---
 
@@ -66,9 +72,10 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 9** | Debriefing Screen & Xuất PDF + QR | **P0** | ✅ Hoàn tất |
 | **Slice 10** | Tài khoản & Đăng nhập (Supabase Auth) | **P0** | ✅ Hoàn tất (PR #24, test chéo PR #25) |
 | **Slice 11** | Lịch sử luyện tập & Tiến bộ | **P0** | ✅ Hoàn tất (PR #23, test chéo PR #25) |
-| **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | 🟡 Code xong, chờ merge (PR #27, #28) |
-| **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | 🟡 Code xong, chờ merge (PR #26, #28); S13-02 chờ quyết định |
+| **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | ✅ Hoàn tất (PR #27, #28, #29) |
+| **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ✅ Hoàn tất (PR #26, #28, #29); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
+| **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | 🟡 Đang làm |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -374,6 +381,36 @@ Hiện tại mọi phiên là phiên khách (guest token trong `sessionStorage`)
 #### `TASK-S14-05` [P2] 🧠: Thử nghiệm người dùng & góp ý trong app (AVP-038)
 * **Mô tả:** Kịch bản thử nghiệm 5–8 sinh viên (nhiệm vụ, câu hỏi SUS), form góp ý trên `/debrief/{id}` (điểm 1–5 + ý kiến, gắn session, có đồng ý). Cần bảng mới `feedback` (migration + RLS).
 * **Tiêu chí hoàn thành:** kết quả thử nghiệm lưu `evals/results/usability-*.md` với n thật; không công bố con số khi chưa có dữ liệu.
+
+---
+
+### Slice 15: Làm lại giao diện "Bento Clinical" (Giai đoạn 3)
+
+Người dùng chọn hướng C (lưới bento) ngày 2026-11-14 từ 4 phương án. Bảng màu y tế, font và component chung mô tả trong `docs/specs/ui-design.md`. Không thêm thư viện npm (Tailwind v4 + component tự viết). **Cảnh 3D avatar giữ nguyên**, người dùng sẽ dựng lại sau; các trang chỉ đổi khung bao quanh `AvatarCanvas`. Logic gọi API, hook và chuỗi trong `vi.json` giữ nguyên ý nghĩa; chỉ thêm chuỗi mới khi cần.
+
+#### `TASK-S15-01` [P0]: Nền thiết kế (AVP-125)
+* **Mô tả:** Token màu trong `globals.css` (`@theme`: canvas, ink, primary teal, tông ô mint/sky/sand, danger chỉ cho red flag), font Be Vietnam Pro qua `next/font`, component `Button`/`buttonClass`, `Tile`, `Card`, `Badge`, `PageShell`, vòng focus mới; header dạng thanh bo tròn, footer mới.
+* **Tiêu chí hoàn thành:** `npm run build` + lint pass; mọi cặp chữ/nền trong token đạt ≥ 4.5:1.
+
+#### `TASK-S15-02` [P0]: Landing page (AVP-126)
+* **Mô tả:** `/` dạng bento: ô hero (tiêu đề, mô tả, nút "Bắt đầu khám bệnh"), các ô tính năng thật của sản phẩm (giọng nói, khám trên avatar, sinh hiệu, chấm OSCE có câu trích, debrief có trích dẫn Bộ Y tế, lịch sử tiến bộ), cách hoạt động 3 bước, lưu ý "phản hồi luyện tập". Không số liệu bịa (Hard Rule 3), không chữ "chứng chỉ".
+* **Tiêu chí hoàn thành:** đẹp ở 360px/768px/1280px, axe không lỗi serious/critical.
+
+#### `TASK-S15-03` [P0]: Setup + Clinical Workspace (AVP-127)
+* **Mô tả:** `/setup` (chọn vai trò, chế độ, đồng ý) và `/session/[id]` (hội thoại, push-to-talk, sinh hiệu, danh sách nhắc việc, đồng hồ, kết thúc) theo lưới bento. Giữ nguyên hành vi, WebSocket, và `AvatarCanvas`.
+* **Tiêu chí hoàn thành:** luồng Setup → hỏi → khám → kết thúc chạy như trước; layout không vỡ trên điện thoại.
+
+#### `TASK-S15-04` [P0]: Debrief (AVP-128)
+* **Mô tả:** `/debrief/[id]`: ô điểm tổng, red flag (màu danger), bằng chứng theo tiêu chí, phản hồi sư phạm có trích dẫn, transcript, xuất PDF, xoá phiên.
+* **Tiêu chí hoàn thành:** hiển thị đủ các trạng thái (đang chấm, lỗi, xong) như trước.
+
+#### `TASK-S15-05` [P1]: Trang tài khoản & trang phụ (AVP-129)
+* **Mô tả:** `/login`, `/auth/callback`, `/profile`, `/history` (+ biểu đồ tiến bộ), `/privacy`, `not-found`, `error`, `loading` theo hệ thiết kế mới.
+* **Tiêu chí hoàn thành:** như S15-02.
+
+#### `TASK-S15-06` [P0]: Tích hợp & kiểm tra (AVP-130)
+* **Mô tả:** Gộp các PR S15-02..05, sửa chỗ lệch hệ thiết kế, kiểm tra trình duyệt (Playwright) ở 3 độ rộng + axe trên mọi trang, cập nhật tài liệu.
+* **Tiêu chí hoàn thành:** build + lint pass; báo cáo kiểm tra không còn lỗi serious/critical.
 
 ---
 
