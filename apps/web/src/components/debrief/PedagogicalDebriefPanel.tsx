@@ -1,26 +1,45 @@
 import vi from "../../../messages/vi.json";
+import Tile from "@/components/ui/Tile";
 import type { Debrief } from "@/hooks/useDebriefData";
 
 type Summary = NonNullable<Debrief["summary"]>;
 
-function Tier({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+/** One part of the debrief. `tone` gives each part a calm tint so the parts read apart. */
+function Part({
+  title,
+  tone = "plain",
+  className = "",
+  children,
+}: {
+  title: string;
+  tone?: "plain" | "mint" | "sky" | "warning";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const tones = {
+    plain: "border border-line bg-surface",
+    mint: "bg-mint-soft",
+    sky: "bg-info-soft",
+    warning: "bg-warning-soft",
+  } as const;
+  const titleTone = {
+    plain: "text-ink",
+    mint: "text-mint-ink",
+    sky: "text-info",
+    warning: "text-warning",
+  } as const;
   return (
-    <div className="flex gap-3">
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
-        {n}
-      </span>
-      <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        <div className="mt-1 text-sm text-gray-700">{children}</div>
-      </div>
+    <div className={`rounded-card p-4 sm:p-5 ${tones[tone]} ${className}`}>
+      <h3 className={`font-bold ${titleTone[tone]}`}>{title}</h3>
+      <div className="mt-2 text-sm leading-relaxed text-ink">{children}</div>
     </div>
   );
 }
 
-function List({ items, danger = false }: { items: string[]; danger?: boolean }) {
-  if (items.length === 0) return <p className="italic text-gray-600">{vi.debrief.summary.none}</p>;
+function List({ items }: { items: string[] }) {
+  if (items.length === 0) return <p className="italic text-ink-muted">{vi.debrief.summary.none}</p>;
   return (
-    <ul className={`list-disc space-y-1 pl-5 ${danger ? "text-red-800" : ""}`}>
+    <ul className="list-disc space-y-1.5 pl-5 marker:text-ink-muted">
       {items.map((x) => (
         <li key={x}>{x}</li>
       ))}
@@ -31,25 +50,27 @@ function List({ items, danger = false }: { items: string[]; danger?: boolean }) 
 export default function PedagogicalDebriefPanel({ summary }: { summary: Summary }) {
   const t = vi.debrief.summary;
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900">{t.title}</h2>
-      <div className="mt-4 space-y-5">
-        <Tier n={1} title={t.expected_approach}>
-          <p>{summary.expected_approach}</p>
-        </Tier>
-        <Tier n={2} title={t.rationale}>
-          <p>{summary.rationale}</p>
-        </Tier>
-        <Tier n={3} title={t.learning_points}>
+    <Tile as="section" tone="surface" aria-labelledby="summary-title" className="border border-line">
+      <h2 id="summary-title" className="text-xl font-bold tracking-tight">
+        {t.title}
+      </h2>
+      <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <Part title={t.expected_approach} className="md:col-span-2">
+          <p className="max-w-prose">{summary.expected_approach}</p>
+        </Part>
+        <Part title={t.rationale} className="md:col-span-2">
+          <p className="max-w-prose">{summary.rationale}</p>
+        </Part>
+        <Part title={t.learning_points} tone="mint">
           <List items={summary.learning_points ?? []} />
-        </Tier>
-        <Tier n={4} title={t.acceptable_alternatives}>
+        </Part>
+        <Part title={t.acceptable_alternatives} tone="sky">
           <p>{summary.acceptable_alternatives}</p>
-        </Tier>
-        <Tier n={5} title={t.important_errors}>
-          <List items={summary.important_errors ?? []} danger />
-        </Tier>
+        </Part>
+        <Part title={t.important_errors} tone="warning" className="md:col-span-2">
+          <List items={summary.important_errors ?? []} />
+        </Part>
       </div>
-    </section>
+    </Tile>
   );
 }

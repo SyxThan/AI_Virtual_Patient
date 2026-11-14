@@ -1,8 +1,13 @@
 import vi from "../../../messages/vi.json";
+import Badge from "@/components/ui/Badge";
+import Tile from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
 import type { Evaluation } from "@/hooks/useDebriefData";
 import { fmt } from "@/lib/sessionAuth";
-import { STATUS_BADGE, statusLabel, type CriterionStatus } from "./statusStyle";
+import StatusIcon from "./StatusIcon";
+import { statusLabel, statusTone } from "./statusStyle";
+
+const MISSED = new Set(["unmet", "insufficient_evidence"]);
 
 export default function RubricEvidenceList({
   evaluation,
@@ -11,75 +16,104 @@ export default function RubricEvidenceList({
   evaluation: Evaluation;
   onOpenTurn: (turnIdx: number) => void;
 }) {
+  const criteria = evaluation.criteria ?? [];
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900">{vi.debrief.rubric.title}</h2>
-      <ol className="mt-3 divide-y divide-gray-100">
-        {(evaluation.criteria ?? []).map((c) => (
-          <li key={c.criterion_id} className="py-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                  STATUS_BADGE[c.status as CriterionStatus] ?? STATUS_BADGE.insufficient_evidence
-                }`}
-              >
-                {statusLabel(c.status)}
-              </span>
-              {c.critical && (
-                <span className="rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-semibold text-white">
-                  {vi.debrief.rubric.critical}
+    <Tile as="section" tone="surface" aria-labelledby="rubric-title" className="border border-line">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="rubric-title" className="text-xl font-bold tracking-tight">
+          {vi.debrief.rubric.title}
+        </h2>
+        <p className="tabular text-sm text-ink-muted">
+          {fmt(vi.debrief.rubricCount, { count: criteria.length })}
+        </p>
+      </div>
+      <ol className="mt-5 space-y-3">
+        {criteria.map((c) => {
+          const criticalMissed = c.critical && MISSED.has(c.status);
+          return (
+            <li
+              key={c.criterion_id}
+              className={`rounded-card border bg-surface p-4 sm:p-5 ${
+                criticalMissed ? "border-danger" : "border-line"
+              }`}
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge tone={statusTone(c.status)}>
+                  <StatusIcon status={c.status} />
+                  {statusLabel(c.status)}
+                </Badge>
+                {c.critical && (
+                  <Badge tone={criticalMissed ? "danger" : "neutral"}>{vi.debrief.rubric.critical}</Badge>
+                )}
+                {c.flagged && (
+                  <Badge tone="warning" title={vi.debrief.rubric.flaggedHint}>
+                    <svg
+                      viewBox="0 0 16 16"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3.5 14V2.5M3.5 3h8l-1.8 3 1.8 3h-8" />
+                    </svg>
+                    {vi.debrief.rubric.flagged}
+                  </Badge>
+                )}
+                {c.low_reliability && <Badge tone="neutral">{vi.debrief.rubric.lowReliability}</Badge>}
+                <span className="tabular ml-auto text-xs text-ink-muted">
+                  {fmt(vi.debrief.rubric.weight, { weight: c.weight })}
                 </span>
-              )}
-              {c.flagged && (
-                <span
-                  className="rounded-full border border-orange-300 bg-orange-50 px-2.5 py-0.5 text-xs font-medium text-orange-800"
-                  title={vi.debrief.rubric.flaggedHint}
-                >
-                  ⚑ {vi.debrief.rubric.flagged}
-                </span>
-              )}
-              {c.low_reliability && (
-                <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600">
-                  {vi.debrief.rubric.lowReliability}
-                </span>
-              )}
-              <span className="ml-auto text-xs text-gray-600">
-                {fmt(vi.debrief.rubric.weight, { weight: c.weight })}
-              </span>
-            </div>
-            <p className="mt-2 font-medium text-gray-900">{c.criterion}</p>
-            {c.feedback && <p className="mt-1 text-sm text-gray-600">{c.feedback}</p>}
-            {c.flagged && <p className="mt-1 text-xs text-orange-700">{vi.debrief.rubric.flaggedHint}</p>}
+              </div>
+              <p className="mt-3 font-semibold leading-snug text-ink">{c.criterion}</p>
+              {c.feedback && <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{c.feedback}</p>}
+              {c.flagged && <p className="mt-1.5 text-xs text-warning">{vi.debrief.rubric.flaggedHint}</p>}
 
-            <div className="mt-2">
-              <p className="text-xs font-medium uppercase tracking-wide text-gray-600">
-                {vi.debrief.rubric.evidence}
-              </p>
-              {c.evidence.length === 0 ? (
-                <p className="mt-1 text-sm italic text-gray-600">{vi.debrief.rubric.noEvidence}</p>
-              ) : (
-                <ul className="mt-1 flex flex-col gap-1.5">
-                  {c.evidence.map((e) => (
-                    <li key={`${e.turn_idx}-${e.quote}`}>
-                      <button
-                        type="button"
-                        onClick={() => onOpenTurn(e.turn_idx)}
-                        className={`w-full rounded-md border border-blue-100 bg-blue-50 px-3 py-2 text-left text-sm text-blue-900 hover:border-blue-300 hover:bg-blue-100 ${FOCUS_RING}`}
-                        title={vi.debrief.rubric.openTranscript}
-                      >
-                        <span className="mr-2 font-mono text-xs text-blue-800">
-                          {fmt(vi.debrief.rubric.turn, { idx: e.turn_idx })}
-                        </span>
-                        “{e.quote}”
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </li>
-        ))}
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-ink-muted">{vi.debrief.rubric.evidence}</p>
+                {c.evidence.length === 0 ? (
+                  <p className="mt-1.5 text-sm italic text-ink-muted">{vi.debrief.rubric.noEvidence}</p>
+                ) : (
+                  <ul className="mt-2 flex flex-col gap-2">
+                    {c.evidence.map((e) => (
+                      <li key={`${e.turn_idx}-${e.quote}`}>
+                        <button
+                          type="button"
+                          onClick={() => onOpenTurn(e.turn_idx)}
+                          className={`group flex min-h-11 w-full flex-col gap-1.5 rounded-control border-l-4 border-primary bg-primary-soft/60 px-3 py-2.5 text-left text-sm text-ink hover:bg-primary-soft ${FOCUS_RING}`}
+                          title={vi.debrief.rubric.openTranscript}
+                        >
+                          <span className="leading-relaxed">“{e.quote}”</span>
+                          <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-semibold text-primary-strong">
+                            <span className="tabular">{fmt(vi.debrief.rubric.turn, { idx: e.turn_idx })}</span>
+                            <span className="inline-flex items-center gap-1 underline-offset-2 group-hover:underline">
+                              <svg
+                                viewBox="0 0 16 16"
+                                className="h-3.5 w-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d="M3 3.5h10v7H7l-3 2.5v-2.5H3z" />
+                              </svg>
+                              {vi.debrief.rubric.openTranscript}
+                            </span>
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ol>
-    </section>
+    </Tile>
   );
 }

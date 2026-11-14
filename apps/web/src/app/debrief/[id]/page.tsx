@@ -12,34 +12,84 @@ import RedFlagAlertBanner from "@/components/debrief/RedFlagAlertBanner";
 import RubricEvidenceList from "@/components/debrief/RubricEvidenceList";
 import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
+import Button, { buttonClass } from "@/components/ui/Button";
+import PageShell from "@/components/ui/PageShell";
+import Tile from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DeleteSessionButton from "@/components/privacy/DeleteSessionButton";
 import { useDebriefData } from "@/hooks/useDebriefData";
 
-function Skeleton({ message }: { message: string }) {
+// Danger outline: delete is destructive but must not compete with the one primary action.
+const DELETE_CLASS = `inline-flex h-11 items-center justify-center rounded-control border border-danger px-5 text-sm font-semibold text-danger hover:bg-danger-soft sm:ml-auto ${FOCUS_RING}`;
+
+/** Bento-shaped placeholder while the evaluation or the debrief is being produced. */
+function Skeleton({ message, compact = false }: { message: string; compact?: boolean }) {
   return (
     <div className="space-y-4" aria-busy="true">
-      <p className="flex items-center gap-2 text-sm text-gray-600" role="status">
+      <p className="flex items-center gap-3 text-sm font-medium text-ink-muted" role="status">
         <span
-          className="h-4 w-4 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-700 motion-reduce:animate-none"
+          className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-primary-soft border-t-primary motion-reduce:animate-none"
           aria-hidden
         />
         {message}
       </p>
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="h-28 animate-pulse rounded-lg bg-gray-100" />
-      ))}
+      {compact ? (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="h-48 animate-pulse rounded-tile bg-surface motion-reduce:animate-none lg:col-span-7" />
+          <div className="h-48 animate-pulse rounded-tile bg-surface motion-reduce:animate-none lg:col-span-5" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <div className="h-72 animate-pulse rounded-tile bg-ink/10 motion-reduce:animate-none lg:col-span-4" />
+          <div className="space-y-3 lg:col-span-8">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-28 animate-pulse rounded-card bg-surface motion-reduce:animate-none" />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function Notice({ tone, children }: { tone: "error" | "info"; children: React.ReactNode }) {
-  const cls =
-    tone === "error" ? "border-red-200 bg-red-50 text-red-900" : "border-gray-200 bg-gray-50 text-gray-800";
+function NoticeIcon({ tone }: { tone: "error" | "info" }) {
   return (
-    <div role={tone === "error" ? "alert" : "status"} className={`rounded-lg border px-4 py-4 text-sm ${cls}`}>
-      {children}
+    <svg
+      viewBox="0 0 24 24"
+      className={`h-6 w-6 shrink-0 ${tone === "error" ? "text-warning" : "text-info"}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {tone === "error" ? (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7.5v5.5M12 16.5v.01" />
+        </>
+      ) : (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </>
+      )}
+    </svg>
+  );
+}
+
+// Errors use the warning tone: red is reserved for red flags and destructive actions.
+function Notice({ tone, children }: { tone: "error" | "info"; children: React.ReactNode }) {
+  const cls = tone === "error" ? "border-warning/30 bg-warning-soft" : "border-line bg-surface";
+  return (
+    <div
+      role={tone === "error" ? "alert" : "status"}
+      className={`flex items-start gap-4 rounded-tile border p-5 text-sm leading-relaxed text-ink sm:p-6 ${cls}`}
+    >
+      <NoticeIcon tone={tone} />
+      <div className="min-w-0 flex-1">{children}</div>
     </div>
   );
 }
@@ -59,6 +109,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
   const evDone = evaluation.state === "ready" && ev?.status === "done";
   const evFailed = evaluation.state === "ready" && ev?.status === "failed";
   const dbDone = debrief.state === "ready" && db?.status === "done";
+  const signedIn = auth.status === "signedIn";
 
   async function onRetry() {
     setRetrying(true);
@@ -73,13 +124,9 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="info">
         <p>{vi.debrief.timeout}</p>
-        <button
-          type="button"
-          onClick={refresh}
-          className={`mt-3 rounded-md bg-gray-800 px-3 py-1.5 text-white ${FOCUS_RING}`}
-        >
+        <Button variant="secondary" onClick={refresh} className="mt-4">
           {vi.debrief.reload}
-        </button>
+        </Button>
       </Notice>
     );
   } else if (evaluation.state === "loading" || evaluation.state === "pending") {
@@ -90,10 +137,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="info">
         <p>{vi.debrief.notFinished}</p>
-        <Link
-          href={`/session/${id}`}
-          className={`mt-3 inline-block rounded text-indigo-800 underline ${FOCUS_RING}`}
-        >
+        <Link href={`/session/${id}`} className={buttonClass({ variant: "secondary", className: "mt-4" })}>
           {vi.debrief.backToSession}
         </Link>
       </Notice>
@@ -102,88 +146,95 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="error">
         <p>{vi.debrief.loadError}</p>
-        <button
-          type="button"
-          onClick={refresh}
-          className={`mt-3 rounded-md bg-red-700 px-3 py-1.5 text-white ${FOCUS_RING}`}
-        >
+        <Button variant="secondary" onClick={refresh} className="mt-4">
           {vi.debrief.reload}
-        </button>
+        </Button>
       </Notice>
     );
   } else if (evFailed) {
     // Failure behaviour: no partial score, a retry button (evaluation.md).
     body = (
       <Notice tone="error">
-        <p className="font-semibold">{vi.debrief.failedTitle}</p>
-        {ev.error && <p className="mt-1">{ev.error}</p>}
-        <button
-          type="button"
-          onClick={onRetry}
-          disabled={retrying}
-          className={`mt-3 rounded-md bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 disabled:opacity-60 ${FOCUS_RING}`}
-        >
+        <p className="text-base font-bold">{vi.debrief.failedTitle}</p>
+        {ev.error && <p className="mt-1 text-ink-muted">{ev.error}</p>}
+        <Button variant="secondary" onClick={onRetry} disabled={retrying} className="mt-4">
           {retrying ? vi.debrief.retrying : vi.debrief.retry}
-        </button>
-        {retryError && <p className="mt-2 text-xs">{vi.debrief.retryError}</p>}
+        </Button>
+        {retryError && <p className="mt-2 text-xs font-medium text-warning">{vi.debrief.retryError}</p>}
       </Notice>
     );
   } else if (evDone) {
     body = (
-      <div className="space-y-5">
-        {ev.critical_missed && <RedFlagAlertBanner />}
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <div className="space-y-5">
-            <ScoreSummaryCard evaluation={ev} />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        {ev.critical_missed && (
+          <div className="lg:col-span-12">
+            <RedFlagAlertBanner />
           </div>
+        )}
+        <div className="lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
+          <ScoreSummaryCard evaluation={ev} />
+        </div>
+        <div className="min-w-0 lg:col-span-8">
           <RubricEvidenceList evaluation={ev} onOpenTurn={setFocusTurn} />
         </div>
         {debrief.state === "pending" || debrief.state === "loading" ? (
-          <Skeleton message={vi.debrief.debriefPending} />
+          <div className="lg:col-span-12">
+            <Skeleton message={vi.debrief.debriefPending} compact />
+          </div>
         ) : dbDone && db.summary ? (
           <>
-            <PedagogicalDebriefPanel summary={db.summary} />
-            <CitedClaimsSection items={db.items ?? []} />
+            <div className="min-w-0 lg:col-span-7">
+              <PedagogicalDebriefPanel summary={db.summary} />
+            </div>
+            <div className="min-w-0 lg:col-span-5">
+              <CitedClaimsSection items={db.items ?? []} />
+            </div>
           </>
         ) : (
-          <Notice tone="info">{db?.error ?? vi.debrief.debriefFailed}</Notice>
+          <div className="lg:col-span-12">
+            <Notice tone="info">{db?.error ?? vi.debrief.debriefFailed}</Notice>
+          </div>
         )}
       </div>
     );
   }
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-5 px-4 py-6 sm:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-gray-900">{vi.debrief.title}</h1>
-        <ExportPdfButton sessionId={id} disabled={!(evDone && dbDone)} />
-      </header>
-      <PracticeNoticeBanner sourcesReviewed={dbDone ? (db?.sources_reviewed ?? false) : null} />
-      {body}
-      <footer className="flex flex-wrap gap-3 border-t border-gray-200 pt-5">
-        <Link
-          href="/setup"
-          className={`rounded-md bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800 ${FOCUS_RING}`}
-        >
-          {vi.debrief.actions.newCase}
-        </Link>
-        {/* A finished session redirects away from /session/{id}, so review the transcript here. */}
-        <button
-          type="button"
-          onClick={() => setFocusTurn(turns[0]?.turn_idx ?? 0)}
-          disabled={turns.length === 0}
-          className={`rounded-md border border-gray-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50 ${FOCUS_RING}`}
-        >
-          {vi.debriefUx.reviewTranscript}
-        </button>
-        {/* Owner-only delete (Slice 13): afterwards every route of this session is 404. */}
-        <DeleteSessionButton
-          sessionId={id}
-          onDeleted={() => router.replace(auth.status === "signedIn" ? "/history" : "/")}
-          className="ml-auto"
-        />
-      </footer>
+    <PageShell
+      width="wide"
+      title={vi.debrief.title}
+      actions={<ExportPdfButton sessionId={id} disabled={!(evDone && dbDone)} />}
+    >
+      <div className="space-y-4">
+        <PracticeNoticeBanner sourcesReviewed={dbDone ? (db?.sources_reviewed ?? false) : null} />
+        {body}
+        <Tile as="footer" tone="surface" compact className="border border-line">
+          <h2 className="text-base font-bold">{vi.debriefUx.actionsTitle}</h2>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <Link href="/setup" className={buttonClass({ variant: "secondary" })}>
+              {vi.debrief.actions.newCase}
+            </Link>
+            {/* A finished session redirects away from /session/{id}, so review the transcript here. */}
+            <Button
+              variant="secondary"
+              onClick={() => setFocusTurn(turns[0]?.turn_idx ?? 0)}
+              disabled={turns.length === 0}
+            >
+              {vi.debriefUx.reviewTranscript}
+            </Button>
+            <Link href={signedIn ? "/history" : "/"} className={buttonClass({ variant: "ghost" })}>
+              {signedIn ? vi.debriefUx.backToHistory : vi.debriefUx.backToHome}
+            </Link>
+            {/* Owner-only delete (Slice 13): afterwards every route of this session is 404. */}
+            <DeleteSessionButton
+              sessionId={id}
+              onDeleted={() => router.replace(signedIn ? "/history" : "/")}
+              className={DELETE_CLASS}
+            />
+          </div>
+        </Tile>
+      </div>
       {focusTurn !== null && <TranscriptDrawer turns={turns} focusIdx={focusTurn} onClose={closeDrawer} />}
-    </main>
+    </PageShell>
   );
 }

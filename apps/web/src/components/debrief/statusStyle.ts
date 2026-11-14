@@ -1,22 +1,36 @@
 import vi from "../../../messages/vi.json";
+import type { BadgeTone } from "@/components/ui/Badge";
 
 export type CriterionStatus = "met" | "partial" | "unmet" | "insufficient_evidence";
 
 export const STATUS_ORDER: CriterionStatus[] = ["met", "partial", "unmet", "insufficient_evidence"];
 
+/** Badge tone per status. Color is paired with the label text and an icon (never color only). */
+export const STATUS_TONE: Record<CriterionStatus, BadgeTone> = {
+  met: "success",
+  partial: "warning",
+  unmet: "danger",
+  insufficient_evidence: "neutral",
+};
+
+/** Class string for status chips outside a Badge (kept for older call sites). */
 export const STATUS_BADGE: Record<CriterionStatus, string> = {
-  met: "bg-green-100 text-green-800 border-green-300",
-  partial: "bg-yellow-100 text-yellow-800 border-yellow-300",
-  unmet: "bg-red-100 text-red-800 border-red-300",
-  insufficient_evidence: "bg-gray-100 text-gray-700 border-gray-300",
+  met: "bg-success-soft text-success border-success-soft",
+  partial: "bg-warning-soft text-warning border-warning-soft",
+  unmet: "bg-danger-soft text-danger border-danger-soft",
+  insufficient_evidence: "bg-canvas text-ink-muted border-line",
 };
 
 export const STATUS_BAR: Record<CriterionStatus, string> = {
-  met: "bg-green-500",
-  partial: "bg-yellow-400",
-  unmet: "bg-red-500",
-  insufficient_evidence: "bg-gray-400",
+  met: "bg-success",
+  partial: "bg-warning",
+  unmet: "bg-danger",
+  insufficient_evidence: "bg-line-strong",
 };
+
+export function statusTone(s: string): BadgeTone {
+  return STATUS_TONE[s as CriterionStatus] ?? STATUS_TONE.insufficient_evidence;
+}
 
 export function statusLabel(s: string): string {
   return (vi.debrief.status as Record<string, string>)[s] ?? s;
