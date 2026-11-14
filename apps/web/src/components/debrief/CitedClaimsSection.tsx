@@ -2,8 +2,11 @@
 
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
+import Badge from "@/components/ui/Badge";
+import Tile from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
 import type { Debrief } from "@/hooks/useDebriefData";
+import { fmt } from "@/lib/sessionAuth";
 
 type Claim = NonNullable<Debrief["items"]>[number];
 type Citation = NonNullable<Claim["citations"]>[number];
@@ -17,9 +20,9 @@ function ClaimRow({ claim }: { claim: Claim }) {
   const citations = claim.citations ?? [];
   const active = citations.find((c) => c.chunk_id === open);
   return (
-    <li className="py-3">
-      <p className="text-sm text-gray-800">{claim.text}</p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
+    <li className="rounded-card border border-line p-4">
+      <p className="text-sm leading-relaxed text-ink">{claim.text}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {claim.verified ? (
           citations.map((c) => (
             <button
@@ -27,33 +30,43 @@ function ClaimRow({ claim }: { claim: Claim }) {
               type="button"
               aria-expanded={open === c.chunk_id}
               onClick={() => setOpen(open === c.chunk_id ? null : c.chunk_id)}
-              className={`rounded-md border px-2 py-0.5 text-xs font-medium ${FOCUS_RING} ${
+              className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition-colors ${FOCUS_RING} ${
                 open === c.chunk_id
-                  ? "border-indigo-700 bg-indigo-700 text-white"
-                  : "border-indigo-200 bg-indigo-50 text-indigo-800 hover:bg-indigo-100"
+                  ? "border-primary bg-primary text-white"
+                  : "border-primary-soft bg-primary-soft text-primary-strong hover:border-primary"
               }`}
             >
-              [{sourceLabel(c)}]
+              <svg
+                viewBox="0 0 16 16"
+                className="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 2.5h6l2.5 2.5v8.5H4z" />
+                <path d="M6.5 8h4M6.5 10.5h4" />
+              </svg>
+              {sourceLabel(c)}
             </button>
           ))
         ) : (
-          <span className="rounded-md border border-gray-300 bg-gray-50 px-2 py-0.5 text-xs text-gray-600">
-            {vi.debrief.claims.unverified}
-          </span>
+          <Badge tone="neutral">{vi.debrief.claims.unverified}</Badge>
         )}
       </div>
       {active && (
-        <blockquote className="mt-2 rounded-md border-l-4 border-indigo-400 bg-indigo-50/60 px-3 py-2 text-sm text-gray-700">
-          <p className="text-xs font-medium text-indigo-900">
-            {active.document_title}
-            {active.year ? ` (${active.year})` : ""} — {vi.debrief.claims.section}: {active.section}
-            {active.review_status === "draft" && (
-              <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 font-normal text-amber-900">
-                {vi.debrief.claims.draft}
-              </span>
-            )}
+        <blockquote className="mt-3 rounded-control border-l-4 border-primary bg-canvas px-4 py-3 text-sm text-ink">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-semibold">{active.document_title}</p>
+            {active.review_status === "draft" && <Badge tone="warning">{vi.debrief.claims.draft}</Badge>}
+          </div>
+          <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-ink-muted">
+            {active.year ? <span className="tabular">{fmt(vi.debrief.citationYear, { year: active.year })}</span> : null}
+            <span>{fmt(vi.debrief.citationSection, { section: active.section })}</span>
           </p>
-          <p className="mt-1 whitespace-pre-line">{active.quote_excerpt}</p>
+          <p className="mt-2 whitespace-pre-line leading-relaxed">{active.quote_excerpt}</p>
         </blockquote>
       )}
     </li>
@@ -62,17 +75,19 @@ function ClaimRow({ claim }: { claim: Claim }) {
 
 export default function CitedClaimsSection({ items }: { items: Claim[] }) {
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold text-gray-900">{vi.debrief.claims.title}</h2>
+    <Tile as="section" tone="surface" aria-labelledby="claims-title" className="border border-line">
+      <h2 id="claims-title" className="text-xl font-bold tracking-tight">
+        {vi.debrief.claims.title}
+      </h2>
       {items.length === 0 ? (
-        <p className="mt-2 text-sm italic text-gray-600">{vi.debrief.claims.empty}</p>
+        <p className="mt-3 text-sm italic text-ink-muted">{vi.debrief.claims.empty}</p>
       ) : (
-        <ul className="mt-1 divide-y divide-gray-100">
+        <ul className="mt-5 space-y-3">
           {items.map((c, i) => (
             <ClaimRow key={`${c.criterion_id ?? "x"}-${i}`} claim={c} />
           ))}
         </ul>
       )}
-    </section>
+    </Tile>
   );
 }

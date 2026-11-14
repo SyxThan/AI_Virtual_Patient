@@ -280,6 +280,18 @@
     "error": "Không lấy được sinh hiệu."
   },
   "debrief": {
+    "redFlagTitle": "Cảnh báo dấu hiệu nguy hiểm",
+    "redFlagBody": "Bạn đã bỏ sót hoặc chưa đạt tiêu chí tối quan trọng (Giật mình chới với / Phân độ Tay chân miệng).",
+    "scoreNoValue": "—",
+    "scoreCountsTitle": "Kết quả theo tiêu chí",
+    "versionsTitle": "Phiên bản chấm",
+    "versionRubric": "Bảng kiểm",
+    "versionScoring": "Cách tính điểm",
+    "versionModel": "Mô hình",
+    "rubricCount": "{count} tiêu chí",
+    "citationSection": "Mục {section}",
+    "citationYear": "Năm {year}",
+    "noticeTitle": "Phản hồi để luyện tập",
     "title": "Kết quả và phản hồi",
     "practiceNotice": "Học liệu phản hồi để luyện tập, không phải kết quả đánh giá chính thức hay chứng chỉ.",
     "draftSources": "Nội dung nguồn đang ở bản nháp chờ bác sĩ thẩm định.",
@@ -649,6 +661,10 @@
     "consentHint": "Bạn cần đồng ý để bắt đầu buổi khám."
   },
   "debriefUx": {
+    "backToHistory": "Về lịch sử luyện tập",
+    "backToHome": "Về trang chủ",
+    "actionsTitle": "Tiếp theo",
+    "loadingTitle": "Đang chấm buổi khám",
     "reviewTranscript": "Xem lại transcript"
   }
 }

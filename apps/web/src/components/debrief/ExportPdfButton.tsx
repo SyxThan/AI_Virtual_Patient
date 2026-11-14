@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
-import { FOCUS_RING } from "@/components/ui/focus";
+import { buttonClass } from "@/components/ui/Button";
 import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
 
 /**
@@ -48,20 +48,36 @@ export default function ExportPdfButton({ sessionId, disabled }: { sessionId: st
   }
 
   return (
-    <div className="flex flex-col items-start gap-1">
+    <div className="flex flex-col items-start gap-1.5">
       <button
         type="button"
         onClick={exportPdf}
         disabled={disabled || busy}
-        className={`inline-flex items-center gap-2 rounded-md bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
+        className={buttonClass({ variant: "primary", size: "md" })}
       >
-        {busy && (
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
+        {busy ? (
+          <span
+            className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none"
+            aria-hidden
+          />
+        ) : (
+          <svg
+            viewBox="0 0 20 20"
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M10 3v9M6.5 8.5L10 12l3.5-3.5M4 15.5h12" />
+          </svg>
         )}
         {busy ? vi.debrief.pdf.exporting : vi.debrief.pdf.export}
       </button>
       {error && (
-        <p className="text-xs text-red-600" role="alert">
+        <p className="max-w-xs text-xs font-medium text-warning" role="alert">
           {error}
         </p>
       )}
