@@ -72,16 +72,16 @@ export default function ConfirmDialog({ open, title, children, actions, onCancel
         e.preventDefault(); // native Escape path: same rule as onKeyDown
         if (!busy) onCancel();
       }}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-lg border border-gray-200 p-0 text-left shadow-xl backdrop:bg-black/40"
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-tile border border-line bg-surface p-0 text-left text-ink shadow-xl backdrop:bg-ink/60"
     >
-      <div className="space-y-3 p-5">
-        <h2 id={titleId} className="text-lg font-semibold text-gray-900">
+      <div className="space-y-4 p-6">
+        <h2 id={titleId} className="text-lg font-bold tracking-tight text-ink">
           {title}
         </h2>
-        <div id={bodyId} className="space-y-2 text-sm text-gray-700">
+        <div id={bodyId} className="space-y-3 text-sm leading-relaxed text-ink-muted">
           {children}
         </div>
-        <div className="flex flex-wrap justify-end gap-2 pt-2">{actions}</div>
+        <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">{actions}</div>
       </div>
     </dialog>
   );

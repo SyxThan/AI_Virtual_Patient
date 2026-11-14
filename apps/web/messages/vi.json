@@ -4,6 +4,13 @@
     "description": "Luyện hỏi bệnh bằng tiếng Việt với bệnh nhân mô phỏng, chấm điểm theo bảng kiểm OSCE kèm phản hồi học tập."
   },
   "history": {
+    "newSession": "Bắt đầu phiên mới",
+    "emptyTitle": "Phiên đầu tiên của bạn sẽ hiện ở đây",
+    "emptyBody": "Hỏi bệnh một ca, kết thúc phiên, rồi quay lại đây để xem điểm và phản hồi của từng lần luyện.",
+    "progressPending": "Biểu đồ tiến bộ xuất hiện khi bạn có ít nhất 2 lần luyện đã chấm.",
+    "scoredCount": "Lần luyện đã chấm",
+    "latestScore": "Điểm lần gần nhất",
+    "listTitle": "Các phiên luyện tập",
     "title": "Lịch sử luyện tập",
     "subtitle": "Các phiên luyện tập của bạn, mới nhất trước.",
     "loading": "Đang tải lịch sử…",
@@ -62,6 +69,7 @@
     }
   },
   "privacy": {
+    "related": "Trang liên quan",
     "footerLink": "Quyền riêng tư",
     "title": "Quyền riêng tư và dữ liệu của bạn",
     "draftBadge": "Bản nháp — chờ nhóm duyệt nội dung pháp lý",
@@ -386,6 +394,10 @@
     "footer": "Công cụ luyện tập hỏi bệnh. Phản hồi Auto-OSCE chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên."
   },
   "auth": {
+    "asideTitle": "Giữ lại từng lần luyện hỏi bệnh",
+    "asideBody": "Với tài khoản, kết quả Auto-OSCE và phản hồi của mỗi phiên được lưu lại để bạn xem lại sau.",
+    "asidePoints": ["Lịch sử các phiên và phản hồi sau buổi luyện tập", "Biểu đồ điểm tổng qua các lần luyện đã chấm", "Tự xoá một phiên hoặc toàn bộ dữ liệu của bạn"],
+    "asideNote": "Phản hồi chỉ mang tính học tập, không thay thế giảng viên.",
     "title": "Đăng nhập",
     "signUpTitle": "Tạo tài khoản",
     "magicTitle": "Đăng nhập bằng liên kết qua email",
@@ -445,6 +457,7 @@
     "setupSignedIn": "Phiên này sẽ được lưu vào tài khoản của bạn."
   },
   "profile": {
+    "accountHeading": "Thông tin tài khoản",
     "title": "Hồ sơ",
     "email": "Email",
     "displayName": "Tên hiển thị",
@@ -523,6 +536,8 @@
     "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn"
   },
   "errors": {
+    "notFoundCode": "Lỗi 404",
+    "errorCode": "Sự cố",
     "notFoundTitle": "Không tìm thấy trang",
     "notFoundBody": "Đường dẫn này không tồn tại hoặc đã được thay đổi.",
     "home": "Về trang chủ",

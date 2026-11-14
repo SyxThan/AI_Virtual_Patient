@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { buttonClass } from "@/components/ui/Button";
+import { FOCUS_RING } from "@/components/ui/focus";
 import { authErrorMessage, safeNext } from "@/components/auth/authErrors";
 import { fmt } from "@/lib/sessionAuth";
 import { getSupabase } from "@/lib/supabaseClient";
@@ -12,6 +14,12 @@ import { getSupabase } from "@/lib/supabaseClient";
 type Mode = "signIn" | "signUp" | "magic" | "forgot" | "reset";
 
 const MIN_PASSWORD = 8;
+
+const INPUT = `h-11 w-full rounded-control border border-line-strong bg-surface px-3 text-base text-ink placeholder:text-ink-muted ${FOCUS_RING}`;
+const LINK = `rounded-control font-semibold text-primary underline-offset-4 hover:underline ${FOCUS_RING}`;
+// Form errors are not red flags or destructive actions, so they use the warning tone.
+const ALERT = "rounded-control border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-warning";
+const NOTICE = "rounded-control border border-success/30 bg-success-soft px-4 py-3 text-sm text-success";
 
 function callbackUrl(next: string): string {
   return `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
@@ -102,11 +110,12 @@ export default function LoginForm() {
 
   if (!configured) {
     return (
-      <div className="flex flex-col gap-4">
-        <p role="status" className="rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900">
+      <div className="flex flex-col gap-5">
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{vi.auth.title}</h1>
+        <p role="status" className={ALERT}>
           {vi.auth.unavailable}
         </p>
-        <Link href="/setup" className="w-fit rounded-md bg-black px-4 py-2 text-white">
+        <Link href="/setup" className={buttonClass({ variant: "primary", className: "w-full sm:w-fit" })}>
           {vi.auth.guest}
         </Link>
       </div>
@@ -130,17 +139,17 @@ export default function LoginForm() {
   const tabs: Mode[] = ["signIn", "magic", "signUp"];
 
   return (
-    <div className="flex flex-col gap-5">
-      <h1 className="text-2xl font-semibold">{title}</h1>
+    <div className="flex flex-col gap-6">
+      <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1>
 
       {status === "signedIn" && signedInEmail && mode !== "reset" && (
-        <p className="rounded-md bg-gray-50 p-3 text-sm text-gray-700">
+        <p className="rounded-control bg-primary-soft px-4 py-3 text-sm text-primary-strong">
           {fmt(vi.auth.signedInAs, { email: signedInEmail })}
         </p>
       )}
 
       {(mode === "signIn" || mode === "signUp" || mode === "magic") && (
-        <div role="tablist" className="flex gap-2">
+        <div role="tablist" className="grid grid-cols-3 gap-1 rounded-control bg-canvas p-1">
           {tabs.map((t) => (
             <button
               key={t}
@@ -148,8 +157,8 @@ export default function LoginForm() {
               role="tab"
               aria-selected={mode === t}
               onClick={() => switchMode(t)}
-              className={`rounded-md border px-3 py-1.5 text-sm ${
-                mode === t ? "border-black bg-black text-white" : "border-gray-300"
+              className={`min-h-11 rounded-[0.5rem] px-2 py-1.5 text-sm font-semibold leading-tight transition-colors ${FOCUS_RING} ${
+                mode === t ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink"
               }`}
             >
               {vi.auth.tabs[t as "signIn" | "magic" | "signUp"]}
@@ -159,33 +168,33 @@ export default function LoginForm() {
       )}
 
       {error && (
-        <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+        <p role="alert" className={ALERT}>
           {error}
         </p>
       )}
       {notice && (
-        <p role="status" className="rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-800">
+        <p role="status" className={NOTICE}>
           {notice}
         </p>
       )}
 
       <form onSubmit={submit} className="flex flex-col gap-4" noValidate>
         {mode !== "reset" && (
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">{vi.auth.email}</span>
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-semibold text-ink">{vi.auth.email}</span>
             <input
               type="email"
               autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2"
+              className={INPUT}
             />
           </label>
         )}
         {(mode === "signIn" || mode === "signUp" || mode === "reset") && (
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="font-semibold text-ink">
               {mode === "reset" ? vi.auth.newPassword : vi.auth.password}
             </span>
             <input
@@ -195,39 +204,40 @@ export default function LoginForm() {
               minLength={mode === "signIn" ? undefined : MIN_PASSWORD}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-gray-300 px-3 py-2"
+              className={INPUT}
             />
-            {mode !== "signIn" && <span className="text-xs text-gray-500">{vi.auth.passwordHint}</span>}
+            {mode !== "signIn" && <span className="text-sm text-ink-muted">{vi.auth.passwordHint}</span>}
           </label>
         )}
         <button
           type="submit"
           disabled={busy}
-          className="w-fit rounded-md bg-black px-5 py-2.5 text-white disabled:cursor-not-allowed disabled:opacity-50"
+          className={buttonClass({ variant: "primary", size: "lg", className: "mt-1 w-full" })}
         >
           {busy ? vi.auth.working : submitLabel}
         </button>
       </form>
 
-      <div className="flex flex-wrap gap-4 text-sm">
-        {mode === "signIn" && (
-          <button type="button" onClick={() => switchMode("forgot")} className="underline">
-            {vi.auth.forgotLink}
-          </button>
-        )}
-        {(mode === "forgot" || mode === "reset") && (
-          <button type="button" onClick={() => switchMode("signIn")} className="underline">
-            {vi.auth.backToSignIn}
-          </button>
-        )}
-      </div>
+      {(mode === "signIn" || mode === "forgot" || mode === "reset") && (
+        <div className="flex flex-wrap gap-4 text-sm">
+          {mode === "signIn" && (
+            <button type="button" onClick={() => switchMode("forgot")} className={`min-h-11 ${LINK}`}>
+              {vi.auth.forgotLink}
+            </button>
+          )}
+          {(mode === "forgot" || mode === "reset") && (
+            <button type="button" onClick={() => switchMode("signIn")} className={`min-h-11 ${LINK}`}>
+              {vi.auth.backToSignIn}
+            </button>
+          )}
+        </div>
+      )}
 
-      <hr className="border-gray-200" />
-      <div className="flex flex-col gap-2">
-        <Link href="/setup" className="w-fit rounded-md border border-gray-300 px-4 py-2">
+      <div className="flex flex-col gap-3 border-t border-line pt-6">
+        <Link href="/setup" className={buttonClass({ variant: "secondary", className: "w-full" })}>
           {vi.auth.guest}
         </Link>
-        <p className="text-xs text-gray-500">{vi.auth.guestHint}</p>
+        <p className="text-sm text-ink-muted">{vi.auth.guestHint}</p>
       </div>
     </div>
   );
