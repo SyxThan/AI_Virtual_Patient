@@ -461,10 +461,38 @@
     "signInLink": "Đăng nhập"
   },
   "landing": {
+    "howLink": "Xem cách hoạt động",
+    "featuresTitle": "Bạn làm gì trong một buổi luyện tập",
+    "features": {
+      "voice": {
+        "title": "Hỏi bệnh bằng giọng nói",
+        "body": "Trò chuyện với người mẹ đưa bé 18 tháng tuổi mắc bệnh Tay chân miệng đến khám. Không có micro thì bạn gõ chữ."
+      },
+      "exam": {
+        "title": "Khám trên mô hình 3D",
+        "body": "Bấm vào lòng bàn tay, lòng bàn chân, miệng, vùng mông hay đầu gối của bé để xem tổn thương."
+      },
+      "vitals": {
+        "title": "Sinh hiệu thay đổi theo y lệnh",
+        "body": "Monitor hiển thị mạch, nhiệt độ, huyết áp, nhịp thở và SpO2, thay đổi theo diễn tiến bệnh và các xử trí bạn đưa ra."
+      },
+      "osce": {
+        "title": "Chấm theo bảng kiểm OSCE",
+        "body": "Mỗi tiêu chí đạt đều kèm câu nói nguyên văn của bạn làm bằng chứng. Không có bằng chứng thì không tính đạt."
+      },
+      "debrief": {
+        "title": "Phản hồi có trích dẫn",
+        "body": "Nhận xét sau buổi khám dẫn chiếu Hướng dẫn chẩn đoán và điều trị bệnh Tay chân miệng của Bộ Y tế."
+      },
+      "history": {
+        "title": "Lịch sử và tiến bộ",
+        "body": "Khi bạn đăng nhập, các buổi luyện tập được lưu lại để xem lại kết quả và theo dõi tiến bộ qua từng lần."
+      }
+    },
     "eyebrow": "Mô phỏng hỏi bệnh Nhi khoa bằng tiếng Việt",
     "title": "Luyện hỏi bệnh với bệnh nhân ảo, nhận phản hồi theo bảng kiểm OSCE",
-    "lead": "Bạn hỏi bệnh người mẹ đang bế bé bằng giọng nói hoặc gõ chữ, khám trên mô hình 3D, theo dõi sinh hiệu, rồi nhận phản hồi học tập có dẫn chứng từ chính lời bạn nói.",
-    "ctaStart": "Bắt đầu luyện tập",
+    "lead": "Hỏi bệnh người mẹ đang bế bé, khám trên mô hình 3D, theo dõi sinh hiệu, rồi nhận phản hồi học tập có dẫn chứng từ chính lời bạn nói.",
+    "ctaStart": "Bắt đầu khám bệnh",
     "ctaHistory": "Xem lịch sử luyện tập",
     "caseLabel": "Ca hiện có",
     "stepsTitle": "Cách hoạt động",
@@ -474,7 +502,7 @@
         "body": "Chọn ca bệnh, vai trò và chế độ Luyện tập hoặc Thi thử, rồi đồng ý điều khoản lưu trữ."
       },
       {
-        "title": "Khám",
+        "title": "Hỏi bệnh và khám",
         "body": "Hỏi bệnh người mẹ, khám các vùng trên mô hình 3D, đo sinh hiệu và xử trí ban đầu."
       },
       {
