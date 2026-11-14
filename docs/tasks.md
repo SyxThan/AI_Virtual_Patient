@@ -48,12 +48,12 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-026, AVP-117** | **Slice 14** (`TASK-S14-03`) | Script đo latency, độ lặp lại, độ đồng thuận evaluator | **P1** | ❌ Chưa làm |
 | **AVP-118** | **Slice 14** (`TASK-S14-04`) | Giới hạn tần suất & trần chi phí LLM/STT/TTS, log không PII | **P0** | ❌ Chưa làm |
 | **AVP-038, AVP-119** | **Slice 14** (`TASK-S14-05`) | Thử nghiệm người dùng + form góp ý trong app | **P2** | ❌ Chưa làm |
-| **AVP-125** | **Slice 15** (`TASK-S15-01`) | Nền thiết kế "Bento Clinical": token màu y tế, font, component UI, header/footer | **P0** | 🟡 PR #32 |
-| **AVP-126** | **Slice 15** (`TASK-S15-02`) | Landing page dạng bento | **P0** | 🟡 PR #34 |
-| **AVP-127** | **Slice 15** (`TASK-S15-03`) | Setup + Clinical Workspace theo bento (giữ nguyên cảnh 3D) | **P0** | 🟡 PR #35 |
-| **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | 🟡 PR #33 |
-| **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | 🟡 PR #36 |
-| **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | 🟡 PR tích hợp (sau #32–#36) |
+| **AVP-125** | **Slice 15** (`TASK-S15-01`) | Nền thiết kế "Bento Clinical": token màu y tế, font, component UI, header/footer | **P0** | ✅ Merged (PR #32) |
+| **AVP-126** | **Slice 15** (`TASK-S15-02`) | Landing page dạng bento | **P0** | ✅ Merged (PR #34) |
+| **AVP-127** | **Slice 15** (`TASK-S15-03`) | Setup + Clinical Workspace theo bento (giữ nguyên cảnh 3D) | **P0** | ✅ Merged (PR #35) |
+| **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | ✅ Merged (PR #33) |
+| **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | ✅ Merged (PR #36) |
+| **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | 🟡 PR #37 |
 
 ---
 
@@ -75,7 +75,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 12** | Hoàn thiện trải nghiệm (App shell, trạng thái lỗi, chế độ, responsive) | **P0** | ✅ Hoàn tất (PR #27, #28, #29) |
 | **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ✅ Hoàn tất (PR #26, #28, #29); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
-| **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | 🟡 Code xong, chờ merge (PR #32–#36 + tích hợp) |
+| **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | 🟡 Đã merge PR #32–#36; chờ PR #37 |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
