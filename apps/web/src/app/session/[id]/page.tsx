@@ -10,7 +10,10 @@ import ExamFindingPanel, { type ExamActionResponse } from "@/components/avatar/E
 import { patientLipSync } from "@/components/avatar/LipSyncController";
 import GuidedChecklist, { type GuideItem } from "@/components/guide/GuidedChecklist";
 import OnboardingOverlay, { onboardingSeen } from "@/components/onboarding/OnboardingOverlay";
-import { FOCUS_RING } from "@/components/ui/focus";
+import Badge from "@/components/ui/Badge";
+import Button, { buttonClass } from "@/components/ui/Button";
+import PageShell from "@/components/ui/PageShell";
+import Tile from "@/components/ui/Tile";
 import ChatInput from "@/components/workspace/ChatInput";
 import FinishDialog from "@/components/workspace/FinishDialog";
 import PushToTalk from "@/components/workspace/PushToTalk";
@@ -309,43 +312,44 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   // ----- non-ready states -----
   if (load !== "ready" || !meta) {
     return (
-      <main className="mx-auto flex w-full max-w-xl flex-col items-start gap-4 px-4 py-16">
-        {load === "loading" || load === "redirecting" ? (
-          <p role="status" className="flex items-center gap-3 text-gray-700">
-            <span
-              className="h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-blue-700 motion-reduce:animate-none"
-              aria-hidden="true"
-            />
-            {load === "loading" ? vi.workspace.loading : vi.workspace.redirecting}
-          </p>
-        ) : (
-          <>
-            <p role="alert" className="text-gray-900">
-              {load === "notFound" ? vi.workspace.notFound : vi.workspace.loadError}
+      <PageShell width="narrow">
+        <Tile className="flex flex-col items-start gap-5">
+          {load === "loading" || load === "redirecting" ? (
+            <p role="status" className="flex items-center gap-3 text-ink">
+              <span
+                className="h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary motion-reduce:animate-none"
+                aria-hidden="true"
+              />
+              {load === "loading" ? vi.workspace.loading : vi.workspace.redirecting}
             </p>
-            <div className="flex flex-wrap gap-3">
-              {load === "error" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setLoad("loading");
-                    setReloadKey((k) => k + 1);
-                  }}
-                  className={`rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white ${FOCUS_RING}`}
+          ) : (
+            <>
+              <p role="alert" className="text-lg font-semibold leading-snug text-ink">
+                {load === "notFound" ? vi.workspace.notFound : vi.workspace.loadError}
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {load === "error" && (
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setLoad("loading");
+                      setReloadKey((k) => k + 1);
+                    }}
+                  >
+                    {vi.workspace.retryLoad}
+                  </Button>
+                )}
+                <Link
+                  href="/setup"
+                  className={buttonClass({ variant: load === "error" ? "secondary" : "primary" })}
                 >
-                  {vi.workspace.retryLoad}
-                </button>
-              )}
-              <Link
-                href="/setup"
-                className={`rounded-md border border-gray-400 px-4 py-2 text-sm font-medium text-gray-900 ${FOCUS_RING}`}
-              >
-                {vi.workspace.backToSetup}
-              </Link>
-            </div>
-          </>
-        )}
-      </main>
+                  {vi.workspace.backToSetup}
+                </Link>
+              </div>
+            </>
+          )}
+        </Tile>
+      </PageShell>
     );
   }
 
@@ -361,71 +365,74 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         : null;
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-3 py-3 sm:px-4">
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-200 pb-3">
-        <div className="min-w-0">
-          <h1 className="font-semibold text-gray-900">{vi.session.patientName}</h1>
-          <p className="text-xs text-gray-700">
-            {vi.session.modeLabel}:{" "}
-            <span
-              className={`rounded px-1.5 py-0.5 font-medium ${exam ? "bg-purple-100 text-purple-900" : "bg-blue-100 text-blue-900"}`}
-            >
-              {modeLabel}
-            </span>
-          </p>
+    <main id="main" className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
+      {/* Top bar: who the patient is, the mode, the clock, and the way out */}
+      <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-tile bg-surface px-5 py-4 sm:px-6">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+          <h1 className="text-lg font-bold tracking-tight text-ink sm:text-xl">
+            {vi.session.patientName}
+          </h1>
+          <Badge tone={exam ? "info" : "primary"}>
+            <span className="sr-only">{vi.session.modeLabel}: </span>
+            {modeLabel}
+          </Badge>
         </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <SessionTimer
-            startedAtMs={startedAtMs}
-            offsetMs={clockOffset}
-            limitS={exam ? (guide?.time_limit_s ?? null) : null}
-            onExpire={() => setLock("timeUp")}
-          />
-          <button
-            type="button"
-            onClick={() => setOnboardingOpen(true)}
-            className={`rounded-md border border-gray-400 px-3 py-1.5 text-sm text-gray-900 hover:bg-gray-50 ${FOCUS_RING}`}
-          >
+        <div className="grid w-full grid-cols-1 gap-2 min-[400px]:grid-cols-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
+          <div className="min-[400px]:col-span-2 sm:contents">
+            <SessionTimer
+              startedAtMs={startedAtMs}
+              offsetMs={clockOffset}
+              limitS={exam ? (guide?.time_limit_s ?? null) : null}
+              onExpire={() => setLock("timeUp")}
+            />
+          </div>
+          <Button variant="ghost" onClick={() => setOnboardingOpen(true)}>
             {vi.workspace.help}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="secondary"
             onClick={() => {
               setFinishError(null);
               setFinishOpen(true);
             }}
-            className={`rounded-md bg-red-800 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-900 ${FOCUS_RING}`}
           >
             {vi.session.finish}
-          </button>
+          </Button>
         </div>
       </header>
 
       {lock === "timeUp" && (
         <div
           role="alert"
-          className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-950"
+          className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-card border border-warning/30 bg-warning-soft px-5 py-4 text-ink"
         >
-          <div>
-            <p className="font-semibold">{vi.workspace.timer.timeUpTitle}</p>
-            <p className="text-sm">{vi.workspace.timer.timeUpBody}</p>
+          <div className="flex items-start gap-3">
+            <svg
+              viewBox="0 0 20 20"
+              className="mt-0.5 h-5 w-5 shrink-0 text-warning"
+              fill="none"
+              aria-hidden="true"
+            >
+              <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M10 6v4.5l3 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+            <div>
+              <p className="font-bold text-warning">{vi.workspace.timer.timeUpTitle}</p>
+              <p className="text-sm">{vi.workspace.timer.timeUpBody}</p>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => setFinishOpen(true)}
-            className={`rounded-md bg-red-800 px-4 py-2 text-sm font-medium text-white hover:bg-red-900 ${FOCUS_RING}`}
-          >
+          <Button variant="primary" onClick={() => setFinishOpen(true)}>
             {vi.session.finish}
-          </button>
+          </Button>
         </div>
       )}
 
       {/* < 1024 px: one column, avatar -> monitor -> chat (-> checklist).
-          >= 1024 px: patient column left, chat column right. */}
-      <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
+          >= 1024 px: patient column left (5/12), chat column right (7/12). */}
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
         <section
           aria-label={vi.workspace.regions.patient}
-          className="flex min-w-0 flex-col gap-4 lg:col-start-1 lg:row-start-1"
+          className="flex min-w-0 flex-col gap-4 lg:col-span-5 lg:col-start-1 lg:row-start-1"
         >
           <AvatarCanvas
             onExamineRegion={examineRegion}
@@ -437,7 +444,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
         <section
           aria-label={vi.workspace.regions.chat}
-          className="flex h-[75vh] min-h-[26rem] min-w-0 flex-col overflow-hidden rounded-lg border border-gray-200 bg-white lg:sticky lg:top-3 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:h-[calc(100vh-9rem)]"
+          className="flex h-[75vh] min-h-[26rem] min-w-0 flex-col overflow-hidden rounded-tile bg-surface lg:sticky lg:top-4 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:h-[calc(100vh-10rem)]"
         >
           <TranscriptBox
             turns={turns}
@@ -446,30 +453,32 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
             onResend={() => pending && void sendTurn(pending.text)}
             onDiscard={() => setPending(null)}
           />
-          {!lock && (
-            <PushToTalk
-              status={voice.status}
-              error={voice.error}
-              notice={voice.notice}
-              micState={voice.micState}
-              gaveUp={voice.gaveUp}
-              disabled={pending?.state === "sending"}
-              onStart={() => void voice.start()}
-              onStop={voice.stop}
-              onRetry={voice.retryConnection}
+          <div className="border-t border-line">
+            {!lock && (
+              <PushToTalk
+                status={voice.status}
+                error={voice.error}
+                notice={voice.notice}
+                micState={voice.micState}
+                gaveUp={voice.gaveUp}
+                disabled={pending?.state === "sending"}
+                onStart={() => void voice.start()}
+                onStop={voice.stop}
+                onRetry={voice.retryConnection}
+              />
+            )}
+            <ChatInput
+              onSend={(t) => void sendTurn(t)}
+              busy={pending?.state === "sending" || voiceBusy}
+              lockedReason={lockedReason}
+              inputRef={inputRef}
             />
-          )}
-          <ChatInput
-            onSend={(t) => void sendTurn(t)}
-            busy={pending?.state === "sending" || voiceBusy}
-            lockedReason={lockedReason}
-            inputRef={inputRef}
-          />
+          </div>
         </section>
 
         {/* Guided mode only; exam mode gets no checklist from the API either. */}
         {!exam && (
-          <div className="min-w-0 lg:col-start-1 lg:row-start-2">
+          <div className="min-w-0 lg:col-span-5 lg:col-start-1 lg:row-start-2">
             <GuidedChecklist
               sessionId={id}
               items={guide?.checklist_enabled ? guide.items : []}

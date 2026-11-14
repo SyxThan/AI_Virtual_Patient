@@ -73,15 +73,17 @@ export default function SessionTimer({
   const label = countdown ? vi.workspace.timer.remaining : vi.workspace.timer.elapsed;
 
   return (
-    <div className="flex items-center gap-2 text-sm">
-      <span className="text-gray-700">{label}</span>
-      <span
-        role="timer"
-        aria-label={label}
-        className={`rounded-md px-2 py-0.5 font-mono font-semibold tabular-nums ${
-          low ? "bg-red-100 text-red-900" : "bg-gray-100 text-gray-900"
-        }`}
-      >
+    <div
+      className={`flex h-11 w-full items-center gap-2 rounded-full border px-4 text-sm sm:w-auto ${
+        low ? "border-warning/40 bg-warning-soft text-warning" : "border-line bg-canvas text-ink"
+      }`}
+    >
+      <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" aria-hidden="true">
+        <circle cx="10" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.6" />
+        <path d="M10 7.5V11l2.2 1.6M8 2.5h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      </svg>
+      <span className={low ? "font-semibold" : "text-ink-muted"}>{label}</span>
+      <span role="timer" aria-label={label} className="tabular text-base font-bold">
         {now === null ? "--:--" : format(shown)}
       </span>
       <span className="sr-only" aria-live="polite">

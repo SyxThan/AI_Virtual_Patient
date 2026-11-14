@@ -2,6 +2,7 @@
 
 import vi from "../../../messages/vi.json";
 import type { MicState, VoiceStatus } from "@/hooks/useVoiceSession";
+import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 /**
@@ -46,13 +47,13 @@ export default function PushToTalk({
         : vi.voice.hold;
 
   return (
-    <div className="flex flex-col gap-1.5 border-t border-gray-200 px-3 pt-3">
+    <div className="flex flex-col gap-2 px-4 pt-4">
       {gaveUp ? (
         <button
           type="button"
           onClick={onRetry}
           disabled={disabled}
-          className={`rounded-md border border-gray-400 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50 ${FOCUS_RING}`}
+          className={buttonClass({ variant: "secondary", size: "lg", className: "w-full" })}
         >
           {vi.workspace.voice.retryVoice}
         </button>
@@ -82,27 +83,54 @@ export default function PushToTalk({
             }
           }}
           onBlur={() => recording && onStop()}
-          className={`select-none rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-60 ${FOCUS_RING} ${
-            recording ? "bg-red-700" : "bg-blue-700 hover:bg-blue-800"
+          className={`flex h-14 w-full select-none items-center justify-center gap-3 rounded-full px-6 text-base font-bold transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${FOCUS_RING} ${
+            recording
+              ? "bg-ink text-white ring-4 ring-primary-soft"
+              : "bg-primary text-white hover:bg-primary-strong"
           }`}
         >
+          {recording ? (
+            <span
+              className="h-3 w-3 animate-pulse rounded-full bg-primary-soft motion-reduce:animate-none"
+              aria-hidden="true"
+            />
+          ) : (
+            <MicIcon />
+          )}
           {label}
         </button>
       )}
-      <p id="ptt-hint" className="text-xs text-gray-600">
+      <p id="ptt-hint" className="text-sm text-ink-muted">
         {vi.voice.hint}
       </p>
       {error && (
-        <p role="alert" className="rounded-md bg-red-50 px-3 py-1.5 text-xs text-red-900">
+        <p
+          role="alert"
+          className="rounded-control border border-warning/30 bg-warning-soft px-3 py-2 text-sm text-ink"
+        >
           {error}
         </p>
       )}
       {notice && !error && (
-        <p role="status" className="rounded-md bg-amber-50 px-3 py-1.5 text-xs text-amber-950">
+        <p role="status" className="rounded-control bg-info-soft px-3 py-2 text-sm text-ink">
           {notice}
         </p>
       )}
     </div>
+  );
+}
+
+function MicIcon() {
+  return (
+    <svg viewBox="0 0 20 20" className="h-5 w-5 shrink-0" fill="none" aria-hidden="true">
+      <rect x="7" y="2.5" width="6" height="10" rx="3" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M4.5 9.5a5.5 5.5 0 0011 0M10 15v2.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
@@ -111,19 +139,19 @@ function MicGuidance({ kind }: { kind: "denied" | "unsupported" }) {
   return (
     <div
       role="status"
-      className="mx-3 mt-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2.5 text-sm text-amber-950"
+      className="mx-4 mt-4 rounded-card border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-ink"
     >
-      <p className="font-semibold">{kind === "denied" ? m.deniedTitle : m.unsupportedTitle}</p>
+      <p className="font-bold text-warning">{kind === "denied" ? m.deniedTitle : m.unsupportedTitle}</p>
       {kind === "denied" ? (
-        <ol className="mt-1 list-decimal space-y-0.5 pl-5 text-xs leading-relaxed">
+        <ol className="mt-1.5 list-decimal space-y-1 pl-5 leading-relaxed">
           {m.deniedSteps.map((s) => (
             <li key={s}>{s}</li>
           ))}
         </ol>
       ) : (
-        <p className="mt-1 text-xs leading-relaxed">{m.unsupportedBody}</p>
+        <p className="mt-1.5 leading-relaxed">{m.unsupportedBody}</p>
       )}
-      <p className="mt-1.5 text-xs font-medium">{m.textMode}</p>
+      <p className="mt-2 font-semibold">{m.textMode}</p>
     </div>
   );
 }
