@@ -2,12 +2,16 @@
 
 import { useEffect, useRef } from "react";
 import vi from "../../../messages/vi.json";
+import Badge from "@/components/ui/Badge";
+import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 export type Turn = { turn_idx: number; speaker: string; text: string };
 
 /** A typed question not yet answered: in flight, or failed (never saved by the server). */
 export type PendingTurn = { text: string; state: "sending" | "failed"; error?: string };
+
+const BUBBLE = "max-w-[85%] whitespace-pre-line break-words rounded-card px-4 py-2.5 text-base leading-relaxed sm:text-sm";
 
 /**
  * The interview transcript. It is an ARIA live log, so new messages are read
@@ -47,10 +51,10 @@ export default function TranscriptBox({
       aria-relevant="additions text"
       aria-label={vi.workspace.regions.transcript}
       tabIndex={0}
-      className={`flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 ${FOCUS_RING} focus-visible:ring-offset-0`}
+      className={`flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 sm:p-6 ${FOCUS_RING} focus-visible:ring-inset focus-visible:ring-offset-0`}
     >
       {turns.length === 0 && !pending && (
-        <p className="m-auto max-w-sm text-center text-sm text-gray-600">{vi.session.empty}</p>
+        <p className="m-auto max-w-sm text-center text-ink-muted">{vi.session.empty}</p>
       )}
       {turns.map((t) => {
         if (t.speaker === "system") {
@@ -58,9 +62,9 @@ export default function TranscriptBox({
           return (
             <div
               key={`${t.turn_idx}-${t.speaker}`}
-              className="max-w-[90%] self-center whitespace-pre-line break-words rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-950"
+              className="max-w-[92%] self-center whitespace-pre-line break-words rounded-card border border-sand-ink/20 bg-sand-soft px-4 py-2.5 text-sm text-sand-ink"
             >
-              <span className="mb-0.5 block font-semibold">{vi.exam.systemLabel}</span>
+              <span className="mb-0.5 block font-bold">{vi.exam.systemLabel}</span>
               {t.text}
             </div>
           );
@@ -69,13 +73,15 @@ export default function TranscriptBox({
         return (
           <div
             key={`${t.turn_idx}-${t.speaker}`}
-            className={`max-w-[85%] whitespace-pre-line break-words rounded-2xl px-4 py-2 text-sm ${
+            className={`${BUBBLE} ${
               mine
-                ? "self-end bg-blue-700 text-white"
-                : "self-start border border-gray-200 bg-gray-100 text-gray-900"
+                ? "self-end rounded-br-control bg-primary text-white"
+                : "self-start rounded-bl-control bg-canvas text-ink"
             }`}
           >
-            <span className={`mb-0.5 block text-xs ${mine ? "text-blue-100" : "text-gray-600"}`}>
+            <span
+              className={`mb-0.5 block text-xs font-semibold ${mine ? "text-primary-soft" : "text-ink-muted"}`}
+            >
               {mine ? vi.session.you : vi.session.mother}
             </span>
             {t.text}
@@ -85,29 +91,27 @@ export default function TranscriptBox({
 
       {pending && (
         <div
-          className={`max-w-[85%] self-end whitespace-pre-line break-words rounded-2xl px-4 py-2 text-sm ${
+          className={`${BUBBLE} self-end rounded-br-control ${
             pending.state === "failed"
-              ? "border border-red-300 bg-red-50 text-red-950"
-              : "border border-dashed border-blue-300 bg-blue-50 text-blue-950"
+              ? "border border-warning/40 bg-warning-soft text-ink"
+              : "border border-dashed border-primary/50 bg-primary-soft text-ink"
           }`}
         >
-          <span
-            className={`mb-0.5 block text-xs ${pending.state === "failed" ? "text-red-800" : "text-blue-800"}`}
-          >
+          <span className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-ink-muted">
             {vi.session.you}
-            {pending.state === "failed" && ` · ${vi.workspace.notSent}`}
+            {pending.state === "failed" && <Badge tone="warning">{vi.workspace.notSent}</Badge>}
           </span>
           {pending.text}
         </div>
       )}
 
       {showWaiting && (
-        <div className="flex items-center gap-2 self-start rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm text-gray-700">
+        <div className="flex items-center gap-2 self-start rounded-card rounded-bl-control bg-canvas px-4 py-2.5 text-sm text-ink-muted">
           <span className="flex gap-1" aria-hidden="true">
             {[0, 150, 300].map((d) => (
               <span
                 key={d}
-                className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-500 motion-reduce:animate-none"
+                className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-muted motion-reduce:animate-none"
                 style={{ animationDelay: `${d}ms` }}
               />
             ))}
@@ -117,21 +121,16 @@ export default function TranscriptBox({
       )}
 
       {pending?.state === "failed" && (
-        <div role="alert" className="self-stretch rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-950">
+        <div
+          role="alert"
+          className="self-stretch rounded-card border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-ink"
+        >
           <p>{pending.error}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onResend}
-              className={`rounded-md bg-red-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-900 ${FOCUS_RING}`}
-            >
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" onClick={onResend} className={buttonClass({ variant: "primary" })}>
               {vi.workspace.resend}
             </button>
-            <button
-              type="button"
-              onClick={onDiscard}
-              className={`rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-900 hover:bg-red-100 ${FOCUS_RING}`}
-            >
+            <button type="button" onClick={onDiscard} className={buttonClass({ variant: "secondary" })}>
               {vi.workspace.discard}
             </button>
           </div>

@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import vi from "../../../messages/vi.json";
 import Modal from "@/components/ui/Modal";
-import { FOCUS_RING } from "@/components/ui/focus";
+import { buttonClass } from "@/components/ui/Button";
 import { fmt } from "@/lib/sessionAuth";
 
 /**
@@ -36,32 +36,36 @@ export default function FinishDialog({
       description={
         <>
           <p>{f.body}</p>
-          <p className="mt-2 text-gray-600">{fmt(f.turns, { n: turnCount })}</p>
+          <p className="tabular mt-3 font-semibold text-ink">{fmt(f.turns, { n: turnCount })}</p>
         </>
       }
       initialFocusRef={cancelRef}
     >
       {error && (
-        <p role="alert" className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-900">
+        <p
+          role="alert"
+          className="mt-4 rounded-card border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-ink"
+        >
           {error}
         </p>
       )}
-      <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <button
           ref={cancelRef}
           type="button"
           onClick={onCancel}
           disabled={finishing}
-          className={`rounded-md border border-gray-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 disabled:opacity-50 ${FOCUS_RING}`}
+          className={buttonClass({ variant: "secondary" })}
         >
           {f.cancel}
         </button>
+        {/* Destructive: the interview cannot be resumed afterwards. */}
         <button
           type="button"
           onClick={onConfirm}
           disabled={finishing}
           aria-busy={finishing}
-          className={`rounded-md bg-red-800 px-4 py-2 text-sm font-medium text-white hover:bg-red-900 disabled:opacity-60 ${FOCUS_RING}`}
+          className={buttonClass({ variant: "danger" })}
         >
           {finishing ? vi.session.finishing : f.confirm}
         </button>

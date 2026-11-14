@@ -640,6 +640,9 @@
     "examButtons": "Khám bằng nút (dùng được với bàn phím)"
   },
   "setupUx": {
+    "intro": "Chọn vai trò và chế độ, đồng ý lưu dữ liệu, rồi bắt đầu hỏi bệnh người mẹ.",
+    "accountTitle": "Tài khoản",
+    "consentTitle": "Lưu dữ liệu buổi khám",
     "guidedDesc": "Hiện danh sách nhắc việc dựa trên bảng kiểm (bạn tự đánh dấu) và đồng hồ đếm thời gian khám.",
     "examDesc": "Ẩn nhắc việc, mô phỏng một trạm OSCE. Nếu có cấu hình giới hạn thời gian, đồng hồ sẽ đếm ngược.",
     "privacyLink": "Xem chính sách quyền riêng tư",

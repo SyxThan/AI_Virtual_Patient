@@ -2,6 +2,7 @@
 
 import { useId, useState, type Ref } from "react";
 import vi from "../../../messages/vi.json";
+import Button from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 export const MAX_TURN_CHARS = 2000;
@@ -35,7 +36,7 @@ export default function ChatInput({
 
   return (
     <form
-      className="flex flex-col gap-1 border-t border-gray-200 p-3"
+      className="flex flex-col gap-1.5 px-4 pb-4 pt-3"
       onSubmit={(e) => {
         e.preventDefault();
         submit();
@@ -55,18 +56,14 @@ export default function ChatInput({
           maxLength={MAX_TURN_CHARS}
           autoComplete="off"
           aria-describedby={locked ? `${id}-locked` : undefined}
-          className={`min-w-0 flex-1 rounded-md border border-gray-400 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-600 disabled:bg-gray-100 ${FOCUS_RING}`}
+          className={`h-11 min-w-0 flex-1 rounded-control border border-line-strong bg-surface px-4 text-base text-ink placeholder:text-ink-muted disabled:cursor-not-allowed disabled:bg-canvas sm:text-sm ${FOCUS_RING}`}
         />
-        <button
-          type="submit"
-          disabled={busy || locked || !text.trim()}
-          className={`shrink-0 rounded-md bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 disabled:opacity-50 ${FOCUS_RING}`}
-        >
+        <Button type="submit" variant="secondary" disabled={busy || locked || !text.trim()} className="shrink-0">
           {vi.session.send}
-        </button>
+        </Button>
       </div>
       {locked && (
-        <p id={`${id}-locked`} className="text-xs text-gray-700">
+        <p id={`${id}-locked`} className="text-sm text-ink-muted">
           {lockedReason}
         </p>
       )}
