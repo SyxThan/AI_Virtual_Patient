@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import vi from "../../../messages/vi.json";
+import { buttonClass } from "@/components/ui/Button";
+import Tile from "@/components/ui/Tile";
 import { FOCUS_RING_DARK } from "@/components/ui/focus";
 import { API_URL, authHeaders, fmt, whenAuthReady } from "@/lib/sessionAuth";
 
@@ -100,16 +102,22 @@ export default function VitalsMonitor({
   ].filter(Boolean) as string[];
 
   return (
-    <section
-      aria-labelledby="vitals-title"
-      className="rounded-lg border border-gray-800 bg-gray-900 p-4 text-gray-100"
-    >
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 id="vitals-title" className="text-sm font-semibold tracking-wide text-gray-200">
+    <Tile as="section" tone="ink" compact aria-labelledby="vitals-title">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <h2 id="vitals-title" className="flex items-center gap-2 text-base font-bold text-white">
+          <svg viewBox="0 0 20 20" className="h-5 w-5 text-primary-soft" fill="none" aria-hidden="true">
+            <path
+              d="M2 10.5h3.5l2-4.5 3 9 2.5-6 1.5 1.5H18"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
           {vi.monitor.title}
         </h2>
         {v && (
-          <span className="rounded-full bg-gray-800 px-2 py-0.5 text-xs text-amber-300">
+          <span className="rounded-full border border-ink-inverse-muted/40 px-3 py-1 text-sm font-semibold text-white">
             {v.clinical_label}
           </span>
         )}
@@ -119,26 +127,24 @@ export default function VitalsMonitor({
         {alerts.length > 0 ? fmt(vi.a11y.vitalsAlert, { alerts: alerts.join(", ") }) : ""}
       </p>
       {error && (
-        <p role="alert" className="mb-2 text-sm text-red-300">
+        <p role="alert" className="mb-3 rounded-control bg-warning-soft px-3 py-2 text-sm text-ink">
           {vi.monitor.error}
         </p>
       )}
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
         <Metric
-          icon="❤"
           label={vi.monitor.hr}
           value={v ? `${v.heart_rate_bpm}` : "—"}
           unit={vi.monitor.unitBpm}
-          className={hrHigh ? "text-amber-300" : "text-emerald-300"}
-          pulse
+          pulse={!!v}
+          warn={hrHigh}
+          warnText={vi.a11y.hrHigh}
         />
         <Metric
-          icon="🌡"
           label={vi.monitor.temp}
           value={v ? v.temperature_c.toFixed(1) : "—"}
           unit="°C"
-          className="text-red-300"
           warn={feverHigh}
           warnText={vi.monitor.feverWarning}
         />
@@ -146,35 +152,40 @@ export default function VitalsMonitor({
           label={vi.monitor.rr}
           value={v ? `${v.respiratory_rate_bpm}` : "—"}
           unit={vi.monitor.unitBpm}
-          className="text-sky-300"
         />
         <Metric
           label={vi.monitor.bp}
           value={v ? `${v.blood_pressure_sys}/${v.blood_pressure_dia}` : "—"}
           unit="mmHg"
-          className="text-gray-100"
         />
         <Metric
           label={vi.monitor.spo2}
           value={v ? `${v.spo2_percent}` : "—"}
           unit="%"
-          className={spo2Low ? "text-red-300" : "text-cyan-300"}
+          warn={spo2Low}
+          warnText={vi.a11y.spo2Low}
         />
-      </div>
+      </dl>
 
       {v && v.active_symptoms.length > 0 && (
-        <div className="mt-3 text-xs text-gray-300">
-          <span className="font-medium text-gray-200">{vi.monitor.symptoms}: </span>
-          {v.active_symptoms.join(" · ")}
+        <div className="mt-4">
+          <p className="text-sm font-semibold text-ink-inverse-muted">{vi.monitor.symptoms}</p>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {v.active_symptoms.map((s) => (
+              <li key={s} className="rounded-full bg-white/10 px-3 py-1 text-sm text-white">
+                {s}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={measure}
           disabled={busy || disabled}
-          className={`rounded-md border border-gray-500 px-3 py-1.5 text-xs text-gray-100 hover:bg-gray-800 disabled:opacity-50 ${FOCUS_RING_DARK}`}
+          className={buttonClass({ variant: "inverse" })}
         >
           {busy ? vi.monitor.loading : vi.monitor.measure}
         </button>
@@ -182,55 +193,58 @@ export default function VitalsMonitor({
           type="button"
           onClick={() => sendEvent("ORDER_ANTIPYRETIC")}
           disabled={busy || disabled}
-          className={`rounded-md bg-emerald-700 px-3 py-1.5 text-xs text-white hover:bg-emerald-800 disabled:opacity-50 ${FOCUS_RING_DARK}`}
+          className={`inline-flex h-11 items-center justify-center rounded-control border border-ink-inverse-muted/50 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING_DARK}`}
         >
           {vi.monitor.antipyretic}
         </button>
       </div>
-    </section>
+    </Tile>
   );
 }
 
+/** One monitor reading. An out-of-range value is flagged with text, not color alone. */
 function Metric({
   pulse,
-  icon,
   label,
   value,
   unit,
-  className,
   warn,
   warnText,
 }: {
   pulse?: boolean;
-  icon?: string;
   label: string;
   value: string;
   unit: string;
-  className?: string;
   warn?: boolean;
   warnText?: string;
 }) {
   return (
     <div
-      className={`rounded-md border p-2 ${
-        warn ? "border-red-500 bg-red-950 ring-1 ring-red-500" : "border-gray-700 bg-gray-800"
+      className={`flex min-w-0 flex-col rounded-card border p-3 ${
+        warn ? "border-warning-soft bg-white/10" : "border-white/10 bg-white/5"
       }`}
     >
-      <div className="flex items-center gap-1 text-xs text-gray-300">
-        {icon && <span aria-hidden="true">{icon}</span>}
+      <dt className="flex items-center gap-1.5 text-sm text-ink-inverse-muted">
         {label}
         {pulse && (
           <span
-            className="ml-auto h-2 w-2 animate-pulse rounded-full bg-emerald-400 motion-reduce:animate-none"
+            className="ml-auto h-2 w-2 animate-pulse rounded-full bg-primary-soft motion-reduce:animate-none"
             aria-hidden="true"
           />
         )}
-      </div>
-      <div className={`text-2xl font-bold tabular-nums ${className ?? ""}`}>
-        {value}
-        <span className="ml-1 text-xs font-normal text-gray-300">{unit}</span>
-      </div>
-      {warn && warnText && <div className="text-xs text-red-300">{warnText}</div>}
+      </dt>
+      <dd className="mt-1 flex flex-wrap items-baseline gap-x-1 text-white">
+        <span className="tabular text-3xl font-bold tracking-tight">{value}</span>
+        <span className="text-sm text-ink-inverse-muted">{unit}</span>
+        {warn && warnText && (
+          <span className="mt-1.5 flex w-fit basis-full items-center gap-1 rounded-full bg-warning-soft px-2 py-0.5 text-xs font-bold text-warning">
+            <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" aria-hidden="true">
+              <path d="M6 2v5M6 9.5v.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+            {warnText}
+          </span>
+        )}
+      </dd>
     </div>
   );
 }

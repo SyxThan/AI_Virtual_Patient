@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useMemo, useState } from "react";
 import vi from "../../../messages/vi.json";
+import { buttonClass } from "@/components/ui/Button";
+import Tile from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { fmt } from "@/lib/sessionAuth";
 
@@ -79,73 +81,73 @@ export default function GuidedChecklist({
   const done = items.filter((i) => ticks.has(i.criterion_id)).length;
 
   return (
-    <section
-      aria-labelledby={headingId}
-      className="rounded-lg border border-gray-200 bg-white p-4"
-    >
+    <Tile as="section" tone="mint" compact aria-labelledby={headingId}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id={headingId} className="font-semibold text-gray-900">
+        <h2 id={headingId} className="text-base font-bold text-ink">
           {vi.guide.title}
         </h2>
         {state === "ready" && items.length > 0 && (
-          <span className="text-xs text-gray-700" aria-live="polite">
+          <span className="tabular text-sm font-semibold" aria-live="polite">
             {fmt(vi.guide.progress, { done, total: items.length })}
           </span>
         )}
       </div>
-      <p className="mt-1 text-xs leading-relaxed text-gray-700">{vi.guide.subtitle}</p>
-      <p className="mt-2 rounded bg-amber-50 px-2 py-1 text-xs text-amber-950">
-        <span aria-hidden="true">⚠ </span>
+      <p className="mt-1 text-sm leading-relaxed">{vi.guide.subtitle}</p>
+      <p className="mt-3 flex items-start gap-2 rounded-control bg-surface/70 px-3 py-2 text-sm text-warning">
+        <svg viewBox="0 0 20 20" className="mt-0.5 h-4 w-4 shrink-0" fill="none" aria-hidden="true">
+          <path d="M10 3l7.5 13h-15L10 3z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+          <path d="M10 8.5v3.5M10 14.2v.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
         {vi.guide.draft}
       </p>
 
       {state === "loading" && (
-        <div className="mt-3 space-y-2" aria-busy="true">
+        <div className="mt-4 space-y-2" aria-busy="true">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-5 animate-pulse rounded bg-gray-100" />
+            <div key={i} className="h-6 animate-pulse rounded-control bg-surface/70 motion-reduce:animate-none" />
           ))}
         </div>
       )}
       {state === "error" && (
-        <div role="alert" className="mt-3 text-sm text-red-900">
+        <div role="alert" className="mt-4 rounded-control bg-surface px-3 py-3 text-sm text-ink">
           <p>{vi.guide.loadError}</p>
-          <button
-            type="button"
-            onClick={onRetry}
-            className={`mt-2 rounded-md border border-gray-400 px-3 py-1 text-xs font-medium text-gray-900 ${FOCUS_RING}`}
-          >
+          <button type="button" onClick={onRetry} className={buttonClass({ variant: "secondary", className: "mt-2" })}>
             {vi.guide.retry}
           </button>
         </div>
       )}
       {state === "ready" && items.length === 0 && (
-        <p className="mt-3 text-sm text-gray-700">{vi.guide.empty}</p>
+        <p className="mt-4 text-sm">{vi.guide.empty}</p>
       )}
       {state === "ready" && groups.length > 0 && (
-        <div className="mt-3 space-y-3">
+        <div className="mt-4 space-y-4">
           {groups.map(([domain, list]) => (
             <fieldset key={domain}>
-              <legend className="text-xs font-semibold uppercase tracking-wide text-gray-700">
+              <legend className="text-sm font-bold text-ink">
                 {vi.guide.domains[domain as DomainKey] ?? domain}
               </legend>
-              <ul className="mt-1 space-y-1">
+              <ul className="mt-1.5 overflow-hidden rounded-card bg-surface">
                 {list.map((it) => {
                   const checked = ticks.has(it.criterion_id);
                   const inputId = `guide-${sessionId}-${it.criterion_id}`;
                   return (
-                    <li key={it.criterion_id} className="flex items-start gap-2">
-                      <input
-                        id={inputId}
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggle(it.criterion_id)}
-                        className={`mt-0.5 h-4 w-4 shrink-0 accent-blue-700 ${FOCUS_RING}`}
-                      />
+                    <li key={it.criterion_id} className="border-b border-line last:border-b-0">
                       <label
                         htmlFor={inputId}
-                        className={`text-sm leading-snug ${checked ? "text-gray-600 line-through" : "text-gray-900"}`}
+                        className="flex min-h-11 cursor-pointer items-start gap-3 px-3 py-2.5"
                       >
-                        {it.title}
+                        <input
+                          id={inputId}
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggle(it.criterion_id)}
+                          className={`mt-0.5 h-5 w-5 shrink-0 accent-primary ${FOCUS_RING}`}
+                        />
+                        <span
+                          className={`text-sm leading-snug ${checked ? "text-ink-muted line-through" : "text-ink"}`}
+                        >
+                          {it.title}
+                        </span>
                       </label>
                     </li>
                   );
@@ -155,6 +157,6 @@ export default function GuidedChecklist({
           ))}
         </div>
       )}
-    </section>
+    </Tile>
   );
 }
