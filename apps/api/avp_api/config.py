@@ -61,8 +61,10 @@ class Settings(BaseSettings):
     stt_model: str | None = None
     stt_language: str = "vi-VN"
     stt_timeout_s: float = 8.0
-    tts_provider: str | None = None  # "google" | unset
+    tts_provider: str | None = None  # "google" | "vieneu" | unset
     tts_api_key: str | None = Field(default=None, repr=False)
+    # Self-hosted TTS server root, e.g. http://127.0.0.1:8880 (vieneu only).
+    tts_base_url: str | None = None
     tts_voice_id: str | None = None
     tts_language: str = "vi-VN"
     tts_timeout_s: float = 8.0

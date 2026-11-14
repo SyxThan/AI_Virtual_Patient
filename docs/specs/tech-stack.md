@@ -41,7 +41,7 @@ Backend (`apps/api`, read via pydantic-settings; never `NEXT_PUBLIC_`):
 | `ALLOWED_ORIGINS` | CORS origins for the web app, comma-separated |
 | `LLM_PROVIDER`, `LLM_API_KEY`, `LLM_MODEL_PATIENT`, `LLM_MODEL_EVALUATOR` | LLM adapter |
 | `EMBEDDING_MODEL` | Fixed in AVP-018; changing it means re-embedding |
-| `STT_PROVIDER`, `STT_API_KEY`, `TTS_PROVIDER`, `TTS_API_KEY` | Voice adapters |
+| `STT_PROVIDER`, `STT_API_KEY`, `TTS_PROVIDER` (`google` \| `vieneu`), `TTS_API_KEY`, `TTS_BASE_URL`, `TTS_VOICE_ID` | Voice adapters (`vieneu` = self-hosted VieNeu-TTS server, Slice 16) |
 
 Frontend (`apps/web`; these are public by design, so no secrets):
 | Variable | Meaning |
