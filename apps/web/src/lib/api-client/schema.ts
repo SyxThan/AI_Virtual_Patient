@@ -113,6 +113,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sessions/{session_id}/turns/{turn_idx}/speech": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Speak Turn
+         * @description Read a saved patient turn aloud, so a typed question gets a spoken reply too.
+         *     Never logs the text or audio (voice_common logs provider, outcome and ms only).
+         */
+        post: operations["speak_turn_api_v1_sessions__session_id__turns__turn_idx__speech_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions/{session_id}/vitals": {
         parameters: {
             query?: never;
@@ -1124,6 +1145,63 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    speak_turn_api_v1_sessions__session_id__turns__turn_idx__speech_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-guest-token"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                session_id: string;
+                turn_idx: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The patient turn as audio (format in Content-Type). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/wav": unknown;
+                    "audio/mpeg": unknown;
+                };
+            };
+            /** @description No real TTS provider is configured: nothing to play. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Session or patient turn not found (or not yours). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description TTS_UNAVAILABLE: the TTS provider failed; the text reply stands. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
