@@ -15,13 +15,13 @@ import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
 import Button, { buttonClass } from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
 import Tile from "@/components/ui/Tile";
-import { FOCUS_RING } from "@/components/ui/focus";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DeleteSessionButton from "@/components/privacy/DeleteSessionButton";
 import { useDebriefData } from "@/hooks/useDebriefData";
 
 // Danger outline: delete is destructive but must not compete with the one primary action.
-const DELETE_CLASS = `inline-flex h-11 items-center justify-center rounded-control border border-danger px-5 text-sm font-semibold text-danger hover:bg-danger-soft sm:ml-auto ${FOCUS_RING}`;
+// DeleteSessionButton appends this to its own trigger styles: outline + layout only.
+const DELETE_CLASS = "border border-danger px-5 sm:ml-auto";
 
 /** Bento-shaped placeholder while the evaluation or the debrief is being produced. */
 function Skeleton({ message, compact = false }: { message: string; compact?: boolean }) {

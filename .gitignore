@@ -20,3 +20,6 @@ data/source/
 .agents/
 .claude/skills/supabase-postgres-best-practices/
 skills-lock.json
+
+# Written by `next dev` (Next 16 agent rules) on every start
+apps/web/AGENTS.md
