@@ -1,30 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import vi from "../../messages/vi.json";
-import { FOCUS_RING } from "@/components/ui/focus";
+import { buttonClass } from "@/components/ui/Button";
+import PageShell from "@/components/ui/PageShell";
+import Tile, { TILE_MUTED } from "@/components/ui/Tile";
 
 export const metadata: Metadata = { title: vi.errors.notFoundTitle };
 
 export default function NotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col items-start gap-4 px-4 py-16 sm:px-6">
-      <p className="text-sm font-semibold text-blue-800">404</p>
-      <h1 className="text-2xl font-semibold text-gray-900">{vi.errors.notFoundTitle}</h1>
-      <p className="text-gray-700">{vi.errors.notFoundBody}</p>
-      <div className="mt-2 flex flex-wrap gap-3">
-        <Link
-          href="/"
-          className={`rounded-md bg-gray-900 px-4 py-2 font-medium text-white hover:bg-gray-700 ${FOCUS_RING}`}
-        >
-          {vi.errors.home}
-        </Link>
-        <Link
-          href="/setup"
-          className={`rounded-md border border-gray-400 px-4 py-2 font-medium text-gray-900 hover:bg-gray-50 ${FOCUS_RING}`}
-        >
-          {vi.errors.start}
-        </Link>
+    <PageShell>
+      <div className="grid gap-4 sm:grid-cols-5">
+        <Tile tone="ink" className="flex flex-col justify-between gap-10 sm:col-span-3">
+          <p className={`text-sm font-semibold ${TILE_MUTED.ink}`}>{vi.errors.notFoundCode}</p>
+          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{vi.errors.notFoundTitle}</h1>
+        </Tile>
+        <Tile tone="surface" className="flex flex-col justify-between gap-6 border border-line sm:col-span-2">
+          <p className="text-ink-muted">{vi.errors.notFoundBody}</p>
+          <div className="flex flex-col gap-3">
+            <Link href="/" className={buttonClass({ variant: "primary", className: "w-full" })}>
+              {vi.errors.home}
+            </Link>
+            <Link href="/setup" className={buttonClass({ variant: "secondary", className: "w-full" })}>
+              {vi.errors.start}
+            </Link>
+          </div>
+        </Tile>
       </div>
-    </main>
+    </PageShell>
   );
 }

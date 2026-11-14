@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import vi from "../../../messages/vi.json";
 import { safeNext } from "@/components/auth/authErrors";
+import { buttonClass } from "@/components/ui/Button";
 import { getSupabase } from "@/lib/supabaseClient";
 
 /**
@@ -40,13 +41,26 @@ export default function AuthCallback() {
     };
   }, [params, router]);
 
-  if (!failed) return <p role="status">{vi.auth.callback.working}</p>;
+  if (!failed) {
+    return (
+      <p role="status" className="flex items-center gap-3 text-ink">
+        <span
+          className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-line border-t-primary motion-reduce:animate-none"
+          aria-hidden="true"
+        />
+        {vi.auth.callback.working}
+      </p>
+    );
+  }
   return (
-    <div className="flex flex-col gap-4">
-      <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-red-800">
+    <div className="flex flex-col gap-5">
+      <p
+        role="alert"
+        className="rounded-control border border-warning/30 bg-warning-soft px-4 py-3 text-warning"
+      >
         {vi.auth.callback.failed}
       </p>
-      <Link href="/login" className="w-fit underline">
+      <Link href="/login" className={buttonClass({ variant: "primary", className: "w-full sm:w-fit" })}>
         {vi.auth.callback.back}
       </Link>
     </div>
