@@ -54,9 +54,9 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | ✅ Merged (PR #33) |
 | **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | ✅ Merged (PR #36) |
 | **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | ✅ Merged (PR #37) |
-| **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | 🟡 Đang làm |
-| **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | ❌ Chưa làm |
-| **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | ❌ Chưa làm |
+| **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | 🟡 PR #39 |
+| **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | 🟡 PR #40 |
+| **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | 🟡 PR #41 |
 
 ---
 
@@ -79,7 +79,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ✅ Hoàn tất (PR #26, #28, #29); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
 | **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | ✅ Hoàn tất (PR #32–#37) |
-| **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | 🟡 Đang làm |
+| **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | 🟡 PR #39–#41 |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
