@@ -107,3 +107,23 @@ def list_turns(
 ) -> list[TurnResponse]:
     session_service.get_session(session_id, session_repo, user_id, guest_token)  # ownership
     return [_to_response(t) for t in turn_repo.list_for_session(session_id)]
+
+
+def patient_turn_text(
+    session_id: str,
+    turn_idx: int,
+    session_repo: SessionRepository,
+    turn_repo: TurnRepository,
+    user_id: str | None,
+    guest_token: str | None,
+) -> str:
+    """The saved text of one patient turn, for read-aloud (Slice 16, AVP-133).
+    Ownership first (404 on any miss); a missing or non-patient turn is also 404,
+    so only text the Patient Agent already produced (and guardrails passed) is spoken."""
+    session_service.get_session(session_id, session_repo, user_id, guest_token)
+    for t in turn_repo.list_for_session(session_id):
+        if t.idx == turn_idx and t.speaker == "patient" and t.text.strip():
+            return t.text
+    raise HTTPException(
+        status_code=404, detail={"code": "TURN_NOT_FOUND", "message": "Turn not found."}
+    )

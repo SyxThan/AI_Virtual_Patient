@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import vi from "../../messages/vi.json";
-import { API_URL, fmt, whenAuthReady, wsAuthMessage } from "@/lib/sessionAuth";
+import { API_URL, authHeaders, fmt, whenAuthReady, wsAuthMessage } from "@/lib/sessionAuth";
 
 /**
  * Push-to-talk voice loop over `/ws/sessions/{id}` (Slice 6-02, hardened in Slice 12).
@@ -22,6 +22,12 @@ import { API_URL, fmt, whenAuthReady, wsAuthMessage } from "@/lib/sessionAuth";
  * - A failed turn calls `onTurnFailed` so the page reloads the canonical
  *   transcript (the server saved nothing): no turn is ever shown as answered
  *   when it was not.
+ *
+ * Typed turns (Slice 16, AVP-133): the page calls `prepareAudio()` inside the
+ * submit gesture, then `speakTurn(turn_idx)` once the reply is saved; the reply
+ * audio comes from `POST /sessions/{id}/turns/{idx}/speech` and plays through the
+ * same AnalyserNode, so the avatar lip-syncs to typed turns too. 204 (no real
+ * TTS configured) plays nothing; a failure is only a notice, the text stands.
  */
 
 export type VoiceStatus =
@@ -48,6 +54,7 @@ const CHUNK_MS = 250;
 export const MAX_RECONNECTS = 3;
 const BACKOFF_MS = [1000, 2000, 4000];
 const REPLY_TIMEOUT_MS = 30_000;
+const SPEECH_TIMEOUT_MS = 60_000;
 
 function wsBaseUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_WS_URL;
@@ -109,6 +116,8 @@ export function useVoiceSession({
   const onTranscriptRef = useRef(onTranscript);
   const onTurnFailedRef = useRef(onTurnFailed);
   const onLockedRef = useRef(onLocked);
+  const speechSeqRef = useRef(0); // only the latest typed-turn speech may play
+  const speechAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     onTranscriptRef.current = onTranscript;
@@ -159,15 +168,28 @@ export function useVoiceSession({
     }, REPLY_TIMEOUT_MS);
   }, [clearReplyTimer]);
 
-  const play = useCallback(async (b64: string) => {
+  /** Create (or resume) audio output. Browsers only allow this inside a user
+   *  gesture, so call it from the click/submit handler before any await. */
+  const prepareAudio = useCallback(() => {
+    if (typeof window === "undefined" || typeof AudioContext === "undefined") return;
+    if (!ctxRef.current) {
+      const ctx = new AudioContext();
+      const node = ctx.createAnalyser();
+      node.fftSize = 1024;
+      node.connect(ctx.destination);
+      ctxRef.current = ctx;
+      analyserRef.current = node;
+      setAnalyser(node);
+    }
+    void ctxRef.current.resume();
+  }, []);
+
+  const playBuffer = useCallback(async (data: ArrayBuffer) => {
     const ctx = ctxRef.current;
     const out = analyserRef.current;
     if (!ctx || !out) return;
     try {
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      const buffer = await ctx.decodeAudioData(bytes.buffer);
+      const buffer = await ctx.decodeAudioData(data);
       playingRef.current?.stop();
       const src = ctx.createBufferSource();
       src.buffer = buffer;
@@ -177,6 +199,55 @@ export function useVoiceSession({
     } catch {
       setNotice(vi.voice.playbackFailed);
     }
+  }, []);
+
+  const play = useCallback(
+    async (b64: string) => {
+      const bin = atob(b64);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      await playBuffer(bytes.buffer);
+    },
+    [playBuffer],
+  );
+
+  /** Read a saved patient turn aloud (typed turns). Never throws. */
+  const speakTurn = useCallback(
+    async (turnIdx: number) => {
+      speechAbortRef.current?.abort();
+      const ctrl = new AbortController();
+      speechAbortRef.current = ctrl;
+      const seq = ++speechSeqRef.current;
+      const timer = setTimeout(() => ctrl.abort(), SPEECH_TIMEOUT_MS);
+      try {
+        const res = await fetch(`${API_URL}/api/v1/sessions/${sessionId}/turns/${turnIdx}/speech`, {
+          method: "POST",
+          headers: authHeaders(),
+          signal: ctrl.signal,
+        });
+        if (res.status === 204) return; // no real TTS configured: text only, by design
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.arrayBuffer();
+        if (seq !== speechSeqRef.current) return; // a newer reply superseded this one
+        await playBuffer(data);
+      } catch {
+        // Superseded or stopped (seq moved on): silent. Failure or timeout: say so.
+        if (seq === speechSeqRef.current) setNotice(vi.voice.ttsFailed);
+      } finally {
+        clearTimeout(timer);
+        if (speechAbortRef.current === ctrl) speechAbortRef.current = null;
+      }
+    },
+    [sessionId, playBuffer],
+  );
+
+  /** Stop the patient's voice and drop any typed-turn speech still loading. */
+  const stopSpeaking = useCallback(() => {
+    speechSeqRef.current++;
+    speechAbortRef.current?.abort();
+    speechAbortRef.current = null;
+    playingRef.current?.stop();
+    playingRef.current = null;
   }, []);
 
   const handleEvent = useCallback(
@@ -335,17 +406,8 @@ export function useVoiceSession({
     }
 
     // Audio output must be created/resumed inside the user gesture.
-    if (!ctxRef.current) {
-      const ctx = new AudioContext();
-      const node = ctx.createAnalyser();
-      node.fftSize = 1024;
-      node.connect(ctx.destination);
-      ctxRef.current = ctx;
-      analyserRef.current = node;
-      setAnalyser(node);
-    }
-    void ctxRef.current.resume();
-    playingRef.current?.stop(); // student speaks over the patient: cut playback
+    prepareAudio();
+    stopSpeaking(); // student speaks over the patient: cut playback
 
     const [wsRes, micRes] = await Promise.allSettled([
       connect(),
@@ -393,7 +455,7 @@ export function useVoiceSession({
     rec.start(CHUNK_MS);
     setStatus("recording");
     if (stopRequestedRef.current) rec.stop(); // released before the mic was ready
-  }, [connect, releaseMic, armReplyTimer]);
+  }, [connect, releaseMic, armReplyTimer, prepareAudio, stopSpeaking]);
 
   /** Manual retry after `gaveUp`: a fresh set of reconnect attempts. */
   const retryConnection = useCallback(() => {
@@ -412,6 +474,7 @@ export function useVoiceSession({
     if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
     reconnectTimerRef.current = null;
     clearReplyTimer();
+    stopSpeaking();
     const rec = recorderRef.current;
     if (rec) {
       rec.onstop = null;
@@ -420,13 +483,14 @@ export function useVoiceSession({
     }
     releaseMic();
     wsRef.current?.close();
-  }, [clearReplyTimer, releaseMic]);
+  }, [clearReplyTimer, releaseMic, stopSpeaking]);
 
   useEffect(() => {
     return () => {
       closingRef.current = true;
       if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current);
       if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
+      speechAbortRef.current?.abort();
       const rec = recorderRef.current;
       if (rec) {
         rec.onstop = null;
@@ -452,5 +516,8 @@ export function useVoiceSession({
     stop,
     retryConnection,
     shutdown,
+    prepareAudio,
+    speakTurn,
+    stopSpeaking,
   };
 }

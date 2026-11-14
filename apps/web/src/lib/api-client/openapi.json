@@ -584,6 +584,96 @@
         }
       }
     },
+    "/api/v1/sessions/{session_id}/turns/{turn_idx}/speech": {
+      "post": {
+        "tags": [
+          "turns"
+        ],
+        "summary": "Speak Turn",
+        "description": "Read a saved patient turn aloud, so a typed question gets a spoken reply too.\nNever logs the text or audio (voice_common logs provider, outcome and ms only).",
+        "operationId": "speak_turn_api_v1_sessions__session_id__turns__turn_idx__speech_post",
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "turn_idx",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Turn Idx"
+            }
+          },
+          {
+            "name": "x-guest-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Guest-Token"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The patient turn as audio (format in Content-Type).",
+            "content": {
+              "audio/wav": {},
+              "audio/mpeg": {}
+            }
+          },
+          "204": {
+            "description": "No real TTS provider is configured: nothing to play."
+          },
+          "404": {
+            "description": "Session or patient turn not found (or not yours)."
+          },
+          "503": {
+            "description": "TTS_UNAVAILABLE: the TTS provider failed; the text reply stands."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/sessions/{session_id}/vitals": {
       "get": {
         "tags": [

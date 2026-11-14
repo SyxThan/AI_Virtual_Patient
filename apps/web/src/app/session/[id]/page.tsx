@@ -123,7 +123,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     onTurnFailed: () => void reloadTurns(),
     onLocked: applyLock,
   });
-  const { shutdown: shutdownVoice } = voice;
+  const { shutdown: shutdownVoice, prepareAudio, speakTurn, stopSpeaking } = voice;
 
   // Lip-sync follows the patient's voice playback once audio output exists.
   useEffect(() => {
@@ -207,6 +207,10 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
   async function sendTurn(text: string) {
     if (lock) return;
+    // Inside the submit gesture: allow the reply to be read aloud (AVP-133), and
+    // cut the previous reply if it is still playing.
+    prepareAudio();
+    stopSpeaking();
     setPending({ text, state: "sending" });
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), TURN_TIMEOUT_MS);
@@ -244,6 +248,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         patient,
       ]);
       setPending(null);
+      void speakTurn(patient.turn_idx); // never throws; text is already shown
     } catch (e) {
       const timedOut = e instanceof DOMException && e.name === "AbortError";
       setPending({
