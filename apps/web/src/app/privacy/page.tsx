@@ -2,44 +2,51 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import vi from "../../../messages/vi.json";
 import GuestSessionDelete from "@/components/privacy/GuestSessionDelete";
+import Badge from "@/components/ui/Badge";
+import { buttonClass } from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import PageShell from "@/components/ui/PageShell";
 
 // Every statement on this page must match what the code does (Slice 13, AVP-115).
 // The text is a draft until the team reviews the legal wording.
-export const metadata: Metadata = { title: `${vi.privacy.title} · ${vi.app.title}` };
+// The root layout's title template appends the app name.
+export const metadata: Metadata = { title: vi.privacy.title };
 
 export default function PrivacyPage() {
   const p = vi.privacy;
   return (
-    <main className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
-      <header className="space-y-2">
-        <p className="w-fit rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-900">
-          {p.draftBadge}
-        </p>
-        <h1 className="text-2xl font-semibold text-gray-900">{p.title}</h1>
-        <p className="text-sm text-gray-700">{p.intro}</p>
+    <PageShell width="narrow">
+      <header className="mb-8 space-y-3">
+        <Badge tone="warning">{p.draftBadge}</Badge>
+        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{p.title}</h1>
+        <p className="max-w-[68ch] text-ink-muted">{p.intro}</p>
       </header>
 
-      {p.sections.map((s) => (
-        <section key={s.heading} className="space-y-2">
-          <h2 className="text-lg font-semibold text-gray-900">{s.heading}</h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm text-gray-800">
-            {s.items.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      <Card as="article" className="divide-y divide-line">
+        {p.sections.map((s) => (
+          <section key={s.heading} className="space-y-3 py-6 first:pt-0 last:pb-0">
+            <h2 className="text-lg font-bold tracking-tight text-ink">{s.heading}</h2>
+            <ul className="max-w-[68ch] list-disc space-y-2 pl-5 leading-relaxed text-ink marker:text-primary">
+              {s.items.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </Card>
 
-      <GuestSessionDelete />
+      <div className="mt-6">
+        <GuestSessionDelete />
+      </div>
 
-      <nav className="flex flex-wrap gap-4 text-sm">
-        <Link href="/history" className="text-indigo-700 underline">
+      <nav aria-label={p.related} className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <Link href="/history" className={buttonClass({ variant: "secondary" })}>
           {vi.nav.history}
         </Link>
-        <Link href="/profile" className="text-indigo-700 underline">
+        <Link href="/profile" className={buttonClass({ variant: "secondary" })}>
           {vi.nav.profile}
         </Link>
       </nav>
-    </main>
+    </PageShell>
   );
 }

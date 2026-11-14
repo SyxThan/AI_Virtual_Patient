@@ -27,17 +27,17 @@ export default function GuestSessionDelete() {
 
   if (view.kind === "loading") return null;
   return (
-    <section aria-labelledby="guest-tab-heading" className="space-y-2 rounded-lg border border-gray-200 p-4">
-      <h2 id="guest-tab-heading" className="text-base font-semibold text-gray-900">
+    <section aria-labelledby="guest-tab-heading" className="space-y-3 rounded-tile bg-sand-soft p-6 text-sand-ink">
+      <h2 id="guest-tab-heading" className="text-lg font-bold tracking-tight">
         {vi.privacy.guestTab.heading}
       </h2>
       {view.kind === "guest" ? (
         <>
-          <p className="text-sm text-gray-700">{vi.privacy.guestTab.body}</p>
+          <p>{vi.privacy.guestTab.body}</p>
           <DeleteSessionButton sessionId={view.id} onDeleted={() => setView({ kind: "deleted" })} />
         </>
       ) : (
-        <p role={view.kind === "deleted" ? "status" : undefined} className="text-sm text-gray-700">
+        <p role={view.kind === "deleted" ? "status" : undefined}>
           {view.kind === "deleted" ? vi.privacy.guestTab.deleted : vi.privacy.guestTab.none}
         </p>
       )}

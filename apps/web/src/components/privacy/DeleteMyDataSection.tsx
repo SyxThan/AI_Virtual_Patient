@@ -2,6 +2,9 @@
 
 import { useId, useState } from "react";
 import vi from "../../../messages/vi.json";
+import { buttonClass } from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import { FOCUS_RING } from "@/components/ui/focus";
 import { API_URL, authHeaders, fmt } from "@/lib/sessionAuth";
 
 // Local type for DELETE /api/v1/me (DeleteMeResponse in docs/specs/openapi.yaml).
@@ -45,13 +48,13 @@ export default function DeleteMyDataSection({ onDone }: { onDone: (r: DeleteMeRe
   }
 
   return (
-    <section aria-labelledby={headingId} className="space-y-3 rounded-lg border border-red-300 bg-red-50/40 p-4">
-      <h2 id={headingId} className="text-lg font-semibold text-red-900">
+    <Card aria-labelledby={headingId} className="space-y-4">
+      <h2 id={headingId} className="text-xl font-bold tracking-tight text-ink">
         {t.heading}
       </h2>
-      <p className="text-sm text-gray-800">{t.body}</p>
+      <p className="text-ink-muted">{t.body}</p>
       <form onSubmit={submit} className="flex flex-col gap-3">
-        <label htmlFor={inputId} className="text-sm font-medium text-gray-900">
+        <label htmlFor={inputId} className="text-sm font-semibold text-ink">
           {fmt(t.prompt, { word: t.word })}
         </label>
         <input
@@ -60,21 +63,21 @@ export default function DeleteMyDataSection({ onDone }: { onDone: (r: DeleteMeRe
           value={typed}
           autoComplete="off"
           onChange={(e) => setTyped(e.target.value)}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2"
+          className={`h-11 w-full rounded-control border border-line-strong bg-surface px-3 text-base text-ink sm:max-w-xs ${FOCUS_RING}`}
         />
         {error && (
-          <p role="alert" className="text-sm text-red-800">
+          <p role="alert" className="rounded-control border border-warning/30 bg-warning-soft px-4 py-3 text-sm text-warning">
             {t.error}
           </p>
         )}
         <button
           type="submit"
           disabled={!matches || working}
-          className="w-fit rounded-md bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800 disabled:opacity-50"
+          className={buttonClass({ variant: "danger", className: "w-full sm:w-fit" })}
         >
           {working ? t.working : t.submit}
         </button>
       </form>
-    </section>
+    </Card>
   );
 }
