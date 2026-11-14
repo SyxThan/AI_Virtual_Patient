@@ -8,6 +8,7 @@ Vietnamese voice-first virtual-patient simulator for medical students. A *Patien
 | Anything that produces patient replies | docs/specs/guardrails.md, docs/specs/agents-and-rag.md |
 | Case data, schema, conversion | docs/specs/case-schema.md, schemas/case.schema.json |
 | Stack, repo layout, env vars, API/WebSocket conventions | docs/specs/tech-stack.md, docs/specs/openapi.yaml |
+| Web visual design: colors, type, bento layout, UI primitives | docs/specs/ui-design.md |
 | Database tables, migrations, Supabase connection, RLS | docs/specs/database.md |
 | Vitals state machine and clinical grades | docs/specs/vitals-state-machine.md |
 | "Is this in the MVP?", priorities, done criteria, claims allowed | docs/specs/product-scope.md |

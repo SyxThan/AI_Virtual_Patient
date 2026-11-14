@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 /** Moves keyboard focus to the page's <main> (works on every page, no id needed). */
@@ -83,29 +84,34 @@ export default function SiteHeader() {
   }
 
   const signedIn = status === "signedIn";
-  const linkCls = `rounded px-1 py-0.5 text-gray-800 hover:underline ${FOCUS_RING}`;
-  const mobileLinkCls = `block rounded-md px-3 py-2.5 text-gray-900 hover:bg-gray-100 ${FOCUS_RING}`;
+  const linkCls = `rounded-full px-3 py-2 font-medium text-ink-muted hover:bg-canvas hover:text-ink ${FOCUS_RING}`;
+  const mobileLinkCls = `block rounded-control px-3 py-3 font-medium text-ink hover:bg-canvas ${FOCUS_RING}`;
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="px-3 pt-3 sm:px-6 sm:pt-4">
       <a
         href="#main"
         onClick={skipToMain}
-        className={`sr-only z-50 rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow focus:not-sr-only focus:fixed focus:left-2 focus:top-2 ${FOCUS_RING}`}
+        className={`sr-only z-50 rounded-control bg-surface px-3 py-2 text-sm font-medium text-ink shadow focus:not-sr-only focus:fixed focus:left-2 focus:top-2 ${FOCUS_RING}`}
       >
         {vi.a11y.skipToContent}
       </a>
       <nav
         aria-label={vi.a11y.mainNav}
-        className="relative mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3"
+        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-surface py-2 pl-5 pr-2 shadow-[0_1px_0_0_var(--color-line)]"
         ref={mobileRef}
       >
-        <Link href="/" className={`rounded font-semibold text-gray-900 ${FOCUS_RING}`}>
+        <Link href="/" className={`flex items-center gap-2 rounded-full font-extrabold tracking-tight text-ink ${FOCUS_RING}`}>
+          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full bg-primary">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </span>
           {vi.nav.brand}
         </Link>
 
         {/* Desktop */}
-        <div className="hidden items-center gap-4 text-sm sm:flex">
+        <div className="hidden items-center gap-1 text-sm sm:flex">
           <Link href="/setup" className={linkCls}>
             {vi.nav.start}
           </Link>
@@ -122,17 +128,17 @@ export default function SiteHeader() {
                 aria-expanded={open}
                 aria-label={vi.nav.menuLabel}
                 onClick={() => setOpen((o) => !o)}
-                className={`rounded-md border border-gray-400 px-3 py-1.5 text-gray-900 ${FOCUS_RING}`}
+                className={buttonClass({ variant: "secondary", size: "sm", pill: true, className: "ml-2" })}
               >
                 {vi.nav.account}
               </button>
               {open && (
                 <div
                   role="menu"
-                  className="absolute right-0 z-20 mt-2 w-56 rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+                  className="absolute right-0 z-20 mt-2 w-60 rounded-card border border-line bg-surface p-1 shadow-lg"
                 >
                   {email && (
-                    <p className="truncate px-3 py-2 text-xs text-gray-600" title={email}>
+                    <p className="truncate px-3 py-2 text-xs text-ink-muted" title={email}>
                       {email}
                     </p>
                   )}
@@ -140,7 +146,7 @@ export default function SiteHeader() {
                     href="/profile"
                     role="menuitem"
                     onClick={() => setOpen(false)}
-                    className={`block px-3 py-2 hover:bg-gray-50 ${FOCUS_RING}`}
+                    className={`block rounded-control px-3 py-2 hover:bg-canvas ${FOCUS_RING}`}
                   >
                     {vi.nav.profile}
                   </Link>
@@ -148,7 +154,7 @@ export default function SiteHeader() {
                     type="button"
                     role="menuitem"
                     onClick={handleSignOut}
-                    className={`block w-full px-3 py-2 text-left hover:bg-gray-50 ${FOCUS_RING}`}
+                    className={`block w-full rounded-control px-3 py-2 text-left hover:bg-canvas ${FOCUS_RING}`}
                   >
                     {vi.nav.signOut}
                   </button>
@@ -160,7 +166,7 @@ export default function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className={`rounded-md bg-gray-900 px-3 py-1.5 text-white hover:bg-gray-700 ${FOCUS_RING}`}
+              className={buttonClass({ variant: "primary", size: "sm", pill: true, className: "ml-2" })}
             >
               {vi.nav.signIn}
             </Link>
@@ -175,7 +181,7 @@ export default function SiteHeader() {
           aria-controls="mobile-nav"
           aria-label={mobileOpen ? vi.a11y.closeMenu : vi.a11y.openMenu}
           onClick={() => setMobileOpen((o) => !o)}
-          className={`rounded-md border border-gray-400 p-2 text-gray-900 sm:hidden ${FOCUS_RING}`}
+          className={`flex h-11 w-11 items-center justify-center rounded-full border border-line text-ink sm:hidden ${FOCUS_RING}`}
         >
           <svg viewBox="0 0 20 20" className="h-5 w-5" aria-hidden="true">
             {mobileOpen ? (
@@ -188,7 +194,7 @@ export default function SiteHeader() {
         {mobileOpen && (
           <div
             id="mobile-nav"
-            className="absolute inset-x-0 top-full z-30 border-b border-gray-200 bg-white px-4 py-2 shadow-lg sm:hidden"
+            className="absolute inset-x-0 top-full z-30 mt-2 rounded-card border border-line bg-surface p-2 shadow-lg sm:hidden"
           >
             <ul className="flex flex-col gap-1 text-base">
               <li>
@@ -217,7 +223,7 @@ export default function SiteHeader() {
                     </Link>
                   </li>
                   {email && (
-                    <li className="truncate px-3 pt-2 text-xs text-gray-600" title={email}>
+                    <li className="truncate px-3 pt-2 text-xs text-ink-muted" title={email}>
                       {email}
                     </li>
                   )}
