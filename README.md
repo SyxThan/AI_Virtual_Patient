@@ -61,6 +61,12 @@ make test        # backend tests
 make lint        # ruff + eslint
 make dev         # start API and web
 ```
+On Windows, double-click `run.bat` (or run `run` from the repo root): it opens
+one window for the API (http://127.0.0.1:8000, auto-reload) and one for the web
+(http://localhost:3000), installs web packages on first run, then opens the
+browser. Close a window to stop that part. `set API_PORT=8001` / `set WEB_PORT=3001`
+change the ports, `set NO_BROWSER=1` skips the browser.
+
 Windows equivalents (no make):
 ```powershell
 # backend
