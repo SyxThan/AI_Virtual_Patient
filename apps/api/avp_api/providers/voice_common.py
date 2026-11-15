@@ -12,6 +12,7 @@ import json
 import logging
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections.abc import Awaitable
 from dataclasses import dataclass
@@ -80,3 +81,11 @@ def post_json(url: str, payload: dict, api_key: str, timeout_s: float) -> dict:
     except urllib.error.HTTPError as exc:
         # Status code only; the body may echo request details.
         raise RuntimeError(f"HTTP {exc.code}") from None
+
+
+def valid_base_url(url: str | None) -> bool:
+    """A self-hosted voice server root: http(s) with a host, nothing else."""
+    if not url:
+        return False
+    parts = urllib.parse.urlparse(url)
+    return parts.scheme in ("http", "https") and bool(parts.netloc)
