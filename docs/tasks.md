@@ -57,9 +57,9 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | ✅ Merged (PR #39) |
 | **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | ✅ Merged (PR #40) |
 | **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | ✅ Merged (PR #41) |
-| **AVP-135** | **Slice 17** (`TASK-S17-01`) | Adapter STT Whisper tự chạy (API chuẩn OpenAI) | **P0** | 🟡 Đang làm |
-| **AVP-136** | **Slice 17** (`TASK-S17-02`) | Server STT nhỏ `scripts/stt_server` (faster-whisper) | **P0** | ❌ Chưa làm |
-| **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | ❌ Chưa làm |
+| **AVP-135** | **Slice 17** (`TASK-S17-01`) | Adapter STT Whisper tự chạy (API chuẩn OpenAI) | **P0** | 🟡 PR #42 |
+| **AVP-136** | **Slice 17** (`TASK-S17-02`) | Server STT nhỏ `scripts/stt_server` (faster-whisper) | **P0** | 🟡 PR #43 |
+| **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | 🟡 PR #44 |
 
 ---
 
@@ -83,7 +83,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
 | **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | ✅ Hoàn tất (PR #32–#37) |
 | **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | ✅ Hoàn tất (PR #39–#41) |
-| **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | 🟡 Đang làm |
+| **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | 🟡 PR #42–#44 |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
