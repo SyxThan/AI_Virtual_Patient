@@ -56,9 +56,11 @@ class Settings(BaseSettings):
     embedding_model: str | None = None
 
     # --- Voice adapters (Slice 6). Unset = offline Fake providers. ---
-    stt_provider: str | None = None  # "google" | unset
+    stt_provider: str | None = None  # "google" | "whisper" | unset
     stt_api_key: str | None = Field(default=None, repr=False)
     stt_model: str | None = None
+    # Self-hosted STT server root, e.g. http://127.0.0.1:8890 (whisper only).
+    stt_base_url: str | None = None
     stt_language: str = "vi-VN"
     stt_timeout_s: float = 8.0
     tts_provider: str | None = None  # "google" | "vieneu" | unset

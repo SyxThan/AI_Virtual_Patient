@@ -1,6 +1,6 @@
 # Danh mục Nhiệm vụ Kỹ thuật theo Vertical Slices (TASKS.md)
 
-> **Phương pháp quản lý:** Chia nhỏ công việc theo **15 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web; Giai đoạn 3: Slice 15 làm lại giao diện) (từ Data/Backend tới UI/UX Frontend).
+> **Phương pháp quản lý:** Chia nhỏ công việc theo **17 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web; Giai đoạn 3: Slice 15 làm lại giao diện; Slice 16–17 giọng nói chạy tại máy) (từ Data/Backend tới UI/UX Frontend).
 > **Nguyên tắc triển khai:** Mỗi slice thực hiện trên branch `<type>/avp-xxx-slug` (xem `docs/git-workflow.md`), vượt qua build/typecheck/lint và được **Reviewer** độc lập kiểm duyệt trước khi merge vào `main`.
 
 ---
@@ -54,9 +54,12 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-128** | **Slice 15** (`TASK-S15-04`) | Debrief theo bento | **P0** | ✅ Merged (PR #33) |
 | **AVP-129** | **Slice 15** (`TASK-S15-05`) | Trang tài khoản: đăng nhập, hồ sơ, lịch sử, quyền riêng tư, 404/lỗi/loading | **P1** | ✅ Merged (PR #36) |
 | **AVP-130** | **Slice 15** (`TASK-S15-06`) | Tích hợp, kiểm tra responsive + axe trên toàn site | **P0** | ✅ Merged (PR #37) |
-| **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | 🟡 PR #39 |
-| **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | 🟡 PR #40 |
-| **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | 🟡 PR #41 |
+| **AVP-132** | **Slice 16** (`TASK-S16-01`) | Adapter TTS VieNeu (tự chạy, miễn phí) | **P0** | ✅ Merged (PR #39) |
+| **AVP-133** | **Slice 16** (`TASK-S16-02`) | Người bệnh đọc to câu trả lời cho cả câu hỏi gõ chữ | **P0** | ✅ Merged (PR #40) |
+| **AVP-134** | **Slice 16** (`TASK-S16-03`) | `run.bat` mở VieNeu + hướng dẫn cài đặt | **P1** | ✅ Merged (PR #41) |
+| **AVP-135** | **Slice 17** (`TASK-S17-01`) | Adapter STT Whisper tự chạy (API chuẩn OpenAI) | **P0** | 🟡 PR #42 |
+| **AVP-136** | **Slice 17** (`TASK-S17-02`) | Server STT nhỏ `scripts/stt_server` (faster-whisper) | **P0** | 🟡 PR #43 |
+| **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | 🟡 PR #44 |
 
 ---
 
@@ -79,7 +82,8 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 13** | Quyền riêng tư & Dữ liệu cá nhân | **P0** | ✅ Hoàn tất (PR #26, #28, #29); S13-02 chờ quyết định |
 | **Slice 14** | Triển khai, Vận hành & Đo lường | **P0** | 🟡 Một phần (PR #21) |
 | **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | ✅ Hoàn tất (PR #32–#37) |
-| **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | 🟡 PR #39–#41 |
+| **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | ✅ Hoàn tất (PR #39–#41) |
+| **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | 🟡 PR #42–#44 |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -433,6 +437,22 @@ Người dùng chọn VieNeu-TTS (github.com/pnnbao97/VieNeu-TTS, code và weigh
 #### `TASK-S16-03` [P1]: Chạy VieNeu cùng dự án (AVP-134)
 * **Mô tả:** `run.bat` mở thêm cửa sổ VieNeu (cổng 8880) khi `TTS_PROVIDER=vieneu` và biết thư mục cài VieNeu; README hướng dẫn cài (CPU/GPU, đặt cache ngoài ổ C nếu cần) và cấu hình `.env`.
 * **Tiêu chí hoàn thành:** chạy `run.bat` mở đủ 3 cửa sổ; khi không cấu hình VieNeu thì hành vi như cũ.
+
+### Slice 17: Micro chạy tại máy (STT Whisper tự host)
+
+Người dùng duyệt ngày 2026-11-15 (đề xuất "A" trong kế hoạch phát triển tiếp), chọn model `whisper-small`. Lý do: khoá Google STT không dùng được nên micro chưa chạy; tự host thì miễn phí và âm thanh của sinh viên không rời máy (Hard Rule 6). Server STT là một tiến trình riêng có venv riêng, nói API chuẩn OpenAI `POST /v1/audio/transcriptions`. `apps/api` chỉ thêm một provider sau adapter (ADR-0006), không thêm thư viện. Đổi model chỉ cần sửa env, không đổi code. Độ trễ chỉ báo khi đo bằng script trong `evals/` (Hard Rule 3).
+
+#### `TASK-S17-01` [P0]: Adapter STT Whisper (AVP-135)
+* **Mô tả:** `WhisperSTTProvider` trong `providers/stt.py`, chọn bằng `STT_PROVIDER=whisper` + `STT_BASE_URL`. Gửi nguyên WEBM/Opus của trình duyệt dạng multipart (`file`, `language` lấy từ `STT_LANGUAGE`, `model` từ `STT_MODEL` nếu có); `STT_API_KEY` tuỳ chọn (Bearer). Lỗi HTTP chỉ giữ mã trạng thái, giới hạn kích thước phản hồi, timeout như adapter cũ.
+* **Tiêu chí hoàn thành:** test với server giả trên 127.0.0.1 (đúng multipart, âm thanh nguyên byte, lỗi/timeout/rỗng/sai định dạng/quá lớn đều thành `VoiceProviderError`, không lộ key hay lời nói); `make test` + `make lint` pass.
+
+#### `TASK-S17-02` [P0]: Server STT `scripts/stt_server` (AVP-136)
+* **Mô tả:** Server nhỏ dùng faster-whisper, venv riêng (không thuộc `apps/api`), chỉ nghe 127.0.0.1. Model, thiết bị (cpu/cuda) và kiểu tính lấy từ env. Giải mã WebM/Opus bằng PyAV, có VAD; giới hạn kích thước âm thanh; không ghi log lời nói hay âm thanh.
+* **Tiêu chí hoàn thành:** test lớp HTTP với bộ nhận dạng giả; chạy thật với model `small` trên máy, nhận đúng câu tiếng Việt từ âm thanh WebM/Opus.
+
+#### `TASK-S17-03` [P1]: Chạy server STT cùng dự án (AVP-137)
+* **Mô tả:** `run.bat` mở thêm cửa sổ STT (cổng 8890) khi `STT_PROVIDER=whisper`; README hướng dẫn cài (CPU/GPU, đặt cache model ngoài ổ C) và cấu hình `.env`.
+* **Tiêu chí hoàn thành:** `run.bat` mở đủ cửa sổ; không cấu hình thì hành vi như cũ; một lượt nói thật qua micro ra đúng chữ và người bệnh trả lời.
 
 ---
 

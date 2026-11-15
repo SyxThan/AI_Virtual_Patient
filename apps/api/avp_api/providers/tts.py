@@ -15,14 +15,19 @@ import json
 import math
 import struct
 import urllib.error
-import urllib.parse
 import urllib.request
 import wave
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from avp_api.config import get_settings
-from avp_api.providers.voice_common import Timed, VoiceProviderError, post_json, run_timed
+from avp_api.providers.voice_common import (
+    Timed,
+    VoiceProviderError,
+    post_json,
+    run_timed,
+    valid_base_url,
+)
 
 _GOOGLE_TTS_URL = "https://texttospeech.googleapis.com/v1/text:synthesize"
 # VieNeu resamples on the server; 24 kHz mono s16le keeps a reply small over the
@@ -170,18 +175,11 @@ class VieNeuTTSProvider(TTSProvider):
         return await asyncio.to_thread(self._synthesize, text, voice_id)
 
 
-def _valid_base_url(url: str | None) -> bool:
-    if not url:
-        return False
-    parts = urllib.parse.urlparse(url)
-    return parts.scheme in ("http", "https") and bool(parts.netloc)
-
-
 def get_tts_provider() -> TTSProvider:
     s = get_settings()
     if s.tts_provider == "google" and s.tts_api_key:
         return GoogleTTSProvider(s.tts_api_key, s.tts_voice_id, s.tts_language, s.tts_timeout_s)
-    if s.tts_provider == "vieneu" and _valid_base_url(s.tts_base_url):
+    if s.tts_provider == "vieneu" and valid_base_url(s.tts_base_url):
         return VieNeuTTSProvider(
             s.tts_base_url or "", s.tts_api_key, s.tts_voice_id, s.tts_timeout_s
         )
