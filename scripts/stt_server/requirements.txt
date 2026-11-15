@@ -1,0 +1,5 @@
+# Local STT server (scripts/stt_server). Its own virtualenv: not part of apps/api.
+faster-whisper>=1.1,<2
+# faster-whisper 1.2 passes metadata_errors= to av.open(); PyAV 19 rejects it.
+# Tested with PyAV 15.1.
+av>=12,<16
