@@ -66,7 +66,8 @@ one window for the API (http://127.0.0.1:8000, auto-reload) and one for the web
 (http://localhost:3000), installs web packages on first run, then opens the
 browser. Close a window to stop that part. `set API_PORT=8001` / `set WEB_PORT=3001`
 change the ports, `set NO_BROWSER=1` skips the browser, `set DRY_RUN=1` only
-prints the commands. With VieNeu configured (below) it opens a third window for it.
+prints the commands. With VieNeu and/or the local STT server configured (below) it
+opens one more window for each.
 
 ## Giọng nói người bệnh: VieNeu-TTS (Slice 16)
 The patient's replies (voice and typed turns) can be spoken by
@@ -98,8 +99,43 @@ clone a real person's voice (model card terms).
    says it is ready: `curl http://127.0.0.1:8880/v1/voices`.
 
 Without `TTS_PROVIDER=vieneu`, nothing changes: voice turns use the offline fake
-(a beep) and typed turns stay text only. Microphone input (STT) is separate and
-still needs `STT_PROVIDER`/`STT_API_KEY`.
+(a beep) and typed turns stay text only. Microphone input (STT) is separate: see
+the next section.
+
+## Micro: nhận dạng giọng nói tại máy bằng Whisper (Slice 17)
+The student's speech can be transcribed by a small self-hosted Whisper server
+(`scripts/stt_server`, [faster-whisper](https://github.com/SYSTRAN/faster-whisper),
+MIT): free, no cloud account, and the student's audio never leaves your machine
+(it listens on 127.0.0.1 only and logs no audio or text). It runs in its own
+virtualenv, outside `apps/api`, and speaks the OpenAI-compatible
+`POST /v1/audio/transcriptions`, so any compatible server works too.
+
+1. Create its virtualenv (any folder; here on drive D:) and install it:
+   ```powershell
+   uv venv --python 3.12 D:\avp-stt\.venv          # tested with Python 3.12
+   uv pip install --python D:\avp-stt\.venv\Scripts\python.exe -r scripts\stt_server\requirements.txt
+   ```
+   The model downloads on first start into `HF_HOME` (`small` is about 480 MB).
+   If drive C: is short on space, set `STT_HF_HOME` below to a folder on another drive.
+2. In `apps/api/.env`:
+   ```
+   STT_PROVIDER=whisper
+   STT_BASE_URL=http://127.0.0.1:8890
+   STT_MODEL=small            # any faster-whisper model name; changing it needs no code change
+   STT_TIMEOUT_S=30           # CPU transcribes the whole question first
+   STT_SERVER_PYTHON=D:\avp-stt\.venv\Scripts\python.exe
+   STT_HF_HOME=D:\avp-stt\hf-home
+   ```
+   No quotes around values. Port 8890 (not 8000, which is this API); change both
+   `STT_BASE_URL` and `set STT_PORT=...` together. `STT_API_KEY` stays empty
+   unless you start the server with `STT_SERVER_API_KEY`.
+3. Run `run.bat`: it opens an "AVP STT" window. When it prints `ready`, check it:
+   `curl http://127.0.0.1:8890/health`.
+
+Tested only on CPU (`int8`). An NVIDIA GPU may work with `set WHISPER_DEVICE=cuda`
+and `set WHISPER_COMPUTE_TYPE=float16` before `run.bat`, but it also needs the CUDA
+12 cuBLAS and cuDNN 9 libraries (see the faster-whisper README); this is not tested here.
+Without `STT_PROVIDER=whisper`, nothing changes.
 
 Windows equivalents (no make):
 ```powershell
