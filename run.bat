@@ -5,6 +5,8 @@ REM  Cach dung: nhap dup run.bat, hoac go "run" trong thu muc goc repo.
 REM  Moi phan mo trong mot cua so rieng; dong cua so do de dung no.
 REM  Giong noi VieNeu-TTS (Slice 16): mo them cua so thu 3 khi apps\api\.env co
 REM    TTS_PROVIDER=vieneu  va  VIENEU_DIR=<thu muc cai VieNeu-TTS> (xem README).
+REM  Micro tai may (Slice 17): mo them cua so STT khi apps\api\.env co
+REM    STT_PROVIDER=whisper, STT_MODEL va STT_SERVER_PYTHON (xem README).
 REM  Thu ma khong khoi dong gi: "set DRY_RUN=1" roi chay run.bat (chi in lenh).
 REM ============================================================
 setlocal
@@ -15,6 +17,8 @@ if not defined API_PORT set "API_PORT=8000"
 if not defined WEB_PORT set "WEB_PORT=3000"
 REM Cong VieNeu phai khop TTS_BASE_URL trong apps\api\.env (mac dinh 8880).
 if not defined VIENEU_PORT set "VIENEU_PORT=8880"
+REM Cong server STT phai khop STT_BASE_URL trong apps\api\.env (mac dinh 8890).
+if not defined STT_PORT set "STT_PORT=8890"
 set "LAUNCH=start"
 if defined DRY_RUN set "LAUNCH=echo [DRY_RUN] start"
 
@@ -69,6 +73,38 @@ goto after_vieneu
 echo [CANH BAO] Cong %VIENEU_PORT% dang duoc dung - co the VieNeu da chay san.
 :after_vieneu
 
+REM ---- Micro tai may (Slice 17): STT_PROVIDER, STT_MODEL, STT_SERVER_PYTHON, STT_HF_HOME ----
+set "STT_ON="
+set "STT_STARTED="
+if exist "apps\api\.env" findstr /B /I /C:"STT_PROVIDER=whisper" "apps\api\.env" >nul && set "STT_ON=1"
+if not defined STT_ON goto after_stt
+if not defined WHISPER_MODEL for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_MODEL=" "apps\api\.env"`) do set "WHISPER_MODEL=%%B"
+if not defined STT_SERVER_PYTHON for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_SERVER_PYTHON=" "apps\api\.env"`) do set "STT_SERVER_PYTHON=%%B"
+if not defined STT_HF_HOME for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_HF_HOME=" "apps\api\.env"`) do set "STT_HF_HOME=%%B"
+if not defined WHISPER_MODEL goto stt_no_model
+if not defined STT_SERVER_PYTHON goto stt_no_python
+if not exist "%STT_SERVER_PYTHON%" goto stt_bad_python
+netstat -ano | findstr /R /C:":%STT_PORT% .*LISTENING" >nul && goto stt_busy
+REM HF_HOME chi dat trong cua so STT (khong anh huong VieNeu hay API).
+set "STT_ENV=set PYTHONUTF8=1&& set WHISPER_MODEL=%WHISPER_MODEL%&& set STT_SERVER_PORT=%STT_PORT%"
+if defined STT_HF_HOME set "STT_ENV=%STT_ENV%&& set HF_HOME=%STT_HF_HOME%"
+echo Khoi dong server STT (model %WHISPER_MODEL%) tai http://127.0.0.1:%STT_PORT% (lan dau co the phai tai model)...
+%LAUNCH% "AVP STT :%STT_PORT%" /D "%~dp0scripts\stt_server" cmd /k "%STT_ENV%&& "%STT_SERVER_PYTHON%" server.py"
+set "STT_STARTED=1"
+goto after_stt
+:stt_no_model
+echo [CANH BAO] STT_PROVIDER=whisper nhung apps\api\.env chua co STT_MODEL (vi du small) - khong mo server STT.
+goto after_stt
+:stt_no_python
+echo [CANH BAO] STT_PROVIDER=whisper nhung apps\api\.env chua co STT_SERVER_PYTHON - khong mo server STT.
+goto after_stt
+:stt_bad_python
+echo [CANH BAO] Khong thay "%STT_SERVER_PYTHON%" - kiem tra STT_SERVER_PYTHON (xem README).
+goto after_stt
+:stt_busy
+echo [CANH BAO] Cong %STT_PORT% dang duoc dung - co the server STT da chay san.
+:after_stt
+
 echo Khoi dong API tai http://127.0.0.1:%API_PORT% ...
 %LAUNCH% "AVP API :%API_PORT%" /D "%~dp0apps\api" cmd /k python -m uvicorn avp_api.main:app --reload --host 127.0.0.1 --port %API_PORT%
 
@@ -83,9 +119,8 @@ if not defined NO_BROWSER (
 )
 
 echo.
-if defined VIENEU_STARTED (
-  echo Da mo 3 cua so: "AVP VieNeu", "AVP API" va "AVP Web". Dong tung cua so de dung.
-) else (
-  echo Da mo 2 cua so: "AVP API" va "AVP Web". Dong tung cua so de dung.
-)
+set "WINDOWS="
+if defined STT_STARTED set "WINDOWS=%WINDOWS%"AVP STT", "
+if defined VIENEU_STARTED set "WINDOWS=%WINDOWS%"AVP VieNeu", "
+echo Da mo cac cua so: %WINDOWS%"AVP API" va "AVP Web". Dong tung cua so de dung.
 endlocal
