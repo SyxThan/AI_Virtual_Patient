@@ -26,6 +26,8 @@
   --color-primary-soft: #d5efeb;
   /* Decorative only (glow, waveform, gauge): never used for text on light surfaces. */
   --color-glow: #5eead4;
+  /* Patient-monitor yellow: the ECG trace and vitals values on dark stages only. */
+  --color-monitor: #f2c14e;
 
   --color-info: #1f5fbf;
   --color-info-soft: #e2ecfa;
@@ -85,6 +87,109 @@
 
 :root {
   color-scheme: light;
+
+  /* Motion tokens (AVP-142). Durations and easings are declared once and reused. */
+  --dur-fast: 150ms;
+  --dur-base: 350ms;
+  --dur-slow: 700ms;
+  --dur-draw: 1600ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/*
+ * Motion rules. Initial hidden states live behind `.js`, a class an inline head
+ * script adds before first paint: without JavaScript every element shows in its
+ * final state. Only transform, opacity, stroke-dashoffset and clip-path animate.
+ */
+
+/* Loops pause while their scope is off screen or the tab is hidden (useActive). */
+[data-paused="true"],
+[data-paused="true"] * {
+  animation-play-state: paused !important;
+}
+
+/* Hero title: each line slides up from behind its own mask. */
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.hero-line > span {
+  display: block;
+}
+.js .hero-line > span {
+  animation: line-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i, 0) * 90ms);
+}
+.js .hero-after {
+  animation: fade-in var(--dur-base) var(--ease-out) both;
+  /* 150ms after the last title line has finished sliding in. */
+  animation-delay: calc(120ms + (var(--lines, 4) - 1) * 90ms + var(--dur-slow) + 150ms);
+}
+
+/* Scroll reveal: a section fades in once with its children 70ms apart (RevealObserver). */
+.js [data-reveal] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+.js [data-reveal][data-shown] > * {
+  opacity: 1;
+  transform: none;
+}
+[data-reveal] > :nth-child(2) { transition-delay: 70ms; }
+[data-reveal] > :nth-child(3) { transition-delay: 140ms; }
+[data-reveal] > :nth-child(4) { transition-delay: 210ms; }
+[data-reveal] > :nth-child(5) { transition-delay: 280ms; }
+[data-reveal] > :nth-child(6) { transition-delay: 350ms; }
+
+/* Underlined links: the underline redraws from left to right on hover. */
+.link-draw {
+  position: relative;
+  text-decoration: none;
+}
+.link-draw::after {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.55rem;
+  height: 1.5px;
+  background: currentColor;
+  transform-origin: left;
+}
+.link-draw:hover::after {
+  animation: underline-draw var(--dur-base) var(--ease-out);
+}
+
+/* Primary actions lift on hover and sink on press. */
+.btn-lift {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+.btn-lift:hover {
+  transform: translateY(-2px);
+}
+.btn-lift:active {
+  transform: translateY(1px);
+}
+
+@keyframes line-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 body {
@@ -131,6 +236,10 @@ body {
   mask-image: radial-gradient(60% 70% at 70% 40%, #000 30%, transparent 100%);
 }
 
+/*
+ * Reduced motion: no loops, no scroll-driven or entrance motion; every element
+ * jumps to its final state. Only opacity cross-fades of 150ms remain.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -138,7 +247,17 @@ body {
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: opacity !important;
+    transition-duration: var(--dur-fast) !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+  .js [data-reveal] > * {
+    opacity: 1;
+    transform: none;
+  }
+  .btn-lift:hover,
+  .btn-lift:active {
+    transform: none;
   }
 }

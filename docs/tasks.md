@@ -63,6 +63,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48); judge PR #49 |
 | **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | 🟡 PR mở |
 | **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | 🟡 PR mở |
+| **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
 
 ---
 

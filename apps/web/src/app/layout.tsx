@@ -41,7 +41,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   // UI language is Vietnamese (CLAUDE.md "Working agreements").
   return (
-    <html lang="vi" className={`${beVietnam.variable} ${bricolage.variable}`}>
+    // `js` is added before first paint so entrance animations can hide elements
+    // only when JavaScript runs (without JS, everything shows in its final state).
+    <html lang="vi" className={`${beVietnam.variable} ${bricolage.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="flex min-h-screen flex-col bg-canvas text-ink">
         <AuthProvider>
           <SiteHeader />
