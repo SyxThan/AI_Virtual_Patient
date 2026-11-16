@@ -45,7 +45,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-116** | **Slice 13** (`TASK-S13-02`) | Trang xác thực báo cáo công khai qua QR (`/verify/[code]`) | **P2** | ⏸ Chờ quyết định (OPEN_QUESTIONS Q6) |
 | **AVP-037** | **Slice 14** (`TASK-S14-01`) | Deploy staging (API + worker + web), Dockerfile, CORS | **P0** | ⏸ Chờ chọn hosting (OPEN_QUESTIONS Q5) |
 | **AVP-025** | **Slice 14** (`TASK-S14-02`) | Test luồng đầy đủ: API in-process (pt1) + Playwright & 3 lần trên staging (pt2) | **P0** | 🟡 pt1 merged (PR #21); pt2 chờ staging |
-| **AVP-026, AVP-117** | **Slice 14** (`TASK-S14-03`) | Script đo latency, độ lặp lại, độ đồng thuận evaluator | **P1** | ❌ Chưa làm |
+| **AVP-026, AVP-117** | **Slice 14** (`TASK-S14-03`) | Script đo latency, độ lặp lại, độ đồng thuận evaluator | **P1** | 🟡 `evals/latency.py` xong; độ lặp lại + đồng thuận chưa làm |
 | **AVP-118** | **Slice 14** (`TASK-S14-04`) | Giới hạn tần suất & trần chi phí LLM/STT/TTS, log không PII | **P0** | ❌ Chưa làm |
 | **AVP-038, AVP-119** | **Slice 14** (`TASK-S14-05`) | Thử nghiệm người dùng + form góp ý trong app | **P2** | ❌ Chưa làm |
 | **AVP-125** | **Slice 15** (`TASK-S15-01`) | Nền thiết kế "Bento Clinical": token màu y tế, font, component UI, header/footer | **P0** | ✅ Merged (PR #32) |
