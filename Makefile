@@ -20,7 +20,7 @@ help:
 > @echo "  load-cases     load cases into the database             (AVP-008)"
 > @echo "  gen-client     regenerate the TS client from OpenAPI    (AVP-035)"
 > @echo "  check-llm      diagnose the configured LLM provider"
-> @echo "  redteam        run the red-team suite                   (AVP-011)"
+> @echo "  redteam        run the Patient red-team suite -> evals/results (AVP-011)"
 > @echo "  eval-latency   measure turn latency -> evals/results    (AVP-026)"
 
 dev:
@@ -59,4 +59,4 @@ load-cases:
 > python scripts/load_cases.py
 
 redteam:
-> @echo "redteam: not implemented yet - see task AVP-011"; exit 1
+> python evals/redteam.py $(ARGS)

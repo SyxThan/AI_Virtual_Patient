@@ -1,0 +1,5 @@
+# evals/ scripts import the API package; same rules as apps/api, stable from any cwd.
+extend = "../apps/api/pyproject.toml"
+
+[lint.isort]
+known-first-party = ["avp_api", "common"]
