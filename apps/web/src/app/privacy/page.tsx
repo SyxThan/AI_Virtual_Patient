@@ -5,7 +5,7 @@ import GuestSessionDelete from "@/components/privacy/GuestSessionDelete";
 import Badge from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import PageShell from "@/components/ui/PageShell";
+import PageShell, { PAGE_TITLE } from "@/components/ui/PageShell";
 
 // Every statement on this page must match what the code does (Slice 13, AVP-115).
 // The text is a draft until the team reviews the legal wording.
@@ -18,7 +18,7 @@ export default function PrivacyPage() {
     <PageShell width="narrow">
       <header className="mb-8 space-y-3">
         <Badge tone="warning">{p.draftBadge}</Badge>
-        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{p.title}</h1>
+        <h1 className={PAGE_TITLE}>{p.title}</h1>
         <p className="max-w-[68ch] text-ink-muted">{p.intro}</p>
       </header>
 

@@ -18,9 +18,9 @@ export default function RubricEvidenceList({
 }) {
   const criteria = evaluation.criteria ?? [];
   return (
-    <Tile as="section" tone="surface" aria-labelledby="rubric-title" className="border border-line">
+    <Tile as="section" tone="surface" aria-labelledby="rubric-title">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="rubric-title" className="text-xl font-bold tracking-tight">
+        <h2 id="rubric-title" className="font-display text-2xl font-bold tracking-tight">
           {vi.debrief.rubric.title}
         </h2>
         <p className="tabular text-sm text-ink-muted">

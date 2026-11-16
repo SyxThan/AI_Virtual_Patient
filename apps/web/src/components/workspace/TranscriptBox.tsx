@@ -76,11 +76,11 @@ export default function TranscriptBox({
             className={`${BUBBLE} ${
               mine
                 ? "self-end rounded-br-control bg-primary text-white"
-                : "self-start rounded-bl-control bg-canvas text-ink"
+                : "self-start rounded-bl-control bg-sand-soft text-ink"
             }`}
           >
             <span
-              className={`mb-0.5 block text-xs font-semibold ${mine ? "text-primary-soft" : "text-ink-muted"}`}
+              className={`mb-0.5 block text-xs font-semibold ${mine ? "text-primary-soft" : "text-sand-ink"}`}
             >
               {mine ? vi.session.you : vi.session.mother}
             </span>
@@ -106,12 +106,12 @@ export default function TranscriptBox({
       )}
 
       {showWaiting && (
-        <div className="flex items-center gap-2 self-start rounded-card rounded-bl-control bg-canvas px-4 py-2.5 text-sm text-ink-muted">
+        <div className="flex items-center gap-2 self-start rounded-card rounded-bl-control bg-sand-soft px-4 py-2.5 text-sm text-sand-ink">
           <span className="flex gap-1" aria-hidden="true">
             {[0, 150, 300].map((d) => (
               <span
                 key={d}
-                className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-muted motion-reduce:animate-none"
+                className="h-1.5 w-1.5 animate-bounce rounded-full bg-sand-ink motion-reduce:animate-none"
                 style={{ animationDelay: `${d}ms` }}
               />
             ))}

@@ -7,6 +7,7 @@ import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
+import BrandMark from "./BrandMark";
 
 /** Moves keyboard focus to the page's <main> (works on every page, no id needed). */
 function skipToMain(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -98,15 +99,14 @@ export default function SiteHeader() {
       </a>
       <nav
         aria-label={vi.a11y.mainNav}
-        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-surface py-2 pl-5 pr-2 shadow-[0_1px_0_0_var(--color-line)]"
+        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-surface/90 py-2 pl-5 pr-2 shadow-lift ring-1 ring-line/70 backdrop-blur"
         ref={mobileRef}
       >
-        <Link href="/" className={`flex items-center gap-2 rounded-full font-extrabold tracking-tight text-ink ${FOCUS_RING}`}>
-          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full bg-primary">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </span>
+        <Link
+          href="/"
+          className={`font-display flex items-center gap-2 rounded-full text-lg font-bold tracking-tight text-ink ${FOCUS_RING}`}
+        >
+          <BrandMark />
           {vi.nav.brand}
         </Link>
 
@@ -114,6 +114,9 @@ export default function SiteHeader() {
         <div className="hidden items-center gap-1 text-sm sm:flex">
           <Link href="/setup" className={linkCls}>
             {vi.nav.start}
+          </Link>
+          <Link href="/transparency" className={linkCls}>
+            {vi.transparency.navLink}
           </Link>
           {signedIn && (
             <Link href="/history" className={linkCls}>
@@ -200,6 +203,11 @@ export default function SiteHeader() {
               <li>
                 <Link href="/setup" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
                   {vi.nav.start}
+                </Link>
+              </li>
+              <li>
+                <Link href="/transparency" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
+                  {vi.transparency.navLink}
                 </Link>
               </li>
               {signedIn && (

@@ -51,7 +51,7 @@ export default function SessionCard({ session, onDeleted }: Props) {
         </div>
         <p className="shrink-0 text-right">
           {scored ? (
-            <span className="tabular text-2xl font-extrabold tracking-tight text-ink">
+            <span className="font-display tabular text-3xl font-bold tracking-tight text-ink">
               {fmt(vi.history.score, { score: formatScore(session.total_score as number) })}
             </span>
           ) : (

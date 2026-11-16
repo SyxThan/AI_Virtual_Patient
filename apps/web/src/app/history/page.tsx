@@ -42,7 +42,7 @@ export default function HistoryPage() {
   } else if (h.state === "unauthorized") {
     body = (
       <Tile tone="sky" className="max-w-2xl">
-        <p className="text-xl font-bold tracking-tight">{vi.history.signInPrompt}</p>
+        <p className="font-display text-2xl font-bold tracking-tight">{vi.history.signInPrompt}</p>
         <p className={`mt-2 ${TILE_MUTED.sky}`}>{vi.history.signInHint}</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link href="/login" className={buttonClass({ variant: "primary" })}>
@@ -69,7 +69,7 @@ export default function HistoryPage() {
   } else if (h.items.length === 0) {
     body = (
       <Tile tone="mint" className="max-w-2xl">
-        <p className="text-xl font-bold tracking-tight">{vi.history.emptyTitle}</p>
+        <p className="font-display text-2xl font-bold tracking-tight">{vi.history.emptyTitle}</p>
         <p className={`mt-2 ${TILE_MUTED.mint}`}>{vi.history.emptyBody}</p>
         <Link href="/setup" className={buttonClass({ variant: "primary", size: "lg", className: "mt-6" })}>
           {vi.history.startFirst}
@@ -82,7 +82,7 @@ export default function HistoryPage() {
         <ProgressSection progress={h.progress} />
         {h.progressError && <p className="text-sm text-ink-muted">{vi.history.progress.loadError}</p>}
         <section aria-labelledby="history-list-title" className="space-y-4">
-          <h2 id="history-list-title" className="text-xl font-bold tracking-tight text-ink">
+          <h2 id="history-list-title" className="font-display text-2xl font-bold tracking-tight text-ink">
             {vi.history.listTitle}
           </h2>
           <ul className="grid gap-4 lg:grid-cols-2">
