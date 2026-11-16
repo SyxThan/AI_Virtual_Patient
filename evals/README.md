@@ -47,3 +47,33 @@ python evals/latency.py --providers env --mode text --sessions 3
 **Ở chế độ voice với STT thật:** câu hỏi được đọc thành âm thanh trước bằng TTS đã cấu hình. Bước này không tính giờ. Vì vậy nên bật VieNeu, không dùng TTS giả.
 
 **Kết quả không bao giờ chứa:** nội dung câu hỏi hoặc câu trả lời, âm thanh, token.
+
+## Độ lặp lại của Evaluator (`repeatability.py`, AVP-117)
+
+**Cách đo:** script chấm cùng một transcript K lần (mặc định 5) bằng Evaluator đã cấu hình. Script đi qua đúng pipeline thật: LLM đề xuất mức đạt, rồi code kiểm tra bằng chứng và tính điểm.
+
+**Transcript dùng để chấm:**
+- 3 transcript tổng hợp trong `evals/fixtures/repeatability_transcripts.json`: `thorough` (hỏi kỹ), `partial` (hỏi một phần), `minimal` (hỏi rất ít).
+- Câu của sinh viên được viết riêng cho bài đo.
+- Câu của người mẹ lấy nguyên văn từ `history[].lay_response` và `fallback_lines` của ca bệnh.
+- Không có dữ kiện lâm sàng nào được viết mới.
+
+**Các chỉ số:**
+
+| Chỉ số | Nghĩa |
+|---|---|
+| `identical_all_runs_rate` | Tỉ lệ ô (transcript × tiêu chí) cho cùng một mức ở mọi lần chấm |
+| `mean_modal_agreement` | Trung bình tỉ lệ số lần chấm trùng với mức xuất hiện nhiều nhất |
+| `max_total_score_range` | Chênh lệch lớn nhất (max − min) của tổng điểm do code tính |
+| `evaluator_ms` | Thời gian một lần chấm |
+
+**Giới hạn khi trình bày:**
+- Đây là độ **ổn định**, không phải độ **đúng**. Evaluator có thể sai một cách ổn định.
+- Độ đồng thuận với giảng viên (Cohen's kappa, mục tiêu ≥ 0.82) cần bộ nhãn do giảng viên chấm, và là script riêng, chưa làm.
+- Rubric ca bệnh vẫn ở trạng thái `draft` (ghi trong `case_review_status`).
+
+```bash
+python evals/repeatability.py                              # Evaluator giả, kiểm tra script
+python evals/repeatability.py --providers env --runs 5     # số đo thật (15 lượt gọi LLM)
+python evals/repeatability.py --providers env --only thorough --runs 10
+```

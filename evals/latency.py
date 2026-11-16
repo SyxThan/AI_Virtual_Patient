@@ -184,9 +184,10 @@ def _run_turn(ws, payload, mode: str) -> TurnResult:
 
 
 def run(providers: str, mode: str, sessions: int, warmup: int) -> dict:
+    from fastapi.testclient import TestClient
+
     from avp_api.main import create_app
     from avp_api.routers import websocket as ws_router
-    from fastapi.testclient import TestClient
 
     case = _load_case()
     llm, stt, tts = _providers(providers)

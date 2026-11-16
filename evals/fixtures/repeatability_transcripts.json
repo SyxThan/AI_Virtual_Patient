@@ -1,0 +1,59 @@
+{
+  "_comment": "Synthetic transcripts for evals/repeatability.py (AVP-117). Student lines are written for this eval (no real student data). Patient lines are NOT written here: {\"topic\": ...} is replaced at runtime by that topic's lay_response from the case JSON, {\"fallback\": ...} by the case's first fallback line of that kind. System lines are neutral placeholders, not exam findings. These fixtures test scoring stability only; they are not gold labels.",
+  "case_id": "case-01-hfmd",
+  "transcripts": [
+    {
+      "id": "thorough",
+      "turns": [
+        {"speaker": "student", "text": "Chào chị, em là sinh viên y, hôm nay em hỏi thăm bé một chút được không ạ?"},
+        {"speaker": "patient", "fallback": "out_of_scope"},
+        {"speaker": "student", "text": "Bé sốt mấy ngày rồi chị, uống thuốc hạ sốt có hạ không ạ?"},
+        {"speaker": "patient", "topic": "Sốt"},
+        {"speaker": "student", "text": "Cháu có hay giật mình không chị, giật mình lúc nằm yên hay lúc ngủ ạ?"},
+        {"speaker": "patient", "topic": "Giật mình"},
+        {"speaker": "student", "text": "Bé có bị co giật lần nào chưa chị?"},
+        {"speaker": "patient", "topic": "Co giật"},
+        {"speaker": "student", "text": "Bé ăn uống thế nào, có chảy nước dãi nhiều không ạ?"},
+        {"speaker": "patient", "topic": "Ăn uống, chảy dãi"},
+        {"speaker": "student", "text": "Cháu có đi nhà trẻ không, xung quanh có ai bị bệnh tương tự không chị?"},
+        {"speaker": "patient", "topic": "Tiếp xúc dịch tễ"},
+        {"speaker": "student", "text": "Em xin phép khám miệng xem có loét không, và khám da lòng bàn tay, bàn chân, mông, gối của bé nhé."},
+        {"speaker": "system", "text": "[Đã ghi nhận thao tác khám]"},
+        {"speaker": "student", "text": "Em sẽ cho bé làm công thức máu, CRP và xét nghiệm RT-PCR tìm tác nhân."},
+        {"speaker": "patient", "fallback": "not_ordered_lab"},
+        {"speaker": "student", "text": "Em nghĩ bé bị bệnh tay chân miệng, và em sẽ phân độ cho bé dựa trên dấu hiệu giật mình."},
+        {"speaker": "patient", "fallback": "out_of_scope"},
+        {"speaker": "student", "text": "Bé cần nhập viện để theo dõi chị ạ. Nếu bé co giật, li bì hay thở nhanh thì chị báo ngay cho bác sĩ."},
+        {"speaker": "patient", "fallback": "out_of_scope"},
+        {"speaker": "student", "text": "Em giải thích để chị hiểu tình trạng của bé, chị yên tâm, bác sĩ sẽ theo dõi sát cho bé."},
+        {"speaker": "patient", "fallback": "out_of_scope"}
+      ]
+    },
+    {
+      "id": "partial",
+      "turns": [
+        {"speaker": "student", "text": "Bé bị sao vậy chị?"},
+        {"speaker": "patient", "topic": "Sốt"},
+        {"speaker": "student", "text": "Sốt bao lâu rồi?"},
+        {"speaker": "patient", "topic": "Sốt"},
+        {"speaker": "student", "text": "Bé ăn có được không?"},
+        {"speaker": "patient", "topic": "Ăn uống, chảy dãi"},
+        {"speaker": "student", "text": "Để em xem miệng bé."},
+        {"speaker": "system", "text": "[Đã ghi nhận thao tác khám]"},
+        {"speaker": "student", "text": "Chắc là bị tay chân miệng."},
+        {"speaker": "patient", "fallback": "out_of_scope"},
+        {"speaker": "student", "text": "Chị cho bé về uống thuốc hạ sốt nhé."},
+        {"speaker": "patient", "fallback": "out_of_scope"}
+      ]
+    },
+    {
+      "id": "minimal",
+      "turns": [
+        {"speaker": "student", "text": "Bé bị gì vậy?"},
+        {"speaker": "patient", "topic": "Sốt"},
+        {"speaker": "student", "text": "Vâng, em biết rồi."},
+        {"speaker": "patient", "fallback": "out_of_scope"}
+      ]
+    }
+  ]
+}
