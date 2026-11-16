@@ -103,9 +103,11 @@
  * final state. Only transform, opacity, stroke-dashoffset and clip-path animate.
  */
 
-/* Loops pause while their scope is off screen or the tab is hidden (useActive). */
-[data-paused="true"],
-[data-paused="true"] * {
+/*
+ * Loops pause while their scope is off screen or the tab is hidden (useActive).
+ * Only loops: one-shot entrances must finish even if scrolled past mid-way.
+ */
+[data-paused="true"] :is(.animate-wave, .animate-breathe, .art-ripple, .ecg-band, .ecg-head-x, .ecg-head-y, .ecg-halo) {
   animation-play-state: paused !important;
 }
 
@@ -194,6 +196,56 @@
   75% { transform: translateX(3px); }
   90% { transform: translateX(-1px); }
   100% { transform: none; }
+}
+
+/*
+ * Feature illustrations (FeatureArt). `data-play` is set when the card enters the
+ * viewport (and again on hover, to replay). Before that, with JS, draw-type parts
+ * wait in their start state; without JS they show finished.
+ */
+.js [data-art]:not([data-play]) .art-draw { stroke-dashoffset: 1; }
+.js [data-art]:not([data-play]) .art-pop,
+.js [data-art]:not([data-play]) .art-sweep { opacity: 0; }
+[data-art][data-play] .art-draw {
+  stroke-dasharray: 1;
+  animation: art-draw 600ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+[data-art][data-play] .art-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: art-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+[data-art][data-play] .art-sweep {
+  transform-box: fill-box;
+  transform-origin: left;
+  animation: art-sweep 900ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.art-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: art-ripple 2.4s var(--ease-out) infinite;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes art-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes art-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  70% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes art-sweep {
+  from { opacity: 1; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes art-ripple {
+  0% { opacity: 0.75; transform: scale(0.6); }
+  70%, 100% { opacity: 0; transform: scale(2.6); }
 }
 
 @keyframes line-up {
