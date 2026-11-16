@@ -107,7 +107,7 @@
  * Loops pause while their scope is off screen or the tab is hidden (useActive).
  * Only loops: one-shot entrances must finish even if scrolled past mid-way.
  */
-[data-paused="true"] :is(.animate-wave, .animate-breathe, .art-ripple, .ecg-band, .ecg-head-x, .ecg-head-y, .ecg-halo) {
+[data-paused="true"] :is([class*="animate-wave"], [class*="animate-breathe"], .art-ripple, .ecg-band, .ecg-head-x, .ecg-head-y, .ecg-halo) {
   animation-play-state: paused !important;
 }
 
@@ -168,19 +168,6 @@
 }
 .link-draw:hover::after {
   animation: underline-draw var(--dur-base) var(--ease-out);
-}
-
-/* Primary actions lift on hover and sink on press. */
-.btn-lift {
-  transition:
-    transform var(--dur-fast) var(--ease-out),
-    background-color var(--dur-fast) var(--ease-out);
-}
-.btn-lift:hover {
-  transform: translateY(-2px);
-}
-.btn-lift:active {
-  transform: translateY(1px);
 }
 
 /* The sample conversation waits for hydration instead of flashing its full text. */
@@ -323,10 +310,6 @@ body {
   }
   .js [data-reveal] > * {
     opacity: 1;
-    transform: none;
-  }
-  .btn-lift:hover,
-  .btn-lift:active {
     transform: none;
   }
 }

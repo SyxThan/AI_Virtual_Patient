@@ -429,6 +429,10 @@ Người dùng chọn hướng C (lưới bento) ngày 2026-11-14 từ 4 phươn
 * **Mô tả:** Người dùng thấy giao diện v1 quá đơn giản (2026-11-16). Giữ lưới bento và bảng màu; thêm font hiển thị Bricolage Grotesque (bộ chữ tiếng Việt), nền có hai vùng sáng mềm, ô `surface` có viền mảnh + bóng nhẹ, ô `ink` thành sân khấu gradient. Trang chủ: hero là một lượt hỏi bệnh thật lấy từ ca (bong bóng mẹ/sinh viên, nút giữ để nói, sóng âm) với một chuỗi hiện dần khi tải; minh hoạ SVG vẽ tay cho từng tính năng; "Cách hoạt động" dạng đường ray đánh số; footer có nhóm TRINITY. Setup: ô ca bệnh kiểu bìa hồ sơ, ô bắt đầu trên nền tối. Workspace: lời mẹ trên nền `sand`, sóng âm khi ghi âm. Debrief: vòng điểm quanh điểm tổng. Không số liệu bịa, không chữ "chứng chỉ", `prefers-reduced-motion` tắt mọi chuyển động.
 * **Tiêu chí hoàn thành:** tsc + lint + build pass; 360px/1280px không cuộn ngang; `docs/specs/ui-design.md` cập nhật.
 
+#### `TASK-S15-08` [P1]: Landing page có chuyển động (AVP-142)
+* **Mô tả:** Người dùng yêu cầu ngày 2026-11-16 (ghi đè quy tắc "một chuyển động tự chạy" cho riêng landing) và đồng ý thêm thư viện `motion`. Monitor điện tim tự vẽ rồi chạy như máy thật, sinh hiệu lấy từ ca, hội thoại mẫu 10 giây lấy nguyên văn lời mẹ trong ca, minh hoạ động cho từng tính năng, hiện nội dung khi cuộn, "Cách hoạt động" ghim khi cuộn, vi tương tác. Chi tiết trong `docs/specs/ui-design.md` mục "Landing motion".
+* **Tiêu chí hoàn thành:** tsc + lint + build pass; 390px/1440px không cuộn ngang; không JS vẫn đọc được đủ chữ; reduced motion không còn vòng lặp; CLS < 0.05; Lighthouse mobile báo trước/sau trong PR.
+
 ---
 
 ### Slice 16: Giọng nói người bệnh bằng VieNeu-TTS

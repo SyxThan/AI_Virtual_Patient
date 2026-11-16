@@ -10,15 +10,15 @@ import SiteHeader from "@/components/shell/SiteHeader";
 // Body face, designed for Vietnamese diacritics; self-hosted by next/font (no runtime request to Google).
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"], // 800 is not used anywhere
   variable: "--font-be-vietnam",
   display: "swap",
 });
 
-// Display face for titles and big numbers (Vietnamese subset, optical-size axis).
+// Display face for titles and big numbers (Vietnamese subset). Weight axis only:
+// the opsz/wdth axes tripled the preloaded file and slowed the hero's first render (AVP-142).
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin", "vietnamese"],
-  axes: ["opsz", "wdth"],
   variable: "--font-bricolage",
   display: "swap",
 });

@@ -16,7 +16,7 @@ export default function StartCta() {
       onPointerLeave={off}
       onFocus={on}
       onBlur={off}
-      className={buttonClass({ variant: "inverse", size: "lg", className: "btn-lift" })}
+      className={buttonClass({ variant: "inverse", size: "lg" })}
     >
       {vi.landing.ctaStart}
     </Link>

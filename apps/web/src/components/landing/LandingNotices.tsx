@@ -54,13 +54,13 @@ export default function LandingNotices() {
             <div className="mt-2 flex flex-wrap gap-x-5">
               <Link
                 href="/privacy"
-                className={`inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-info underline underline-offset-4 ${FOCUS_RING}`}
+                className={`link-draw inline-flex min-h-11 items-center rounded-control px-1 text-sm font-semibold text-info ${FOCUS_RING}`}
               >
                 {L.privacyLink}
               </Link>
               <Link
                 href="/transparency"
-                className={`inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-info underline underline-offset-4 ${FOCUS_RING}`}
+                className={`link-draw inline-flex min-h-11 items-center rounded-control px-1 text-sm font-semibold text-info ${FOCUS_RING}`}
               >
                 {vi.transparency.navLink}
               </Link>
