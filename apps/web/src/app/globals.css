@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
 /*
- * AVP design tokens (Slice 15, docs/specs/ui-design.md).
+ * AVP design tokens, "Bento Clinical v2" (docs/specs/ui-design.md).
  * Clinical palette: mineral canvas, deep teal ink, one teal primary, calm tile tints.
- * Every text/background pair used by the UI primitives is >= 4.5:1 (WCAG AA).
- * Red is reserved for red flags and destructive actions.
+ * v2 adds a display face (Bricolage Grotesque), a deep-teal hero gradient, a mint
+ * glow used only as decoration, and a soft lit canvas. Every text/background pair
+ * used by the UI primitives is >= 4.5:1 (WCAG AA). Red is reserved for red flags
+ * and destructive actions.
  */
 @theme {
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
 
   --color-canvas: #eef3f2;
   --color-surface: #ffffff;
   --color-ink: #10231f;
+  --color-ink-deep: #071a18;
   --color-ink-muted: #4a5e59;
   --color-ink-inverse-muted: #b8ccc7;
   --color-line: #d5e0dd;
@@ -20,6 +24,8 @@
   --color-primary: #0a6e69;
   --color-primary-strong: #07524e;
   --color-primary-soft: #d5efeb;
+  /* Decorative only (glow, waveform, gauge): never used for text on light surfaces. */
+  --color-glow: #5eead4;
 
   --color-info: #1f5fbf;
   --color-info-soft: #e2ecfa;
@@ -38,6 +44,43 @@
   --radius-tile: 1.75rem;
   --radius-card: 1rem;
   --radius-control: 0.75rem;
+
+  /* One lift for raised surfaces (surface tiles, menus); tinted tiles stay flat. */
+  --shadow-lift: 0 1px 2px rgba(16, 35, 31, 0.05), 0 18px 40px -24px rgba(16, 35, 31, 0.28);
+  --shadow-stage: 0 24px 60px -24px rgba(7, 26, 24, 0.7);
+
+  --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-wave: wave 1.3s ease-in-out infinite;
+  --animate-breathe: breathe 3.2s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes wave {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 }
 
 :root {
@@ -45,10 +88,20 @@
 }
 
 body {
-  background: var(--color-canvas);
+  /* A lit canvas: two soft glows (mint, sky) at the top, mineral grey-green below. */
+  background-color: var(--color-canvas);
+  background-image:
+    radial-gradient(56rem 28rem at 12% -6%, rgba(94, 234, 212, 0.28), transparent 62%),
+    radial-gradient(44rem 26rem at 96% -4%, rgba(31, 95, 191, 0.12), transparent 60%);
+  background-repeat: no-repeat;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Display type: optical size follows font-size (Bricolage has an opsz axis). */
+.font-display {
+  font-optical-sizing: auto;
 }
 
 /* Vitals, timers and scores line up digit by digit. */
@@ -56,11 +109,34 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Dark "stage" tiles: deep teal gradient with one mint glow in the top-right corner. */
+.tile-ink {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(42rem 22rem at 100% 0%, rgba(94, 234, 212, 0.22), transparent 60%),
+    linear-gradient(160deg, #123a36 0%, var(--color-ink) 48%, var(--color-ink-deep) 100%);
+}
+
+.tile-primary {
+  background-color: var(--color-primary);
+  background-image: linear-gradient(160deg, #0d7f79 0%, var(--color-primary) 55%, var(--color-primary-strong) 100%);
+}
+
+/* Hairline grid for the hero stage (decorative). */
+.stage-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(60% 70% at 70% 40%, #000 30%, transparent 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

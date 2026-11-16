@@ -391,6 +391,8 @@
     "profile": "Hồ sơ",
     "signOut": "Đăng xuất",
     "menuLabel": "Mở menu tài khoản",
+    "team": "Sản phẩm dự thi P-Innovation của nhóm TRINITY, Học viện Công nghệ Bưu chính Viễn thông (PTIT).",
+    "footerLinks": "Liên kết",
     "footer": "Công cụ luyện tập hỏi bệnh. Phản hồi Auto-OSCE chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên."
   },
   "auth": {
@@ -533,7 +535,19 @@
     "draftBody": "Ca bệnh, sinh hiệu và bảng kiểm hiện là bản nháp do nhóm phát triển biên soạn, chưa được bác sĩ thẩm định. Không dùng để ra quyết định lâm sàng.",
     "practiceTitle": "Chỉ là phản hồi luyện tập",
     "practiceBody": "Điểm Auto-OSCE và nhận xét chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên.",
-    "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn"
+    "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn",
+    "stage": {
+      "label": "Một lượt hỏi bệnh",
+      "speakerMother": "Người mẹ",
+      "speakerYou": "Bạn",
+      "status": "trả lời theo hồ sơ ca bệnh",
+      "mother1": "Con em sốt cao ba ngày rồi không hạ, bỏ ăn, quấy khóc, ngủ cứ giật mình.",
+      "you1": "Chị đừng lo, mình xem bé cùng nhau nhé. Bé sốt từ hôm nào ạ?",
+      "mother2": "Dạ ba hôm nay rồi bác, cho uống hạ sốt mà vẫn khó hạ.",
+      "mic": "Giữ để nói",
+      "caption": "Người mẹ chỉ nói những gì có trong hồ sơ ca bệnh. Điều gì không có, mẹ sẽ nói là không biết."
+    },
+    "notesTitle": "Trước khi bắt đầu"
   },
   "errors": {
     "notFoundCode": "Lỗi 404",

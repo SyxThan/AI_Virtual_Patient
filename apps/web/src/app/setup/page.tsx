@@ -8,7 +8,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
-import Tile from "@/components/ui/Tile";
+import Tile, { TILE_MUTED } from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { API_URL, authHeaders, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
 
@@ -25,7 +25,7 @@ function SelectMark({ selected }: { selected: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${
+      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
         selected ? "border-primary bg-primary text-white" : "border-line-strong bg-surface"
       }`}
     >
@@ -45,9 +45,9 @@ function SelectMark({ selected }: { selected: boolean }) {
 }
 
 function optionClass(selected: boolean, layout: string): string {
-  return `flex w-full min-h-11 gap-3 rounded-card border-2 text-left ${layout} transition-colors ${FOCUS_RING} ${
+  return `flex w-full min-h-11 gap-3 rounded-card border-2 text-left ${layout} transition-[border-color,background-color,box-shadow] ${FOCUS_RING} ${
     selected
-      ? "border-primary bg-primary-soft text-ink"
+      ? "border-primary bg-primary-soft text-ink shadow-[0_0_0_4px_rgba(10,110,105,0.12)]"
       : "border-line bg-surface text-ink hover:border-line-strong"
   }`;
 }
@@ -111,14 +111,15 @@ export default function SetupPage() {
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
-        {/* Case: the one fixed MVP case, in the warm pediatric tone */}
-        <Tile tone="sand" as="section" aria-labelledby="case-title" className="lg:col-span-4">
+        {/* Case: the one fixed MVP case, in the warm pediatric tone, read like a chart cover */}
+        <Tile tone="sand" as="section" aria-labelledby="case-title" className="overflow-hidden lg:col-span-4">
+          <CaseGlyph />
           <p className="text-sm font-semibold">{vi.setup.case.label}</p>
-          <h2 id="case-title" className="mt-2 text-xl font-bold tracking-tight text-ink sm:text-2xl">
+          <h2 id="case-title" className="font-display mt-2 max-w-[18ch] text-3xl font-bold tracking-tight text-ink sm:text-4xl">
             {vi.setup.case.title}
           </h2>
-          <p className="mt-3 max-w-prose leading-relaxed text-ink">{vi.setup.case.summary}</p>
-          <p className="mt-4 flex items-start gap-2 text-sm">
+          <p className="mt-4 max-w-prose leading-relaxed text-ink">{vi.setup.case.summary}</p>
+          <p className="mt-5 flex items-start gap-2 rounded-control bg-surface/60 px-3 py-2 text-sm">
             <WarnIcon />
             {vi.setup.case.draftNotice}
           </p>
@@ -126,7 +127,7 @@ export default function SetupPage() {
 
         {/* Account status */}
         <Tile as="section" aria-labelledby="account-title" className="flex flex-col gap-3 lg:col-span-2">
-          <h2 id="account-title" className="text-base font-bold">
+          <h2 id="account-title" className="font-display text-xl font-bold tracking-tight">
             {vi.setupUx.accountTitle}
           </h2>
           {status === "loading" ? (
@@ -150,7 +151,9 @@ export default function SetupPage() {
 
         {/* Role */}
         <Tile as="fieldset" className="min-w-0 lg:col-span-2">
-          <legend className="float-left mb-4 w-full text-base font-bold">{vi.setup.role.label}</legend>
+          <legend className="font-display float-left mb-4 w-full text-xl font-bold tracking-tight">
+            {vi.setup.role.label}
+          </legend>
           <div className="clear-both flex flex-col gap-2">
             {ROLES.map((r) => (
               <button
@@ -169,7 +172,9 @@ export default function SetupPage() {
 
         {/* Mode */}
         <Tile as="fieldset" className="min-w-0 lg:col-span-4">
-          <legend className="float-left mb-4 w-full text-base font-bold">{vi.setup.mode.label}</legend>
+          <legend className="font-display float-left mb-4 w-full text-xl font-bold tracking-tight">
+            {vi.setup.mode.label}
+          </legend>
           <div className="clear-both grid gap-3 sm:grid-cols-2">
             {MODES.map((m) => (
               <button
@@ -181,7 +186,7 @@ export default function SetupPage() {
               >
                 <SelectMark selected={mode === m} />
                 <span className="min-w-0">
-                  <span className="block text-lg font-bold">{vi.setup.mode[m]}</span>
+                  <span className="font-display block text-xl font-bold tracking-tight">{vi.setup.mode[m]}</span>
                   <span className="mt-1 block text-sm leading-relaxed text-ink-muted">
                     {m === "guided" ? vi.setupUx.guidedDesc : vi.setupUx.examDesc}
                   </span>
@@ -193,7 +198,7 @@ export default function SetupPage() {
 
         {/* Consent, in its own card */}
         <Tile as="section" aria-labelledby="consent-title" className="lg:col-span-4">
-          <h2 id="consent-title" className="text-base font-bold">
+          <h2 id="consent-title" className="font-display text-xl font-bold tracking-tight">
             {vi.setupUx.consentTitle}
           </h2>
           <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-card border border-line bg-canvas p-4 text-sm leading-relaxed text-ink">
@@ -213,19 +218,20 @@ export default function SetupPage() {
           </Link>
         </Tile>
 
-        {/* Start: the page's single primary action */}
+        {/* Start: the page's single primary action, on the dark stage */}
         <Tile
           as="section"
+          tone="ink"
           aria-label={vi.setup.start}
-          className="flex flex-col justify-between gap-4 lg:col-span-2"
+          className="flex flex-col justify-between gap-6 lg:col-span-2"
         >
           <div className="flex flex-wrap gap-2">
             <Badge tone="primary">{vi.setup.role[role]}</Badge>
             <Badge tone="info">{vi.setup.mode[mode]}</Badge>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <Button
-              variant="primary"
+              variant="inverse"
               size="lg"
               disabled={!consent || loading}
               aria-describedby={!consent ? "consent-hint" : undefined}
@@ -235,7 +241,7 @@ export default function SetupPage() {
               {loading ? vi.setup.starting : vi.setup.start}
             </Button>
             {!consent && (
-              <p id="consent-hint" className="text-sm text-ink-muted">
+              <p id="consent-hint" className={`text-sm ${TILE_MUTED.ink}`}>
                 {vi.setupUx.consentHint}
               </p>
             )}
@@ -243,6 +249,23 @@ export default function SetupPage() {
         </Tile>
       </div>
     </PageShell>
+  );
+}
+
+/** Mother holding the child, drawn large and faint in the case tile's corner (decorative). */
+function CaseGlyph() {
+  return (
+    <svg
+      viewBox="0 0 160 160"
+      className="pointer-events-none absolute -right-6 -top-4 h-44 w-44 text-sand-ink/15 sm:h-56 sm:w-56"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <circle cx="66" cy="44" r="22" />
+      <path d="M20 150c3-38 22-60 46-60s43 22 46 60z" />
+      <circle cx="112" cy="86" r="15" />
+      <path d="M86 150c2-22 12-36 26-36s24 14 26 36z" />
+    </svg>
   );
 }
 

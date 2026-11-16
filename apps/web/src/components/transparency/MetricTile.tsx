@@ -44,7 +44,7 @@ export default function MetricTile({
   return (
     <Tile as="article" tone={tone} compact className={`flex flex-col gap-4 ${className}`}>
       <header className="space-y-1">
-        <h2 className="text-xl font-bold tracking-tight">{title}</h2>
+        <h2 className="font-display text-2xl font-bold tracking-tight">{title}</h2>
         <p className={`text-sm leading-relaxed ${muted}`}>{what}</p>
       </header>
 
@@ -52,7 +52,7 @@ export default function MetricTile({
         <>
           <div>
             <p className={`text-sm font-semibold ${muted}`}>{headline}</p>
-            <p className="tabular text-4xl font-extrabold tracking-tight">{value}</p>
+            <p className="font-display tabular text-5xl font-bold tracking-tight">{value}</p>
           </div>
           {children && <div className="space-y-1 text-sm leading-relaxed">{children}</div>}
           <ul className={`mt-auto space-y-0.5 text-xs ${muted}`}>

@@ -75,8 +75,8 @@ function ClaimRow({ claim }: { claim: Claim }) {
 
 export default function CitedClaimsSection({ items }: { items: Claim[] }) {
   return (
-    <Tile as="section" tone="surface" aria-labelledby="claims-title" className="border border-line">
-      <h2 id="claims-title" className="text-xl font-bold tracking-tight">
+    <Tile as="section" tone="surface" aria-labelledby="claims-title">
+      <h2 id="claims-title" className="font-display text-2xl font-bold tracking-tight">
         {vi.debrief.claims.title}
       </h2>
       {items.length === 0 ? (

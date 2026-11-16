@@ -208,8 +208,8 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
       <div className="space-y-4">
         <PracticeNoticeBanner sourcesReviewed={dbDone ? (db?.sources_reviewed ?? false) : null} />
         {body}
-        <Tile as="footer" tone="surface" compact className="border border-line">
-          <h2 className="text-base font-bold">{vi.debriefUx.actionsTitle}</h2>
+        <Tile as="footer" tone="surface" compact>
+          <h2 className="font-display text-xl font-bold tracking-tight">{vi.debriefUx.actionsTitle}</h2>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link href="/setup" className={buttonClass({ variant: "secondary" })}>
               {vi.debrief.actions.newCase}

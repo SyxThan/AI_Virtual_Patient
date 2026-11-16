@@ -34,7 +34,7 @@ export default function LoginPage() {
           </div>
         </Card>
         <Tile tone="ink" as="aside" aria-labelledby="login-aside-title" className="lg:col-span-2">
-          <h2 id="login-aside-title" className="text-xl font-bold tracking-tight">
+          <h2 id="login-aside-title" className="font-display text-2xl font-bold tracking-tight">
             {a.asideTitle}
           </h2>
           <p className={`mt-3 ${TILE_MUTED.ink}`}>{a.asideBody}</p>

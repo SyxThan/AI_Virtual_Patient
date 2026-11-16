@@ -13,9 +13,9 @@ export default function NotFound() {
       <div className="grid gap-4 sm:grid-cols-5">
         <Tile tone="ink" className="flex flex-col justify-between gap-10 sm:col-span-3">
           <p className={`text-sm font-semibold ${TILE_MUTED.ink}`}>{vi.errors.notFoundCode}</p>
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{vi.errors.notFoundTitle}</h1>
+          <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">{vi.errors.notFoundTitle}</h1>
         </Tile>
-        <Tile tone="surface" className="flex flex-col justify-between gap-6 border border-line sm:col-span-2">
+        <Tile tone="surface" className="flex flex-col justify-between gap-6 sm:col-span-2">
           <p className="text-ink-muted">{vi.errors.notFoundBody}</p>
           <div className="flex flex-col gap-3">
             <Link href="/" className={buttonClass({ variant: "primary", className: "w-full" })}>
