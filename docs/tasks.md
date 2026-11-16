@@ -60,7 +60,8 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-135** | **Slice 17** (`TASK-S17-01`) | Adapter STT Whisper tự chạy (API chuẩn OpenAI) | **P0** | ✅ Merged (PR #42) |
 | **AVP-136** | **Slice 17** (`TASK-S17-02`) | Server STT nhỏ `scripts/stt_server` (faster-whisper) | **P0** | ✅ Merged (PR #43) |
 | **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | ✅ Merged (PR #44) |
-| **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm, kiểm tra tất định) | **P0** | 🟡 PR mở |
+| **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48); judge PR #49 |
+| **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | 🟡 PR mở |
 
 ---
 
