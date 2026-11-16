@@ -4,11 +4,10 @@ import Tile from "@/components/ui/Tile";
 import { FOCUS_RING_DARK } from "@/components/ui/focus";
 import ConversationStage from "./ConversationStage";
 import EcgMonitor from "./EcgMonitor";
+import { HOW_IT_WORKS_ID } from "./ids";
 import StartCta from "./StartCta";
 
 const L = vi.landing;
-
-export const HOW_IT_WORKS_ID = "cach-hoat-dong";
 
 /**
  * The landing hero. Server component; only the monitor, the sample conversation

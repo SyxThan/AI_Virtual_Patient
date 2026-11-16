@@ -29,8 +29,9 @@ export default function FeatureTiles() {
   return (
     <>
       <h2 className="sr-only">{L.featuresTitle}</h2>
+      <div data-reveal="" className="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 lg:col-span-6">
       {BIG.map(({ key, tone, art }) => (
-        <TiltCard key={key} className="sm:col-span-1 lg:col-span-3">
+        <TiltCard key={key} className="h-full">
           <Tile as="article" tone={tone} className="flex h-full flex-col gap-6">
             <span className={TILE_MUTED[tone]}>{art}</span>
             <div>
@@ -40,7 +41,8 @@ export default function FeatureTiles() {
           </Tile>
         </TiltCard>
       ))}
-      <div className="mt-4 grid grid-cols-1 sm:col-span-2 lg:col-span-6 lg:grid-cols-3">
+      </div>
+      <div data-reveal="" className="mt-4 grid grid-cols-1 sm:col-span-2 lg:col-span-6 lg:grid-cols-3">
         {SMALL.map(({ key, art }, i) => (
           <article
             key={key}
