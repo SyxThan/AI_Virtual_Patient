@@ -1,6 +1,6 @@
 ---
 name: vitals-state-machine
-description: Use when building, testing, or updating the Vitals State Machine, monitor UI, or severity transitions (`apps/api/avp_api/services/vitals_service.py` and `apps/web/src/components/workspace/VitalsMonitor.tsx`).
+description: Use when building, testing, or updating the Vitals State Machine, monitor UI, or severity transitions (`apps/api/avp_api/services/vitals_service.py`). The web monitor UI was removed from the workspace (2026-11-16); the API stays.
 ---
 
 # Vitals State Machine Skill
@@ -74,12 +74,8 @@ class VitalsStateMachine:
         )
 ```
 
-## Frontend Integration (`VitalsMonitor.tsx`)
-- Render continuous monitor layout with heart rate waveform / digital readout.
-- Apply conditional Tailwind styles:
-  - Temperature $> 39.0^\circ\text{C}$: `text-red-500 animate-pulse`
-  - Heart rate $> 150$: `text-amber-500 font-bold`
-  - SpO2 $< 95\%$: `text-red-600`
+## Frontend Integration
+- None at the moment: `VitalsMonitor.tsx` was removed from the Clinical Workspace on 2026-11-16 at the human's request (it added nothing for learners). The `/vitals` endpoints and the state machine remain; bring a UI back only with the human's OK.
 
 ## Common Pitfalls
 1. **Clock Desync:** Do not rely purely on client `setInterval` for vital degradation. Backend must validate elapsed session time.

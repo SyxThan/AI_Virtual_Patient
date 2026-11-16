@@ -19,7 +19,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-009, AVP-011** | **Slice 3** (`TASK-S3-01`) | Patient Agent service, 3-tier guardrails, prompt cache | **P0** | ✅ Merged (PR #9, #11) |
 | **AVP-010, AVP-012** | **Slice 3** (`TASK-S3-02`) | Transcript Box, text turn loop (`POST /sessions/{id}/turns`) | **P0** | ✅ Merged (PR #9, #10) |
 | **AVP-102** | **Slice 4** (`TASK-S4-01`) | Vitals State Machine engine backend (5 trạng thái HFMD) | **P0** | ✅ Merged (PR #12) |
-| **AVP-102** | **Slice 4** (`TASK-S4-02`) | Monitor sinh hiệu frontend (`VitalsMonitor.tsx`) | **P0** | ✅ Merged (PR #12) |
+| **AVP-102** | **Slice 4** (`TASK-S4-02`) | Monitor sinh hiệu frontend (`VitalsMonitor.tsx`) | **P0** | ✅ Merged (PR #12); UI đã gỡ khỏi trang khám ngày 16/11/2026, API vẫn giữ |
 | **AVP-104** | **Slice 5** (`TASK-S5-01`) | Three.js canvas, avatar 3D người mẹ bế bé | **P0** | ✅ Merged (PR #13) |
 | **AVP-101, AVP-104** | **Slice 5** (`TASK-S5-02`) | Raycasting 4 vùng khám | **P0** | ✅ Merged (PR #14) |
 | **AVP-104** | **Slice 5** (`TASK-S5-03`) | Lip-sync cơ bản theo biên độ audio | **P1** | ✅ Merged (PR #15) |

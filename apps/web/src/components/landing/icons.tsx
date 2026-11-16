@@ -35,15 +35,6 @@ export function HandIcon() {
   );
 }
 
-export function PulseIcon() {
-  return (
-    <Icon>
-      <rect x="3" y="4" width="18" height="14" rx="2.5" />
-      <path d="M6 12h2.5l1.5-3 2.5 6 1.5-3H18M9 21h6" />
-    </Icon>
-  );
-}
-
 export function ChecklistIcon() {
   return (
     <Icon>

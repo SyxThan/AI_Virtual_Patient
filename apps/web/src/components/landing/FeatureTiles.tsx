@@ -3,7 +3,7 @@ import vi from "../../../messages/vi.json";
 import Tile, { TILE_MUTED, type TileTone } from "@/components/ui/Tile";
 import SignedInLink from "@/components/ui/SignedInLink";
 import { FOCUS_RING } from "@/components/ui/focus";
-import { BookIcon, ChecklistIcon, HandIcon, HistoryIcon, MicIcon, PulseIcon } from "./icons";
+import { BookIcon, ChecklistIcon, HandIcon, HistoryIcon, MicIcon } from "./icons";
 
 const L = vi.landing;
 const F = L.features;
@@ -15,19 +15,18 @@ type Feature = {
   span: string;
 };
 
-// Layout on lg (6 columns): voice and exam sit beside the hero; the rest fill rows of three.
+// Layout on lg (6 columns): voice and exam sit beside the hero; OSCE and debrief share a row.
 const FEATURES: Feature[] = [
   { key: "voice", tone: "mint", icon: <MicIcon />, span: "lg:col-span-2" },
   { key: "exam", tone: "sky", icon: <HandIcon />, span: "lg:col-span-2" },
-  { key: "vitals", tone: "sand", icon: <PulseIcon />, span: "lg:col-span-2" },
-  { key: "osce", tone: "surface", icon: <ChecklistIcon />, span: "lg:col-span-2" },
-  { key: "debrief", tone: "mint", icon: <BookIcon />, span: "lg:col-span-2" },
+  { key: "osce", tone: "surface", icon: <ChecklistIcon />, span: "lg:col-span-3" },
+  { key: "debrief", tone: "mint", icon: <BookIcon />, span: "lg:col-span-3" },
   {
     key: "history",
     tone: "surface",
     icon: <HistoryIcon />,
-    // sm: pairs with debrief; lg: a full-width strip under the grid.
-    span:"lg:col-span-6 lg:flex-row lg:items-center lg:gap-6",
+    // A full-width strip under the grid (sm: both columns; lg: all six).
+    span: "sm:col-span-2 lg:col-span-6 lg:flex-row lg:items-center lg:gap-6",
   },
 ];
 

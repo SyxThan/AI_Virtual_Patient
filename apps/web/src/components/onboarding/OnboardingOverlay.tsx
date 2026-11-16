@@ -26,8 +26,8 @@ export function markOnboardingSeen(): void {
 }
 
 /**
- * First-run guide for the workspace: 4 steps (ask, examine on the avatar,
- * vitals, finish). Skippable at any step; Escape also skips. Closing marks it
+ * First-run guide for the workspace: 3 steps (ask, examine on the avatar,
+ * finish). Skippable at any step; Escape also skips. Closing marks it
  * seen; the workspace header can reopen it.
  */
 export default function OnboardingOverlay({

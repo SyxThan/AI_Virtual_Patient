@@ -23,7 +23,6 @@ import FinishDialog from "@/components/workspace/FinishDialog";
 import PushToTalk from "@/components/workspace/PushToTalk";
 import SessionTimer from "@/components/workspace/SessionTimer";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
-import VitalsMonitor from "@/components/workspace/VitalsMonitor";
 import {
   useVoiceSession,
   type LockReason,
@@ -166,7 +165,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   }, [voice.analyser]);
 
   // Restore on load / reload (T-SESSION-01): session (mode, status), transcript,
-  // guide (timer start, limit, checklist). Vitals restore inside VitalsMonitor.
+  // guide (timer start, limit, checklist).
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -468,7 +467,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         </div>
       )}
 
-      {/* < 1024 px: one column, avatar -> monitor -> chat (-> checklist).
+      {/* < 1024 px: one column, avatar -> chat (-> checklist).
           >= 1024 px: patient column left (5/12), chat column right (7/12). */}
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
         <section
@@ -481,7 +480,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
             findings={examFindings}
             busy={examLoading || !!lock}
           />
-          <VitalsMonitor sessionId={id} disabled={!!lock} />
         </section>
 
         <section

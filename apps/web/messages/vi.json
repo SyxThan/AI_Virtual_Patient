@@ -290,21 +290,6 @@
     "error": "Không thực hiện được thao tác khám. Vui lòng thử lại.",
     "systemLabel": "Kết quả khám"
   },
-  "monitor": {
-    "title": "Theo dõi sinh hiệu",
-    "hr": "Nhịp tim",
-    "temp": "Nhiệt độ",
-    "rr": "Nhịp thở",
-    "bp": "Huyết áp",
-    "spo2": "SpO₂",
-    "unitBpm": "l/ph",
-    "symptoms": "Biểu hiện lâm sàng",
-    "measure": "Đo sinh hiệu",
-    "antipyretic": "Cho hạ sốt (Paracetamol)",
-    "feverWarning": "Sốt cao",
-    "loading": "Đang đo…",
-    "error": "Không lấy được sinh hiệu."
-  },
   "debrief": {
     "redFlagTitle": "Cảnh báo dấu hiệu nguy hiểm",
     "redFlagBody": "Bạn đã bỏ sót hoặc chưa đạt tiêu chí tối quan trọng (Giật mình chới với / Phân độ Tay chân miệng).",
@@ -503,10 +488,6 @@
         "title": "Khám trên mô hình 3D",
         "body": "Bấm vào lòng bàn tay, lòng bàn chân, miệng, vùng mông hay đầu gối của bé để xem tổn thương."
       },
-      "vitals": {
-        "title": "Sinh hiệu thay đổi theo y lệnh",
-        "body": "Monitor hiển thị mạch, nhiệt độ, huyết áp, nhịp thở và SpO2, thay đổi theo diễn tiến bệnh và các xử trí bạn đưa ra."
-      },
       "osce": {
         "title": "Chấm theo bảng kiểm OSCE",
         "body": "Mỗi tiêu chí đạt đều kèm câu nói nguyên văn của bạn làm bằng chứng. Không có bằng chứng thì không tính đạt."
@@ -522,7 +503,7 @@
     },
     "eyebrow": "Mô phỏng hỏi bệnh Nhi khoa bằng tiếng Việt",
     "title": "Luyện hỏi bệnh với bệnh nhân ảo, nhận phản hồi theo bảng kiểm OSCE",
-    "lead": "Hỏi bệnh người mẹ đang bế bé, khám trên mô hình 3D, theo dõi sinh hiệu, rồi nhận phản hồi học tập có dẫn chứng từ chính lời bạn nói.",
+    "lead": "Hỏi bệnh người mẹ đang bế bé, khám trên mô hình 3D, rồi nhận phản hồi học tập có dẫn chứng từ chính lời bạn nói.",
     "ctaStart": "Bắt đầu khám bệnh",
     "ctaHistory": "Xem lịch sử luyện tập",
     "caseLabel": "Ca hiện có",
@@ -534,7 +515,7 @@
       },
       {
         "title": "Hỏi bệnh và khám",
-        "body": "Hỏi bệnh người mẹ, khám các vùng trên mô hình 3D, đo sinh hiệu và xử trí ban đầu."
+        "body": "Hỏi bệnh người mẹ và khám các vùng trên mô hình 3D của bé."
       },
       {
         "title": "Phản hồi",
@@ -624,7 +605,7 @@
       "finished": "Buổi khám đã kết thúc."
     },
     "regions": {
-      "patient": "Bệnh nhân và sinh hiệu",
+      "patient": "Bệnh nhân",
       "chat": "Hội thoại với người mẹ",
       "transcript": "Nội dung hội thoại"
     }
@@ -660,10 +641,6 @@
         "body": "Bấm vào một vùng cơ thể của bé trên mô hình 3D, hoặc dùng các nút khám ngay dưới mô hình, để xem ghi nhận khám."
       },
       {
-        "title": "Sinh hiệu",
-        "body": "Màn hình theo dõi hiển thị nhịp tim, nhiệt độ, nhịp thở, huyết áp và SpO₂. Bấm “Đo sinh hiệu” để cập nhật; can thiệp của bạn có thể làm sinh hiệu thay đổi."
-      },
-      {
         "title": "Kết thúc",
         "body": "Khi đã hỏi và khám xong, bấm “Kết thúc buổi khám”. Sau đó bạn không hỏi thêm được; hệ thống chấm điểm và tạo phản hồi luyện tập."
       }
@@ -679,9 +656,6 @@
     "closeMenu": "Đóng menu điều hướng",
     "mainNav": "Điều hướng chính",
     "close": "Đóng",
-    "vitalsAlert": "Cảnh báo sinh hiệu: {alerts}",
-    "hrHigh": "Nhịp tim nhanh",
-    "spo2Low": "SpO₂ thấp",
     "examButtons": "Khám bằng nút (dùng được với bàn phím)"
   },
   "setupUx": {
