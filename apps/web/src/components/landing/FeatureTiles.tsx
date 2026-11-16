@@ -3,25 +3,25 @@ import vi from "../../../messages/vi.json";
 import Tile, { TILE_MUTED, type TileTone } from "@/components/ui/Tile";
 import SignedInLink from "@/components/ui/SignedInLink";
 import { FOCUS_RING } from "@/components/ui/focus";
-import { ChecklistGlyph, CitedPageGlyph, HandGlyph, ProgressGlyph, WaveGlyph } from "./glyphs";
+import TiltCard from "@/components/motion/TiltCard";
+import { ChecklistArt, CitationArt, ExamArt, ProgressArt, VoiceArt } from "./FeatureArt";
 
 const L = vi.landing;
 const F = L.features;
 
-type Feature = {
-  key: keyof typeof F;
-  tone: TileTone;
-  glyph: ReactNode;
-  span: string;
-};
+type Big = { key: "voice" | "exam"; tone: TileTone; art: ReactNode };
+type Small = { key: "osce" | "debrief" | "history"; art: ReactNode };
 
-// Layout on lg (6 columns): three feature cells in a row, then the debrief and history cells.
-const FEATURES: Feature[] = [
-  { key: "voice", tone: "mint", glyph: <WaveGlyph />, span: "lg:col-span-2" },
-  { key: "exam", tone: "sky", glyph: <HandGlyph />, span: "lg:col-span-2" },
-  { key: "osce", tone: "surface", glyph: <ChecklistGlyph />, span: "lg:col-span-2" },
-  { key: "debrief", tone: "sand", glyph: <CitedPageGlyph />, span: "lg:col-span-3" },
-  { key: "history", tone: "surface", glyph: <ProgressGlyph />, span: "lg:col-span-3" },
+// The two things you do in the clinic are big, tinted and tilt toward the pointer.
+const BIG: Big[] = [
+  { key: "voice", tone: "mint", art: <VoiceArt /> },
+  { key: "exam", tone: "sky", art: <ExamArt /> },
+];
+// What you get afterwards: no fill, separated only by rules.
+const SMALL: Small[] = [
+  { key: "osce", art: <ChecklistArt /> },
+  { key: "debrief", art: <CitationArt /> },
+  { key: "history", art: <ProgressArt /> },
 ];
 
 /** Feature cells of the landing bento. Rendered as direct children of the grid. */
@@ -29,25 +29,39 @@ export default function FeatureTiles() {
   return (
     <>
       <h2 className="sr-only">{L.featuresTitle}</h2>
-      {FEATURES.map(({ key, tone, glyph, span }) => (
-        <Tile key={key} as="article" tone={tone} compact className={`flex flex-col gap-4 ${span}`}>
-          <span className={`${TILE_MUTED[tone]} ${tone === "surface" ? "text-primary" : ""}`}>{glyph}</span>
-          <div className="flex flex-1 flex-col gap-2">
-            <h3 className="font-display text-2xl font-bold tracking-tight">{F[key].title}</h3>
-            <p className={`max-w-prose leading-relaxed ${tone === "surface" ? TILE_MUTED.surface : ""}`}>
-              {F[key].body}
-            </p>
-          </div>
-          {key === "history" && (
-            <SignedInLink
-              href="/history"
-              className={`inline-flex min-h-11 items-center self-start rounded-control font-semibold text-primary underline underline-offset-4 hover:text-primary-strong ${FOCUS_RING}`}
-            >
-              {L.ctaHistory}
-            </SignedInLink>
-          )}
-        </Tile>
+      <div data-reveal="" className="grid grid-cols-1 gap-4 sm:col-span-2 sm:grid-cols-2 lg:col-span-6">
+      {BIG.map(({ key, tone, art }) => (
+        <TiltCard key={key} className="h-full">
+          <Tile as="article" tone={tone} className="flex h-full flex-col gap-6">
+            <span className={TILE_MUTED[tone]}>{art}</span>
+            <div>
+              <h3 className="font-display text-3xl font-bold tracking-tight">{F[key].title}</h3>
+              <p className="mt-2 max-w-prose text-lg leading-relaxed">{F[key].body}</p>
+            </div>
+          </Tile>
+        </TiltCard>
       ))}
+      </div>
+      <div data-reveal="" className="mt-4 grid grid-cols-1 sm:col-span-2 lg:col-span-6 lg:grid-cols-3">
+        {SMALL.map(({ key, art }, i) => (
+          <article
+            key={key}
+            className={`flex flex-col gap-4 border-t border-line-strong/60 py-6 lg:px-6 ${i === 0 ? "lg:pl-0" : "lg:border-l"}`}
+          >
+            <span className="text-primary">{art}</span>
+            <h3 className="font-display text-2xl font-bold tracking-tight text-ink">{F[key].title}</h3>
+            <p className="max-w-prose leading-relaxed text-ink-muted">{F[key].body}</p>
+            {key === "history" && (
+              <SignedInLink
+                href="/history"
+                className={`link-draw inline-flex min-h-11 items-center self-start rounded-control px-1 font-semibold text-primary hover:text-primary-strong ${FOCUS_RING}`}
+              >
+                {L.ctaHistory}
+              </SignedInLink>
+            )}
+          </article>
+        ))}
+      </div>
     </>
   );
 }

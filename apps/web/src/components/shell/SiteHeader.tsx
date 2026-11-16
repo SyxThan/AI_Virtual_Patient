@@ -35,6 +35,18 @@ export default function SiteHeader() {
   const mobileRef = useRef<HTMLDivElement>(null);
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
 
+  // Landing only: the bar sticks to the top and tightens once the page scrolls past 80px.
+  const sticky = pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!sticky) return;
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [sticky]);
+  const tight = sticky && scrolled;
+
   // Close both menus after navigation (state adjusted during render, no effect).
   if (lastPath !== pathname) {
     setLastPath(pathname);
@@ -89,7 +101,11 @@ export default function SiteHeader() {
   const mobileLinkCls = `block rounded-control px-3 py-3 font-medium text-ink hover:bg-canvas ${FOCUS_RING}`;
 
   return (
-    <header className="px-3 pt-3 sm:px-6 sm:pt-4">
+    <header
+      className={`px-3 pt-3 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] sm:px-6 sm:pt-4 ${
+        sticky ? "sticky top-0 z-40" : ""
+      } ${tight ? "-translate-y-2" : ""}`}
+    >
       <a
         href="#main"
         onClick={skipToMain}
@@ -99,9 +115,18 @@ export default function SiteHeader() {
       </a>
       <nav
         aria-label={vi.a11y.mainNav}
-        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-surface/90 py-2 pl-5 pr-2 shadow-lift ring-1 ring-line/70 backdrop-blur"
+        className={`relative isolate mx-auto flex max-w-7xl origin-top items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2 ring-1 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] ${
+          tight ? "scale-[0.96] ring-line-strong/60" : "ring-line/70"
+        }`}
         ref={mobileRef}
       >
+        {/* Background layer: only its opacity animates (frosted and lifted once scrolled). */}
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 -z-10 rounded-full bg-surface/95 shadow-lift backdrop-blur transition-opacity duration-[var(--dur-base)] ${
+            tight ? "opacity-100" : "opacity-80"
+          }`}
+        />
         <Link
           href="/"
           className={`font-display flex items-center gap-2 rounded-full text-lg font-bold tracking-tight text-ink ${FOCUS_RING}`}

@@ -1,6 +1,6 @@
 # UI design system: "Bento Clinical" v2 (Slice 15, AVP-141)
 
-Agent-facing spec for the web design. The human chose direction C (bento grid) on 2026-11-14; v2 (2026-11-16, AVP-141) keeps the grid and the palette and adds a display face, depth and one hero stage, because the v1 pages read as plain. Tokens live in `apps/web/src/app/globals.css` (`@theme`); primitives in `apps/web/src/components/ui/`. No new npm dependencies: Tailwind v4 utilities and these primitives only.
+Agent-facing spec for the web design. The human chose direction C (bento grid) on 2026-11-14; v2 (2026-11-16, AVP-141) keeps the grid and the palette and adds a display face, depth and one hero stage, because the v1 pages read as plain. Tokens live in `apps/web/src/app/globals.css` (`@theme`); primitives in `apps/web/src/components/ui/`. Dependencies: Tailwind v4 utilities, these primitives, and `motion` (added on 2026-11-16 at the human's request for the landing animations, AVP-142). Nothing else.
 
 ## Palette (all text pairs >= 4.5:1, checked)
 | Token (Tailwind class stem) | Hex | Use |
@@ -42,7 +42,14 @@ Numbers (vitals, timer, scores) add `tabular`. Sentence case; no all-caps eyebro
 - **Feature glyphs** (`landing/glyphs.tsx`): drawn SVGs of each feature's own material (waveform, child's hand with vesicle dots, checklist with a quote, cited page, score line). Decorative, `currentColor`.
 - **Score ring** (`debrief/ScoreSummaryCard`): the API's total inside a `glow` ring gauge (`role="progressbar"`); a missing score shows a dash and an empty ring.
 - **Mother's voice**: in the workspace and the hero, everything the mother says sits on `sand-soft`; the student on `primary`; recorded exam findings stay the sand system strip.
-- Motion tokens: `animate-rise`, `animate-wave`, `animate-breathe` (globals.css). Use them only for the hero reveal, live waveforms and the "answering" dot; no hover motion on cards.
+- Motion tokens: `animate-rise`, `animate-wave`, `animate-breathe` (globals.css), plus the landing motion system below.
+
+## Landing motion (AVP-142)
+The human asked for a landing page "in motion" on 2026-11-16 and overrode the one-autoplay rule for the landing only. Other pages keep the v2 rule (no hover motion on cards, no decorative loops).
+- **Tokens** (`:root` in globals.css): `--dur-fast` 150ms (hover, press), `--dur-base` 350ms (reveals, state), `--dur-slow` 700ms (title lines), `--dur-draw` 1600ms (ECG draw); `--ease-out` cubic-bezier(0.22,1,0.36,1) for entrances, `--ease-in-out` cubic-bezier(0.65,0,0.35,1) for loops. `--color-monitor` #F2C14E: ECG trace and vitals values on dark stages only.
+- **What moves:** hero title lines rise from masks (90 ms apart), lead and buttons fade in after; `EcgMonitor` draws itself then sweeps every 4 s (head dot, fading trail, halo on each R peak), +20% on start-button hover, 2 s burst on the sample red flag; the vitals below show the case's triage values (pulse wobbles 1-2 on screen, `TODO(nhóm)`); `ConversationStage` replays a 10 s exchange taken verbatim from the case (typing, speaking bars, red-flag pop) with a pause button; `FeatureArt` per feature (plays once in view, replays on hover); sections reveal once (`data-reveal` + `RevealObserver`); "Cách hoạt động" pins on desktop with a scroll-filled rail and a cross-fading preview (`StepMockups`); nav tightens after 80 px (landing only, sticky); primary buttons lift 2 px; `.link-draw` underlines redraw; big cards tilt <= 3 deg (`TiltCard`, fine pointers only).
+- **Rules:** animate only transform, opacity, stroke-dashoffset, clip-path. Hidden start states live behind `html.js` (set by an inline head script) so everything shows without JavaScript. Loops carry `data-paused` from `useActive` (off screen or hidden tab) and only loop classes pause; one-shot entrances always finish. Reduced motion: no loops, no scroll or entrance motion, final states, 150 ms opacity fades only; the conversation shows in full and its pause button hides. Every animated box has its size from the first paint (CLS 0 measured). The clinical notices and device requirements never animate.
+- **Shared hooks:** `hooks/useMotionPrefs.ts` (`useReducedMotion`, `useInView`, `usePageVisible`, `useActive`).
 
 ## Quality floor (every page)
 Phone width 360px with 16px gutters and no horizontal scroll; visible focus; `prefers-reduced-motion` respected (global rule in globals.css, also zeroes animation delays); axe: no serious/critical issues; strings in `messages/vi.json`; practice-feedback wording only (ADR-0010: no "chứng chỉ/chứng nhận/certificate"); no invented clinical numbers: placeholders show `—`, values come from the API; no invented metrics (Hard rule 3): the landing shows no counts or percentages.
