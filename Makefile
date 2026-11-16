@@ -7,7 +7,7 @@
 API_DIR := apps/api
 WEB_DIR := apps/web
 
-.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client check-llm redteam eval-latency
+.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client check-llm redteam eval-latency eval-repeatability
 
 help:
 > @echo "AVP make targets:"
@@ -22,6 +22,7 @@ help:
 > @echo "  check-llm      diagnose the configured LLM provider"
 > @echo "  redteam        run the red-team suite                   (AVP-011)"
 > @echo "  eval-latency   measure turn latency -> evals/results    (AVP-026)"
+> @echo "  eval-repeatability  re-score fixed transcripts K times  (AVP-117)"
 
 dev:
 > cd $(API_DIR) && python -m uvicorn avp_api.main:app --reload --port 8000 & \
@@ -46,6 +47,9 @@ check-llm:
 # Fake providers by default; real numbers: make eval-latency ARGS="--providers env --mode voice"
 eval-latency:
 > python evals/latency.py $(ARGS)
+
+eval-repeatability:
+> python evals/repeatability.py $(ARGS)
 
 db-migrate:
 > cd $(API_DIR) && python -m alembic upgrade head
