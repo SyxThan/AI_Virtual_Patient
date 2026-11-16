@@ -1,0 +1,10 @@
+{
+  "generated_by": "evals/publish_summary.py",
+  "latency": {
+    "voice": null,
+    "text": null
+  },
+  "repeatability": null,
+  "redteam": null,
+  "judge": null
+}

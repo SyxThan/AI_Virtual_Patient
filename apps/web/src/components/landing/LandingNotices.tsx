@@ -45,12 +45,20 @@ export default function LandingNotices() {
               {L.practiceTitle}
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink">{L.practiceBody}</p>
-            <Link
-              href="/privacy"
-              className={`mt-2 inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-info underline underline-offset-4 ${FOCUS_RING}`}
-            >
-              {L.privacyLink}
-            </Link>
+            <div className="mt-2 flex flex-wrap gap-x-5">
+              <Link
+                href="/privacy"
+                className={`inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-info underline underline-offset-4 ${FOCUS_RING}`}
+              >
+                {L.privacyLink}
+              </Link>
+              <Link
+                href="/transparency"
+                className={`inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-info underline underline-offset-4 ${FOCUS_RING}`}
+              >
+                {vi.transparency.navLink}
+              </Link>
+            </div>
           </div>
         </section>
       </div>

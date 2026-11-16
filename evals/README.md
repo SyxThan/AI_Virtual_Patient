@@ -77,3 +77,22 @@ python evals/repeatability.py                              # Evaluator giả, ki
 python evals/repeatability.py --providers env --runs 5     # số đo thật (15 lượt gọi LLM)
 python evals/repeatability.py --providers env --only thorough --runs 10
 ```
+
+## Trang "Minh bạch số liệu" (`publish_summary.py`, AVP-139)
+
+Trang web `/transparency` hiển thị số đo từ file `apps/web/src/data/evals-summary.json`. File này **chỉ** được tạo bằng script dưới đây, không sửa tay.
+
+```bash
+python evals/publish_summary.py   # đọc evals/results/, ghi apps/web/src/data/evals-summary.json
+```
+
+**Quy tắc của script:**
+- Kết quả có `contains_fake_provider` khác `false` không bao giờ được đưa lên.
+- Mỗi chỉ số lấy lần đo thật mới nhất, ghi kèm ngày đo, commit, mô hình và tên file nguồn.
+- Tỉ lệ "unsupported / 100 lượt" của judge chỉ hiện khi người kiểm đã chấm **xong** mẫu (`--score-audit` cho `complete: true`).
+- Chưa có số đo thật thì trang ghi "Chưa có số đo thật" kèm lệnh để đo.
+
+**Quy trình sau mỗi lần đo thật:**
+1. Chạy các script đo.
+2. Chạy `publish_summary.py`.
+3. Commit cả file kết quả trong `evals/results/` lẫn `evals-summary.json` trong cùng một PR.
