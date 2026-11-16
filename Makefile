@@ -7,7 +7,7 @@
 API_DIR := apps/api
 WEB_DIR := apps/web
 
-.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client check-llm redteam eval-latency eval-repeatability
+.PHONY: help dev test lint validate-cases db-migrate db-check-rls load-cases gen-client check-llm redteam eval-latency eval-repeatability redteam-judge
 
 help:
 > @echo "AVP make targets:"
@@ -21,6 +21,7 @@ help:
 > @echo "  gen-client     regenerate the TS client from OpenAPI    (AVP-035)"
 > @echo "  check-llm      diagnose the configured LLM provider"
 > @echo "  redteam        run the Patient red-team suite -> evals/results (AVP-011)"
+> @echo "  redteam-judge  LLM-judge a red-team result + audit CSV   (AVP-011)"
 > @echo "  eval-latency   measure turn latency -> evals/results    (AVP-026)"
 > @echo "  eval-repeatability  re-score fixed transcripts K times  (AVP-117)"
 
@@ -64,3 +65,7 @@ load-cases:
 
 redteam:
 > python evals/redteam.py $(ARGS)
+
+# make redteam-judge ARGS="evals/results/redteam-case-01-hfmd-<ts>.json --providers env"
+redteam-judge:
+> python evals/redteam_judge.py $(ARGS)
