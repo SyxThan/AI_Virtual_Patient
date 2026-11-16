@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "gen-client": "python ../../scripts/export_openapi.py src/lib/api-client/openapi.json && openapi-typescript src/lib/api-client/openapi.json -o src/lib/api-client/schema.ts"
+    "gen-client": "python ../../scripts/export_openapi.py src/lib/api-client/openapi.json && openapi-typescript src/lib/api-client/openapi.json -o src/lib/api-client/schema.ts",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",

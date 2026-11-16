@@ -248,7 +248,25 @@
     "title": "Người mẹ bế bé",
     "loading": "Đang tải mô hình 3D…",
     "illustrative": "Mô hình minh hoạ",
-    "hint": "Kéo để xoay góc nhìn. Mô hình 3D chỉ để minh hoạ, không phải hình ảnh lâm sàng."
+    "hint": "Kéo để xoay góc nhìn, giữ Ctrl rồi cuộn để phóng to. Mô hình 3D chỉ để minh hoạ, không phải hình ảnh lâm sàng.",
+    "sceneLabel": "Phòng khám nhi 3D: người mẹ ngồi ở mép giường khám, bế bé trong lòng.",
+    "loadingProgress": "Đang tải phòng khám… {pct}%",
+    "unsupported": "Trình duyệt này không hiển thị được 3D (WebGL). Bạn vẫn khám được bằng các nút bên dưới.",
+    "fallbackModel": "Đang dùng mô hình đơn giản",
+    "speaking": "Mẹ đang nói",
+    "wheelHint": "Giữ Ctrl rồi cuộn để phóng to",
+    "lesionNote": "Ban trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt",
+    "clickToExamine": "Bấm để khám",
+    "examined": "Đã khám",
+    "notExamined": "Chưa khám",
+    "fullscreen": "Xem toàn màn hình",
+    "exitFullscreen": "Thoát toàn màn hình",
+    "views": {
+      "label": "Góc nhìn",
+      "overview": "Toàn cảnh",
+      "talk": "Trò chuyện",
+      "exam": "Khám bé"
+    }
   },
   "exam": {
     "hintClick": "Bấm vào một vùng cơ thể của bé để khám.",

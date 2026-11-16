@@ -34,4 +34,4 @@ Be Vietnam Pro (built for Vietnamese diacritics) via `next/font/google` in `app/
 Phone width 360px with 16px gutters and no horizontal scroll; visible focus; `prefers-reduced-motion` respected (global rule in globals.css); axe: no serious/critical issues; strings in `messages/vi.json`; practice-feedback wording only (ADR-0010: no "chứng chỉ/chứng nhận/certificate"); no invented clinical numbers: placeholders show `—`, values come from the API.
 
 ## Out of scope for Slice 15
-The 3D avatar scene (`components/avatar/AvatarScene.tsx`, `AnatomyColliders.ts`, `LipSyncController.ts`) stays as it is; the human rebuilds it later. Pages only restyle the frame around `AvatarCanvas`.
+The 3D avatar scene stayed as it was during Slice 15. It was rebuilt in Slice 19 (AVP-140) from `mother_child.glb`; see `docs/specs/avatar-asset.md` and the `avatar-3d` skill.
