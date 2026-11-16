@@ -26,8 +26,8 @@ class Settings(BaseSettings):
     # --- App ---
     app_name: str = "AI Virtual Patient API"
     api_prefix: str = "/api/v1"
-    # Comma-separated CORS origins, e.g. "http://localhost:3000".
-    allowed_origins: str = "http://localhost:3000"
+    # Comma-separated CORS origins, e.g. "http://localhost:3000,http://127.0.0.1:3000".
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     # Public web origin printed in the practice-report QR code (Slice 9, AVP-105).
     web_base_url: str = "http://localhost:3000"
 

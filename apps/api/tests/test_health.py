@@ -21,3 +21,12 @@ def test_unknown_route_uses_error_shape() -> None:
     body = resp.json()
     assert "error" in body
     assert set(body["error"]) == {"code", "message"}
+
+
+def test_cors_headers_present_for_allowed_origins() -> None:
+    client = TestClient(create_app())
+    for origin in ("http://localhost:3000", "http://127.0.0.1:3000"):
+        resp = client.get("/api/v1/health", headers={"Origin": origin})
+        assert resp.status_code == 200
+        assert resp.headers.get("access-control-allow-origin") == origin
+        assert resp.headers.get("access-control-allow-credentials") == "true"

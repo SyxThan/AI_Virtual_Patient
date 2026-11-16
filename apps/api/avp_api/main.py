@@ -42,7 +42,15 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(_: Request, exc: Exception):
+        return JSONResponse(
+            status_code=500,
+            content=_error_body("internal_error", "Internal server error."),
+        )
 
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(_: Request, exc: StarletteHTTPException):
