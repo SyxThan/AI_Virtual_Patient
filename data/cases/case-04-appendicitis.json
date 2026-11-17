@@ -9,8 +9,7 @@
   "source": {
     "document": "Diagnosis and treatment of acute appendicitis: 2020 update of the WSES Jerusalem guidelines (World J Emerg Surg 2020;15:27)",
     "year": 2020,
-    "section": "Chẩn đoán: thang điểm lâm sàng và chẩn đoán hình ảnh (khuyến cáo 1.9)",
-    "case_number": 1
+    "section": "Chẩn đoán: thang điểm lâm sàng và chẩn đoán hình ảnh (khuyến cáo 1.9)"
   },
   "review": {
     "status": "draft",
@@ -18,7 +17,6 @@
     "date": null,
     "notes": [
       "DRAFT (S20-09, AVP-154). Converted from the team's S20 data pack (case-04-appendicitis.draft.md + case-04-appendicitis.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the Alvarado and AIR criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
-      "source.case_number=1 is a PLACEHOLDER required by the schema (integer 1..53): this case does not come from the team's 53-case table, so the number points to nothing. Do not read it as a source reference. TODO(owner): allow null in schemas/case.schema.json or confirm a number.",
       "Teaching aim (proposed): elicit the migrating pain (periumbilical to right lower abdomen), examine McBurney's point and the peritoneal signs, rule out differentials (urinary, GI, scrotal), compute the scores and see that Alvarado is high while AIR is only intermediate, so ultrasound is still needed.",
       "Sources in the pack (data/source/appendicitis/source.json): no national Bộ Y tế guideline for this disease (Bộ Y tế only has the surgical technique procedures 201/QĐ-BYT, 16/01/2014). International: wses-2025 'Diagnosis and Treatment of Acute Appendicitis: 2025 Edition of the WSES Jerusalem Guidelines' (JAMA Surg 2026, not open access, abstract only); wses-2020 'Diagnosis and treatment of acute appendicitis: 2020 update of the WSES Jerusalem guidelines' (World J Emerg Surg 2020;15:27, CC BY 4.0); wses-2016 'WSES Jerusalem guidelines for diagnosis and treatment of acute appendicitis' (World J Emerg Surg 2016;11:34); air-andersson-2008 'Appendicitis Inflammatory Response score (AIR)' (World J Surg 2008;32(8):1843-1849); alvarado-1986 'A practical score for the early diagnosis of acute appendicitis' (Ann Emerg Med 1986;15(5):557-564). Hospital level: 'Phác đồ điều trị khoa Ngoại tổng hợp - Viêm ruột thừa cấp' (BVĐK Hoằng Hóa). The OSCE file also cites wikem-appendicitis, which has no entry in source.json.",
       "RAG corpus: NOT ingested (no file in data/guidelines/). Owner decision 2026-11-18: only Bộ Y tế documents get rights_checked=true; international documents (WSES, WikEM, score papers) are not ingested. Rights not confirmed by owner; the debrief has no citations for this case until a citable source is approved.",
@@ -37,7 +35,8 @@
       "TODO(clinician): the OSCE file has no epidemiology criterion. H04 (past surgery, medicines, allergy, last meal) is mapped to the 'epidemiology' domain as background history, the way Dengue's r-epi-history covers past history, so all 7 domains are covered. Confirm, or add a real epidemiology criterion.",
       "TODO(clinician): E04 (scrotal/groin exam) has no partial level in the pack ('—'); anchor 1 says not applicable. Confirm.",
       "Exam layout: the pack's 'Dấu hiệu' row is one hotspot (e-abd-signs, Blumberg, Rovsing, psoas, obturator, pain on coughing). Palpation is split into four quadrant hotspots; 'không sờ thấy khối' (pack: no mass) is repeated in each quadrant. Patient's right is on the viewer's left of the cover.",
-      "management[] has no antibiotic or analgesic drug or dose on purpose (pack: the case does not teach antibiotic doses). The patient-reported paracetamol 500 mg tablet is history, not a recommendation."
+      "management[] has no antibiotic or analgesic drug or dose on purpose (pack: the case does not teach antibiotic doses). The patient-reported paracetamol 500 mg tablet is history, not a recommendation.",
+      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67)."
     ]
   },
   "catalog": {
