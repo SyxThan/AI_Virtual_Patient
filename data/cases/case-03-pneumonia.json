@@ -10,7 +10,7 @@
     "document": "Hướng dẫn xử trí viêm phổi cộng đồng ở trẻ em (Quyết định 101/QĐ-BYT ngày 09/01/2014)",
     "year": 2014,
     "section": "Chẩn đoán (thở nhanh theo tuổi, viêm phổi, viêm phổi nặng); cận lâm sàng; điều trị",
-    "case_number": null
+    "case_number": 29
   },
   "review": {
     "status": "draft",
@@ -18,7 +18,6 @@
     "date": null,
     "notes": [
       "DRAFT (S20-08, AVP-153). Converted from the team's S20 data pack (case-03-pneumonia.draft.md + case-03-pneumonia.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED values picked to fit the 101/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
-      "source.case_number=null: this case is not mapped to an entry of the team's 53-case table (no pneumonia entry could be confirmed), so the schema now allows null. TODO(clinician): give the table number if the case should map to one.",
       "Teaching aim (proposed): the student must count the breathing rate for a full minute, find lower chest wall indrawing, measure SpO2, ask every general danger sign, and classify correctly as pneumonia without signs of severe pneumonia.",
       "The 101/QĐ-BYT text was read from a web copy with broken symbols, not from the original PDF. TODO(clinician): from the original 101/QĐ-BYT PDF, confirm the fast-breathing thresholds for < 2 months and 2-< 12 months and the SpO2 threshold for severe pneumonia (the pack took them from WHO).",
       "TODO(clinician): choose the primary source: 101/QĐ-BYT (2014) or 3312/QĐ-BYT (07/08/2015, 'Hướng dẫn chẩn đoán và điều trị một số bệnh thường gặp ở trẻ em').",
@@ -38,7 +37,8 @@
       "Day count: the pack puts day 1 (runny nose, dry cough) 4 days before the visit; the day number of the visit itself is not stated, so the case does not state one.",
       "TODO(clinician): exam stays 2D; decide whether to add the chest to the 3D model later (separate code task).",
       "Corpus data/guidelines/pneumonia-child_chunks.json holds only the 101/QĐ-BYT document. Not ingested: rights not confirmed by owner: who-pneumonia-diarrhoea-2024 (WHO 2024, CC BY-NC-SA 3.0 IGO) and who-pocketbook-2013 (WHO Pocket Book 2013). They are still named as the origin of some thresholds in these notes.",
-      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08)."
+      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08).",
+      "source.case_number=29 is 'Bài 29. Viêm phổi ở trẻ em' in the team's 53-disease table (BV Bệnh Nhiệt đới TP.HCM 2023); the case itself follows 101/QĐ-BYT."
     ]
   },
   "catalog": {

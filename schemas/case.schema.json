@@ -59,8 +59,7 @@
       "required": [
         "document",
         "year",
-        "section",
-        "case_number"
+        "section"
       ],
       "properties": {
         "document": {
@@ -75,11 +74,8 @@
           "minLength": 1
         },
         "case_number": {
-          "type": [
-            "integer",
-            "null"
-          ],
-          "description": "Entry number in the 53-case source table; null when the case is not mapped to an entry (S20-08).",
+          "description": "Number in the team's 53-disease source table; omitted for a case that is not from that table (e.g. case-06-heart-failure).",
+          "type": "integer",
           "minimum": 1,
           "maximum": 53
         }
