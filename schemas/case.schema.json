@@ -137,6 +137,96 @@
         }
       }
     },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Case-library card data (Slice 20). Optional so older drafts still validate. Never holds the diagnosis name: a card shows only the presenting complaint.",
+      "required": [
+        "patient_group",
+        "display_complaint",
+        "exam_mode",
+        "exam_regions",
+        "order"
+      ],
+      "properties": {
+        "patient_group": {
+          "enum": [
+            "child",
+            "adult",
+            "elderly"
+          ]
+        },
+        "display_complaint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Must equal presentation.chief_complaint verbatim (checked by scripts/validate_cases.py). No diagnosis name."
+        },
+        "cover": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Public web path of the cover image, e.g. /cases/hfmd-cover.webp."
+        },
+        "exam_mode": {
+          "enum": [
+            "3d",
+            "2d"
+          ]
+        },
+        "exam_regions": {
+          "type": "array",
+          "description": "Exam hotspots offered by the UI. x/y are 0..1 positions on the 2D image; null for 3d.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "x",
+              "y"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "x": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              },
+              "y": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "estimated_minutes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "order": {
+          "type": "integer",
+          "description": "Sort hint for the library, lower first."
+        }
+      }
+    },
     "patient": {
       "type": "object",
       "additionalProperties": false,

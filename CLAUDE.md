@@ -50,7 +50,7 @@ Created by task AVP-006. Until it is done they do not exist; do not invent other
 - Never commit secrets, `.env`, `data/source/`, dumps or student data. The script blocks the obvious cases; you are still responsible.
 
 ## Scope
-The approved MVP (docs/specs/product-scope.md): 1 pediatric Hand, Foot, and Mouth Disease case (mother holding child), 3 core screens (Setup, Clinical Workspace, Debriefing). Includes 3D avatar with raycasting exam, vitals state machine, voice-to-voice communication, Auto-OSCE scoring, cited RAG debrief, and practice-feedback PDF+QR export. Multiple cases, payments, and LMS are excluded. Tasks are mapped to vertical slices in `docs/TASKS.md`.
+The approved MVP (docs/specs/product-scope.md): a case library (approved by the Product Owner on 2026-11-17, Slice 20) whose primary case is pediatric Hand, Foot, and Mouth Disease (mother holding child, 3D scene); new cases are drafts until clinician review and may use a 2D exam stage. 3 core screens (Setup, Clinical Workspace, Debriefing). Includes 3D avatar with raycasting exam, vitals state machine, voice-to-voice communication, Auto-OSCE scoring, cited RAG debrief, and practice-feedback PDF+QR export. Payments and LMS are excluded. Tasks are mapped to vertical slices in `docs/TASKS.md`.
 
 ## Working agreements
 - One task = one small, reviewable change. Run `make test` and `make lint` before saying done.

@@ -7,6 +7,8 @@ Checks, per case file:
     - ids are unique within the case (h-*, e-*, l-*, r-*)
     - no `polarity: unknown` history entry is phrased as a negative
       (unknown must neither confirm nor deny; see docs/specs/guardrails.md)
+    - if `catalog` exists: display_complaint equals presentation.chief_complaint
+      verbatim, and no card text contains diagnosis.primary or title.vi
   warnings (exit 0):
     - rubric does not cover all seven domains
     - author_added entries still unreviewed while review.status != clinician_reviewed
@@ -48,6 +50,28 @@ def _load_validator() -> Draft202012Validator:
     return Draft202012Validator(schema)
 
 
+def _catalog_errors(case: dict) -> list[str]:
+    """Check the optional `catalog` block (Slice 20): verbatim complaint, no diagnosis leak."""
+    catalog = case.get("catalog")
+    if not isinstance(catalog, dict):
+        return []
+    errors: list[str] = []
+    complaint = catalog.get("display_complaint")
+    chief = case.get("presentation", {}).get("chief_complaint")
+    if complaint != chief:
+        errors.append("catalog: display_complaint must equal presentation.chief_complaint verbatim")
+
+    regions = catalog.get("exam_regions", [])
+    texts = [complaint] + [r.get("label") for r in regions if isinstance(r, dict)]
+    texts = [t.casefold() for t in texts if isinstance(t, str)]
+    names = (case.get("diagnosis", {}).get("primary"), case.get("title", {}).get("vi"))
+    for name in {n.strip().casefold() for n in names if isinstance(n, str) and n.strip()}:
+        if any(name in t for t in texts):
+            errors.append("catalog: card text must not contain the diagnosis or case title")
+            break
+    return errors
+
+
 def validate_case(path: Path, validator: Draft202012Validator | None = None) -> tuple[list[str], list[str]]:
     """Return (errors, warnings) for one case file."""
     validator = validator or _load_validator()
@@ -84,6 +108,9 @@ def validate_case(path: Path, validator: Draft202012Validator | None = None) -> 
                     f"unknown turned into a negative: {h.get('id')} "
                     f"(polarity=unknown but lay_response asserts a negative)"
                 )
+
+    # 3b) catalog card must quote the complaint verbatim and never name the diagnosis
+    errors += _catalog_errors(case)
 
     # 4) warnings: rubric domain coverage
     covered = {it.get("domain") for it in case.get("rubric", {}).get("items", [])}
