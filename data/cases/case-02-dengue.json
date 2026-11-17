@@ -30,57 +30,71 @@
       "TODO(clinician): option to make the mother have given ibuprofen once, to test counselling (h-nsaid is currently negative).",
       "The mother quotes the private clinic ('theo dõi sốt xuất huyết') and the neighbours' illness, so 'sốt xuất huyết' is NOT in forbidden_terms; the staging terms are.",
       "Differentials are taken from the team's 53-disease table (Bài 28); confirm.",
-      "TODO(clinician): management[] has no fluid regimen or dose on purpose; add only from the original 2760/QĐ-BYT."
+      "TODO(clinician): management[] has no fluid regimen or dose on purpose; add only from the original 2760/QĐ-BYT.",
+      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays are illustrative, TODO(clinician) review. Mapping (AVP-161): collider hands_perfusion -> exam region 'perfusion' (e-perfusion re-tagged from 'vitals' so the hand collider reveals only the perfusion finding), legs_skin -> skin, mouth_nose -> mucosa, abdomen -> abdomen, forearm_tourniquet -> tourniquet, chest -> chest; general and vitals stay as non-collider entries. No exam finding text was added or changed; neuro findings stay inside e-general."
     ]
   },
   "catalog": {
     "patient_group": "child",
     "display_complaint": "Bé sốt mấy ngày nay, sáng nay hết sốt rồi mà lại đau bụng, nôn hoài, người mệt lả.",
-    "cover": "/cases/dengue-cover.svg",
-    "exam_mode": "2d",
+    "cover": "/cases/dengue-cover.png",
+    "exam_mode": "3d",
     "exam_regions": [
       {
-        "id": "general",
-        "label": "Toàn trạng, tri giác",
-        "x": 0.5,
-        "y": 0.08
-      },
-      {
-        "id": "mucosa",
-        "label": "Niêm mạc miệng, mũi",
-        "x": 0.5,
-        "y": 0.17
-      },
-      {
-        "id": "vitals",
-        "label": "Sinh hiệu, đầu chi",
-        "x": 0.2,
-        "y": 0.54
-      },
-      {
-        "id": "chest",
-        "label": "Tim, phổi",
-        "x": 0.5,
-        "y": 0.33
-      },
-      {
-        "id": "abdomen",
-        "label": "Bụng",
-        "x": 0.5,
-        "y": 0.5
-      },
-      {
-        "id": "tourniquet",
-        "label": "Nghiệm pháp dây thắt",
-        "x": 0.72,
-        "y": 0.36
+        "id": "hands_perfusion",
+        "label": "Đầu chi, bàn tay",
+        "exam_region": "perfusion",
+        "x": null,
+        "y": null
       },
       {
         "id": "legs_skin",
         "label": "Da hai cẳng chân",
         "exam_region": "skin",
-        "x": 0.4,
-        "y": 0.8
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "mouth_nose",
+        "label": "Niêm mạc miệng, mũi",
+        "exam_region": "mucosa",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "abdomen",
+        "label": "Bụng",
+        "exam_region": "abdomen",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "forearm_tourniquet",
+        "label": "Nghiệm pháp dây thắt",
+        "exam_region": "tourniquet",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "chest",
+        "label": "Tim, phổi",
+        "exam_region": "chest",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "general",
+        "label": "Toàn trạng, tri giác",
+        "exam_region": "general",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "vitals",
+        "label": "Sinh hiệu",
+        "exam_region": "vitals",
+        "x": null,
+        "y": null
       }
     ],
     "estimated_minutes": null,
@@ -435,7 +449,7 @@
     },
     {
       "id": "e-perfusion",
-      "region": "vitals",
+      "region": "perfusion",
       "action": "Khám đầu chi và thời gian làm đầy mao mạch",
       "finding": "Đầu chi ấm, mạch quay rõ, thời gian làm đầy mao mạch dưới 2 giây.",
       "red_flag": false,
