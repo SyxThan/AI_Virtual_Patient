@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Desktop with a short viewport (e.g. 1366x768): Setup tightens so it still fits one screen. */
+@custom-variant short (@media (min-width: 1024px) and (max-height: 860px));
+
 /*
  * AVP design tokens, "Bento Clinical v2" (docs/specs/ui-design.md).
  * Clinical palette: mineral canvas, deep teal ink, one teal primary, calm tile tints.
@@ -311,5 +314,95 @@ body {
   .js [data-reveal] > * {
     opacity: 1;
     transform: none;
+  }
+}
+
+/*
+ * Setup screen (AVP-145). Entrance runs once on mount: the case cover fades in
+ * and settles from 1.03 to 1 (600ms), the setup panel follows 120ms later.
+ * The cover then "breathes" (1 -> 1.01, 5s); browsers stop it in hidden tabs.
+ */
+@keyframes setup-stage-in {
+  from { opacity: 0; transform: scale(1.03); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes setup-panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes setup-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+}
+@keyframes setup-shake {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(5px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(2px); }
+}
+@keyframes setup-check {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+.js .setup-cover {
+  animation: setup-stage-in 600ms var(--ease-out) both;
+}
+.js .setup-enter-panel {
+  animation: setup-panel-in 500ms var(--ease-out) 120ms both;
+}
+.setup-breathe {
+  animation: setup-breathe 5s ease-in-out infinite;
+  transform-origin: 50% 40%;
+}
+.setup-shake {
+  animation: setup-shake 400ms var(--ease-out) 1;
+}
+.setup-check {
+  stroke-dasharray: 1;
+  animation: setup-check 250ms var(--ease-out) both;
+}
+.setup-fade {
+  animation: fade-in 200ms var(--ease-out) both;
+}
+
+/*
+ * Setup -> workspace view transition (lib/stageTransition.ts): the cover grows
+ * into the 3D stage box (both named patient-stage), the rest cross-fades. 500ms.
+ */
+::view-transition-group(patient-stage) {
+  animation-duration: 500ms;
+  animation-timing-function: var(--ease-in-out);
+}
+::view-transition-old(patient-stage),
+::view-transition-new(patient-stage) {
+  height: 100%;
+  object-fit: cover;
+  animation-duration: 500ms;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 500ms;
+}
+
+/* Reduced motion: no breathing, shake or zoom; only a 150ms fade remains. */
+@media (prefers-reduced-motion: reduce) {
+  .js .setup-cover,
+  .js .setup-enter-panel,
+  .setup-fade {
+    animation-name: fade-in !important;
+    animation-duration: var(--dur-fast) !important;
+    animation-delay: 0ms !important;
+  }
+  .setup-breathe,
+  .setup-shake {
+    animation: none !important;
+  }
+  ::view-transition-group(*) {
+    animation: none !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: var(--dur-fast) !important;
   }
 }
