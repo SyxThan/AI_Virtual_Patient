@@ -26,8 +26,9 @@ export function markOnboardingSeen(): void {
 }
 
 /**
- * First-run guide for the workspace: 3 steps (ask, examine on the avatar,
- * finish). Skippable at any step; Escape also skips. Closing marks it
+ * First-run guide for the workspace: ask, examine on the avatar, finish, then
+ * the controls and keyboard shortcuts ("Hướng dẫn" reopens it on demand).
+ * Skippable at any step; Escape also skips. Closing marks it
  * seen; the workspace header can reopen it.
  */
 export default function OnboardingOverlay({
@@ -39,7 +40,9 @@ export default function OnboardingOverlay({
 }) {
   const [step, setStep] = useState(0);
   const nextRef = useRef<HTMLButtonElement>(null);
-  const steps = vi.onboarding.steps;
+  const controls = vi.onboarding.controls;
+  // The last step lists the stage controls and keyboard shortcuts.
+  const steps = [...vi.onboarding.steps, { title: controls.title, body: controls.body }];
   const last = step === steps.length - 1;
   const current = steps[step];
 
@@ -71,6 +74,28 @@ export default function OnboardingOverlay({
       <div aria-live="polite" className="mt-4 rounded-card bg-canvas p-5">
         <h3 className="text-lg font-bold text-ink">{current.title}</h3>
         <p className="mt-2 leading-relaxed text-ink-muted">{current.body}</p>
+        {last && (
+          <table className="mt-4 w-full text-left text-sm">
+            <thead className="sr-only">
+              <tr>
+                <th scope="col">{controls.keysLabel}</th>
+                <th scope="col">{controls.actionLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {controls.keys.map(([key, action]) => (
+                <tr key={key} className="border-t border-line first:border-t-0">
+                  <th scope="row" className="whitespace-nowrap py-2 pr-4 align-top font-normal">
+                    <kbd className="rounded-control border border-line-strong bg-surface px-2 py-0.5 font-sans text-xs font-semibold text-ink">
+                      {key}
+                    </kbd>
+                  </th>
+                  <td className="py-2 text-ink">{action}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
         <button type="button" onClick={close} className={buttonClass({ variant: "ghost" })}>

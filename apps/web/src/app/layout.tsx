@@ -4,6 +4,7 @@ import "./globals.css";
 import vi from "../../messages/vi.json";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import ClaimGuestSession from "@/components/auth/ClaimGuestSession";
+import ChromeGate from "@/components/shell/ChromeGate";
 import SiteFooter from "@/components/shell/SiteFooter";
 import SiteHeader from "@/components/shell/SiteHeader";
 
@@ -49,10 +50,14 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-screen flex-col bg-canvas text-ink">
         <AuthProvider>
-          <SiteHeader />
+          <ChromeGate>
+            <SiteHeader />
+          </ChromeGate>
           <ClaimGuestSession />
           <div className="flex-1">{children}</div>
-          <SiteFooter />
+          <ChromeGate>
+            <SiteFooter />
+          </ChromeGate>
         </AuthProvider>
       </body>
     </html>

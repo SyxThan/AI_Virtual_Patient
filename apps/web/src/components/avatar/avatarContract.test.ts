@@ -12,6 +12,7 @@ import {
   lesionTargets,
   nextBlinkDelay,
   parseFindings,
+  placeBeside,
   regionIdOf,
 } from "./avatarContract.ts";
 
@@ -107,5 +108,25 @@ describe("aspectDistanceFactor", () => {
   it("backs off on narrow stages", () => {
     assert.ok(aspectDistanceFactor(0.75) > aspectDistanceFactor(1.33));
     assert.ok(aspectDistanceFactor(1.33) > 1);
+  });
+});
+
+describe("placeBeside (result card next to an exam marker)", () => {
+  it("goes to the right of the point when it fits", () => {
+    const p = placeBeside(100, 300, 320, 200, 1400, 900);
+    assert.equal(p.side, "right");
+    assert.equal(p.x, 128);
+    assert.equal(p.y, 200);
+  });
+  it("flips left near the right edge and stays inside the stage", () => {
+    const p = placeBeside(1300, 20, 320, 200, 1400, 900);
+    assert.equal(p.side, "left");
+    assert.equal(p.x, 1300 - 28 - 320);
+    assert.equal(p.y, 12, "clamped to the top margin");
+  });
+  it("never leaves the stage even when it is narrower than the card", () => {
+    const p = placeBeside(150, 450, 320, 200, 300, 500);
+    assert.ok(p.x >= 12);
+    assert.ok(p.y + 200 <= 500 - 12 || p.y === 12);
   });
 });
