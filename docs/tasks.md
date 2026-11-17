@@ -60,14 +60,14 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-135** | **Slice 17** (`TASK-S17-01`) | Adapter STT Whisper tự chạy (API chuẩn OpenAI) | **P0** | ✅ Merged (PR #42) |
 | **AVP-136** | **Slice 17** (`TASK-S17-02`) | Server STT nhỏ `scripts/stt_server` (faster-whisper) | **P0** | ✅ Merged (PR #43) |
 | **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | ✅ Merged (PR #44) |
-| **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48); judge PR #49 |
-| **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | 🟡 PR mở |
-| **AVP-140** | **Slice 19** (`TASK-S19-01`) | Cảnh 3D phòng khám nhi (`mother_child.glb`): loader, collider theo model, mẹ nói/chớp mắt/nhìn người học, ban minh hoạ | **P0** | 🟡 PR mở |
-| **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | 🟡 PR mở |
-| **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
-| **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | 🟡 PR mở |
-| **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | 🟡 PR mở |
-| **AVP-145** | **Slice 19** (`TASK-S19-03`) | Làm lại trang Chuẩn bị (`/setup`): hồ sơ ca có ảnh dựng từ mô hình 3D, 4 bước thiết lập đánh số, kiểm tra WebGL/micro, tải trước mô hình khi rảnh, chuyển cảnh View Transition sang phòng khám | **P1** | 🟡 PR mở |
+| **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48, #49) |
+| **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | ✅ Merged (PR #50) |
+| **AVP-140** | **Slice 19** (`TASK-S19-01`) | Cảnh 3D phòng khám nhi (`mother_child.glb`): loader, collider theo model, mẹ nói/chớp mắt/nhìn người học, ban minh hoạ | **P0** | ✅ Merged (PR #53) |
+| **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | ✅ Merged (PR #51) |
+| **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | ✅ Merged (PR #52) |
+| **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | ✅ Merged (PR #54) |
+| **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | ✅ Merged (PR #55) |
+| **AVP-145** | **Slice 19** (`TASK-S19-03`) | Làm lại trang Chuẩn bị (`/setup`): hồ sơ ca có ảnh dựng từ mô hình 3D, 4 bước thiết lập đánh số, kiểm tra WebGL/micro, tải trước mô hình khi rảnh, chuyển cảnh View Transition sang phòng khám | **P1** | ✅ Merged (PR #56) |
 | **AVP-146** | **Slice 20** (`TASK-S20-01`) | Spec thư viện ca: sửa phạm vi (`product-scope.md`), khối `catalog` trong case schema, mục "Thư viện ca" trong `ui-design.md` | **P0** | ❌ Chưa làm |
 | **AVP-147** | **Slice 20** (`TASK-S20-02`) | API `GET /cases`, `GET /cases/{id}` (chỉ trả thông tin cho thẻ ca, không lộ đáp án), `POST /sessions` kiểm tra ca | **P0** | ❌ Chưa làm |
 | **AVP-148** | **Slice 20** (`TASK-S20-03`) | Trang `/cases` "Thư viện ca bệnh": lưới thẻ ca, lọc theo nhóm người bệnh/chuyên khoa, ẩn tên bệnh | **P0** | ❌ Chưa làm |
@@ -79,6 +79,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
 | **AVP-155** | **Slice 20** (`TASK-S20-10`) | Ca người lớn: Tăng huyết áp (bản nháp, chờ bác sĩ) | **P1** | ❌ Chưa làm |
 | **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ❌ Chưa làm |
+| **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | 🟡 PR mở |
 
 ---
 
@@ -103,9 +104,9 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 15** | Làm lại giao diện theo hướng Bento Clinical (trừ cảnh 3D) | **P0** | ✅ Hoàn tất (PR #32–#37) |
 | **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | ✅ Hoàn tất (PR #39–#41) |
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
-| **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | 🟡 PR #46 ✅, #47, red-team |
-| **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | 🟡 AVP-140 ✅ (PR #53), AVP-143 PR mở |
-| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | ❌ Chưa làm (kế hoạch AVP-146) |
+| **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | ✅ Merged (PR #46–#50); đồng thuận evaluator còn chờ nhãn giảng viên (S14-03) |
+| **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | ✅ Hoàn tất (PR #53, #54, #56) |
+| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | ❌ Chưa làm (kế hoạch đã merge, PR #57) |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
