@@ -26,7 +26,7 @@ from avp_api.db.repositories.evaluation_repo import EvaluationRecord
 from avp_api.db.repositories.rag_repo import RagRepository, RetrievedChunk
 from avp_api.db.repositories.turn_repo import TurnRecord
 from avp_api.providers.embeddings import EmbeddingProvider, FakeEmbeddingProvider
-from avp_api.providers.llm import FakeLLMProvider, LLMProvider
+from avp_api.providers.llm import FakeLLMProvider, LLMProvider, describe_provider_error
 from avp_api.schemas.debrief import (
     CitationItem,
     DebriefClaimItem,
@@ -298,6 +298,11 @@ def _propose_llm(provider: LLMProvider, prompt: str) -> DebriefLLMOutput:
         try:
             raw = provider.generate(prompt, system_prompt=_SYSTEM, temperature=_TEMPERATURE)
         except Exception as exc:  # noqa: BLE001 - never leak provider details
+            logger.warning(
+                "debrief provider %s failed: %s",
+                getattr(provider, "model_id", "?"),
+                describe_provider_error(exc),
+            )
             raise DebriefError("PROVIDER_ERROR") from exc
         try:
             return _parse(raw)

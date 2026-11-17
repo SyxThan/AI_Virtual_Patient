@@ -12,6 +12,7 @@ double, not a validated evaluator; its model id is stored as "fake-heuristic".
 from __future__ import annotations
 
 import json
+import logging
 import re
 import unicodedata
 from dataclasses import dataclass
@@ -19,7 +20,7 @@ from dataclasses import dataclass
 from pydantic import ValidationError
 
 from avp_api.db.repositories.turn_repo import TurnRecord
-from avp_api.providers.llm import FakeLLMProvider, LLMProvider
+from avp_api.providers.llm import FakeLLMProvider, LLMProvider, describe_provider_error
 from avp_api.schemas.evaluation import (
     EvaluatorLLMOutput,
     EvidenceItem,
@@ -29,6 +30,8 @@ from avp_api.schemas.evaluation import (
 )
 from avp_api.services.evidence_verifier import missing_criterion, verify_criterion_evidence
 from avp_api.services.scoring_engine import compute_osce_score
+
+logger = logging.getLogger("avp_api.evaluator")
 
 PROMPT_VERSION = "evaluator-v1"
 FAKE_MODEL_ID = "fake-heuristic"
@@ -113,6 +116,12 @@ def _propose_llm(
         try:
             raw = provider.generate(prompt, system_prompt=_SYSTEM, temperature=_TEMPERATURE)
         except Exception as exc:  # noqa: BLE001 - never leak provider details
+            # Type + HTTP status only (e.g. ClientError(404) = model id retired).
+            logger.warning(
+                "evaluator provider %s failed: %s",
+                getattr(provider, "model_id", "?"),
+                describe_provider_error(exc),
+            )
             raise EvaluatorError("PROVIDER_ERROR") from exc
         try:
             return _parse(raw).items

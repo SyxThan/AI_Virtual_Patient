@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     llm_api_key: str | None = Field(default=None, repr=False)
     llm_model_patient: str | None = None
     llm_model_evaluator: str | None = None
+    # Second Evaluator/Debrief model, used only when the first is overloaded or out
+    # of quota after its own retries (AVP-144). Unset = no fallback.
+    llm_model_evaluator_fallback: str | None = None
     # RAG embeddings (Slice 8, AVP-018). Changing the model means re-ingesting the
     # corpus: chunks are stored with the model id and only same-model chunks match.
     embedding_model: str | None = None

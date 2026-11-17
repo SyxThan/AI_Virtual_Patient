@@ -7,6 +7,7 @@ never hard-coded. The real provider is import-lazy so CI/tests need no SDK/key.
 
 from __future__ import annotations
 
+import logging
 import re
 import time
 from abc import ABC, abstractmethod
@@ -16,6 +17,23 @@ from avp_api.config import get_settings
 # Retry transient Gemini errors (503 overload, 429 rate limit) a few times.
 _GEMINI_ATTEMPTS = 3
 _GEMINI_BACKOFF_S = 0.8
+
+logger = logging.getLogger("avp_api.providers.llm")
+
+# HTTP statuses that mean "try again / try another model", not "fix the config".
+_TRANSIENT_CODES = frozenset({429, 500, 502, 503, 504})
+
+
+def describe_provider_error(exc: BaseException) -> str:
+    """Exception type plus HTTP status, e.g. `ClientError(404)`. Never the message:
+    provider messages can echo prompts. Safe to log (AVP-144)."""
+    code = getattr(exc, "code", None)
+    return f"{type(exc).__name__}({code})" if isinstance(code, int) else type(exc).__name__
+
+
+def is_transient_provider_error(exc: BaseException) -> bool:
+    """Overload, rate limit or server error: another model may still answer."""
+    return getattr(exc, "code", None) in _TRANSIENT_CODES
 
 
 class LLMProvider(ABC):
@@ -122,11 +140,51 @@ def get_llm_provider() -> LLMProvider:
     return FakeLLMProvider()
 
 
+class FallbackLLMProvider(LLMProvider):
+    """Try `primary`; if it fails with a transient error (overload, quota, 5xx)
+    after its own retries, answer with `fallback`. A config error (bad model id,
+    invalid key) is raised as is: hiding it behind a fallback would mask the fix.
+    `model_id` is the model that produced the last reply, so stored evaluations
+    and debriefs say which model actually scored them (AVP-144)."""
+
+    def __init__(self, primary: LLMProvider, fallback: LLMProvider) -> None:
+        self.primary = primary
+        self.fallback = fallback
+        self.model_id = primary.model_id
+
+    def generate(
+        self, prompt: str, system_prompt: str | None = None, temperature: float = 0.2
+    ) -> str:
+        try:
+            out = self.primary.generate(
+                prompt, system_prompt=system_prompt, temperature=temperature
+            )
+            self.model_id = self.primary.model_id
+            return out
+        except Exception as exc:  # noqa: BLE001 - classified below, re-raised if not transient
+            if not is_transient_provider_error(exc):
+                raise
+            logger.warning(
+                "llm %s failed with %s; falling back to %s",
+                self.primary.model_id,
+                describe_provider_error(exc),
+                self.fallback.model_id,
+            )
+        out = self.fallback.generate(prompt, system_prompt=system_prompt, temperature=temperature)
+        self.model_id = self.fallback.model_id
+        return out
+
+
 def get_evaluator_provider() -> LLMProvider:
-    """Cold-path Evaluator model (LLM_MODEL_EVALUATOR, falling back to the patient
-    model id from env). Fake when no provider/key is configured."""
+    """Cold-path Evaluator/Debrief model (LLM_MODEL_EVALUATOR, else the patient
+    model), wrapped with LLM_MODEL_EVALUATOR_FALLBACK when that is set and
+    different. Fake when no provider/key is configured."""
     s = get_settings()
     model = s.llm_model_evaluator or s.llm_model_patient
     if s.llm_provider == "gemini" and s.llm_api_key and model:
-        return GeminiProvider(s.llm_api_key, model)
+        primary = GeminiProvider(s.llm_api_key, model)
+        fallback = s.llm_model_evaluator_fallback
+        if fallback and fallback != model:
+            return FallbackLLMProvider(primary, GeminiProvider(s.llm_api_key, fallback))
+        return primary
     return FakeLLMProvider()
