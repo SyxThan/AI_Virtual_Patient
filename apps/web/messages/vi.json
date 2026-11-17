@@ -942,5 +942,67 @@
       "exam": "Kết quả khám {region}: {finding}",
       "examLoading": "Đang khám {region}…"
     }
+  },
+  "cases": {
+    "title": "Thư viện ca bệnh",
+    "subtitle": "Chọn một ca để luyện hỏi bệnh và thăm khám. Thẻ ca ghi lý do đến khám và thông tin người bệnh, không ghi tên bệnh.",
+    "loading": "Đang tải thư viện ca…",
+    "loadError": "Không tải được danh sách ca bệnh. Kiểm tra kết nối rồi thử lại.",
+    "retry": "Thử lại",
+    "emptyTitle": "Thư viện chưa có ca nào",
+    "emptyBody": "Hiện chưa có ca bệnh nào sẵn sàng để luyện. Bạn quay lại sau nhé.",
+    "noMatchTitle": "Không có ca nào khớp bộ lọc",
+    "noMatchBody": "Bỏ bớt điều kiện lọc để xem thêm ca.",
+    "resultCount": "Đang hiện {n} ca",
+    "practiceError": "Chưa tải được số lần bạn đã luyện từng ca.",
+    "filters": {
+      "label": "Lọc ca bệnh",
+      "groupLabel": "Nhóm người bệnh",
+      "all": "Tất cả",
+      "group": {
+        "child": "Trẻ em",
+        "adult": "Người lớn",
+        "elderly": "Người cao tuổi"
+      },
+      "specialty": "Chuyên khoa",
+      "specialtyAll": "Tất cả chuyên khoa",
+      "unpractised": "Chỉ ca chưa luyện",
+      "clear": "Xoá bộ lọc"
+    },
+    "reveal": {
+      "label": "Hiện tên bệnh",
+      "hint": "Chỉ dùng khi luyện tập. Ở chế độ Thi thử, tên bệnh luôn được ẩn.",
+      "loading": "Đang tải tên bệnh…",
+      "unavailable": "Chưa tải được tên bệnh"
+    },
+    "card": {
+      "diagnosisLabel": "Tên bệnh",
+      "ageUnits": {
+        "days": "{n} ngày",
+        "months": "{n} tháng",
+        "years": "{n} tuổi"
+      },
+      "sex": {
+        "male": "Nam",
+        "female": "Nữ"
+      },
+      "sexUnknown": "Chưa rõ giới",
+      "informant": {
+        "self": "Người bệnh tự trả lời",
+        "mother": "Mẹ trả lời",
+        "father": "Bố trả lời",
+        "relative": "Người nhà trả lời"
+      },
+      "informantOther": "Người nhà trả lời",
+      "minutes": "~{n} phút",
+      "examMode": {
+        "3d": "Khám 3D",
+        "2d": "Ảnh 2D"
+      },
+      "draft": "Nháp, chưa bác sĩ duyệt",
+      "practised": "Đã luyện {n} lần",
+      "lastScore": "Điểm gần nhất {score}/100",
+      "new": "Mới"
+    }
   }
 }
