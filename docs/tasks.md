@@ -1,6 +1,6 @@
 # Danh mục Nhiệm vụ Kỹ thuật theo Vertical Slices (TASKS.md)
 
-> **Phương pháp quản lý:** Chia nhỏ công việc theo **17 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web; Giai đoạn 3: Slice 15 làm lại giao diện; Slice 16–17 giọng nói chạy tại máy) (từ Data/Backend tới UI/UX Frontend).
+> **Phương pháp quản lý:** Chia nhỏ công việc theo **20 Vertical Slices** khép kín (Giai đoạn 1: Slice 1–9 MVP cốt lõi; Giai đoạn 2: Slice 10–14 hoàn thiện web; Giai đoạn 3: Slice 15 làm lại giao diện; Slice 16–17 giọng nói chạy tại máy; Slice 18 bằng chứng đo lường; Slice 19 cảnh 3D phòng khám; Slice 20 thư viện nhiều ca bệnh) (từ Data/Backend tới UI/UX Frontend).
 > **Nguyên tắc triển khai:** Mỗi slice thực hiện trên branch `<type>/avp-xxx-slug` (xem `docs/git-workflow.md`), vượt qua build/typecheck/lint và được **Reviewer** độc lập kiểm duyệt trước khi merge vào `main`.
 
 ---
@@ -68,6 +68,17 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | 🟡 PR mở |
 | **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | 🟡 PR mở |
 | **AVP-145** | **Slice 19** (`TASK-S19-03`) | Làm lại trang Chuẩn bị (`/setup`): hồ sơ ca có ảnh dựng từ mô hình 3D, 4 bước thiết lập đánh số, kiểm tra WebGL/micro, tải trước mô hình khi rảnh, chuyển cảnh View Transition sang phòng khám | **P1** | 🟡 PR mở |
+| **AVP-146** | **Slice 20** (`TASK-S20-01`) | Spec thư viện ca: sửa phạm vi (`product-scope.md`), khối `catalog` trong case schema, mục "Thư viện ca" trong `ui-design.md` | **P0** | ❌ Chưa làm |
+| **AVP-147** | **Slice 20** (`TASK-S20-02`) | API `GET /cases`, `GET /cases/{id}` (chỉ trả thông tin cho thẻ ca, không lộ đáp án), `POST /sessions` kiểm tra ca | **P0** | ❌ Chưa làm |
+| **AVP-148** | **Slice 20** (`TASK-S20-03`) | Trang `/cases` "Thư viện ca bệnh": lưới thẻ ca, lọc theo nhóm người bệnh/chuyên khoa, ẩn tên bệnh | **P0** | ❌ Chưa làm |
+| **AVP-149** | **Slice 20** (`TASK-S20-04`) | Setup theo ca (`/setup?case=`), hồ sơ ca lấy từ API, CTA trỏ tới `/cases`, Lịch sử hiện tên ca | **P0** | ❌ Chưa làm |
+| **AVP-150** | **Slice 20** (`TASK-S20-05`) | Trang khám 2D cho ca chưa có model 3D: ảnh minh hoạ + điểm vùng khám theo từng ca | **P0** | ❌ Chưa làm |
+| **AVP-151** | **Slice 20** (`TASK-S20-06`) | RAG theo ca: mỗi ca có bộ tài liệu riêng, truy vấn lọc theo ca | **P1** | ❌ Chưa làm |
+| **AVP-152** | **Slice 20** (`TASK-S20-07`) | Ca nhi: Sốt xuất huyết Dengue (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
+| **AVP-153** | **Slice 20** (`TASK-S20-08`) | Ca nhi: Viêm phổi trẻ em (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
+| **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
+| **AVP-155** | **Slice 20** (`TASK-S20-10`) | Ca người lớn: Tăng huyết áp (bản nháp, chờ bác sĩ) | **P1** | ❌ Chưa làm |
+| **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ❌ Chưa làm |
 
 ---
 
@@ -94,6 +105,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
 | **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | 🟡 PR #46 ✅, #47, red-team |
 | **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | 🟡 AVP-140 ✅ (PR #53), AVP-143 PR mở |
+| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | ❌ Chưa làm (kế hoạch AVP-146) |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -500,10 +512,191 @@ Thay hình khối procedural của Slice 5 bằng cảnh `mother_child.glb` do t
 
 ---
 
+### Slice 20: Thư viện nhiều ca bệnh
+> Mở rộng từ 1 ca Tay chân miệng sang nhiều bệnh có dấu hiệu khám rõ, cho **người bệnh đa dạng** (trẻ em, người lớn, người cao tuổi). Người học vẫn là sinh viên Y và bác sĩ trẻ. Product Owner duyệt thay đổi phạm vi ngày 17/11/2026, gồm 5 ca đợt đầu, và quyết định ca chưa có model 3D thì dùng ảnh 2D kèm điểm vùng khám.
+>
+> **Đã chạy theo từng ca, dùng lại được:** Patient Agent, Evaluator (`rubric` nằm trong từng case JSON), kết quả khám (`exam[]` lọc theo `region` trong `exam_service.py`), bảng `cases (id, version, is_active)`.
+>
+> **Đang gắn cứng 1 ca, slice này phải gỡ:**
+> - `CASE_ID` trong `apps/web/src/app/setup/page.tsx`;
+> - tên ca, lý do khám, ảnh bìa trong `vi.json` (`setupUx.*`, `setup.case.summary`), `CaseProfile.tsx`, `public/cases/hfmd-cover.webp`;
+> - `case_id` mặc định trong `schemas/session.py`;
+> - `vitals_service.py` chỉ có các độ của HFMD;
+> - corpus RAG chỉ có QĐ 1003 (`rag_corpus.py`);
+> - `UI_TO_CASE_REGION` trong `exam_service.py`.
+>
+> **Thứ tự đề xuất:** S20-01 → S20-02 → S20-03, làm song song với S20-07 → S20-04 → S20-05 → S20-06 → S20-08…11.
+> - Làm UI chọn ca trước.
+> - Ca Dengue (S20-07) vẫn là cảnh mẹ bế bé, nên dùng lại được cảnh 3D. Đây là ca dùng để chạy thử luồng nhiều ca thật.
+
+**Thiết kế UI/UX chọn ca.** Luồng: Landing hoặc header bấm "Bắt đầu luyện tập" → **`/cases` "Thư viện ca bệnh"** → bấm một thẻ → `/setup?case=<id>`. Trang Setup giữ nguyên bố cục của AVP-145; chỉ phần Hồ sơ ca đổi theo ca đã chọn. Vào `/setup` mà không có `case` thì chuyển về `/cases`.
+
+```
+┌ Thư viện ca bệnh ─────────────────────────────────────────────┐
+│ [Tất cả] [Trẻ em] [Người lớn] [Người cao tuổi]   Chuyên khoa ▾ │
+│ ☐ Chỉ ca chưa luyện        Sắp xếp: Gợi ý ▾                   │
+├───────────────────────┬───────────────┬───────────────────────┤
+│ ẢNH BÌA (3D)          │ ẢNH (2D)      │ ẢNH (2D)              │
+│ Nhi · 18 tháng · nam  │ Nhi · … tuổi  │ Người lớn · … · …     │
+│ "<lý do đến khám,     │ "<lý do…>"    │ "<lý do…>"            │
+│  trích từ case>"      │               │                       │
+│ Mẹ trả lời · ~12 phút │ Mẹ trả lời    │ Tự trả lời            │
+│ ◷ Đã luyện 2 · 78%    │ Mới           │ Mới                   │
+│ ⚠ Nháp, chưa BS duyệt │ ⚠ Nháp        │ ⚠ Nháp                │
+└───────────────────────┴───────────────┴───────────────────────┘
+```
+*(Số trong khung chỉ để minh hoạ bố cục, không phải dữ liệu ca.)*
+
+1. **Thẻ không lộ chẩn đoán.**
+   - Mặc định thẻ ghi lý do đến khám, trích đúng từ `presentation` của ca, cùng thông tin người bệnh. Không ghi tên bệnh, vì ghi tên bệnh là đưa luôn đáp án OSCE.
+   - Ở chế độ Luyện tập có công tắc "Hiện tên bệnh", nhớ trong localStorage.
+   - Ở Thi thử luôn ẩn tên bệnh.
+   - Lịch sử và Debrief hiện tên bệnh sau phiên.
+2. **Bộ lọc:**
+   - chip nhóm người bệnh (`catalog.patient_group`);
+   - chuyên khoa;
+   - "Chưa luyện": chỉ có khi đăng nhập, lấy từ `GET /sessions`.
+   - Bộ lọc nằm trên URL (`?group=child`) để chia sẻ được link.
+3. **Trên thẻ:**
+   - tuổi, giới, ai trả lời (mẹ hoặc chính người bệnh), thời lượng gợi ý;
+   - kiểu khám "3D" hoặc "Ảnh 2D";
+   - huy hiệu **"Nháp, chưa bác sĩ duyệt"** khi `review.status = draft` (Hard Rule 2);
+   - số lần đã luyện và điểm gần nhất, nếu có.
+4. **Trạng thái:**
+   - Đang tải: khung xương 6 thẻ.
+   - Lỗi API: báo lỗi kèm nút "Thử lại".
+   - Lọc không ra ca nào: báo rỗng kèm nút "Xoá bộ lọc".
+5. **Truy cập:**
+   - Cả thẻ là một `<a>`.
+   - Chip lọc là nút `aria-pressed`, đi được bằng bàn phím.
+   - Lưới 1 cột (<640px), 2 cột (≥640px), 3 cột (≥1024px).
+   - axe 0 lỗi.
+6. **Trang khám 2D** cho ca chưa có model 3D:
+   - Sân khấu là ảnh minh hoạ người bệnh, với các điểm vùng khám lấy từ `catalog.exam_regions`.
+   - Bấm một điểm thì gọi đúng `POST /sessions/{id}/actions` hiện có. Kết quả lấy từ `exam[]`, không do LLM sinh.
+   - Hội thoại giọng nói, chấm điểm và debrief giữ nguyên.
+
+#### `TASK-S20-01` [P0] 🧠: Spec thư viện ca (AVP-146)
+* **Mô tả:**
+  * `product-scope.md` §1.1: đổi từ "đúng 01 ca" sang thư viện ca. Ghi rõ HFMD vẫn là ca chính có cảnh 3D.
+  * `case-schema.md` và `schemas/case.schema.json`: thêm khối `catalog` gồm
+    * `patient_group`: `child`, `adult` hoặc `elderly`;
+    * `display_complaint`: phải trích đúng từ `presentation`;
+    * `cover`;
+    * `exam_mode`: `3d` hoặc `2d`;
+    * `exam_regions[]`: id vùng, nhãn, toạ độ điểm trên ảnh 2D;
+    * `estimated_minutes`.
+  * Thêm `catalog` cho `case-01-hfmd.json`. Khối này không chứa nội dung lâm sàng mới.
+  * `ui-design.md`: thêm mục "Thư viện ca" theo thiết kế trên.
+* **File liên quan:** `docs/specs/product-scope.md`, `docs/specs/case-schema.md`, `schemas/case.schema.json`, `data/cases/case-01-hfmd.json`, `docs/specs/ui-design.md`.
+* **Không đổi:** nội dung lâm sàng của ca HFMD, database (`catalog` nằm trong `cases.content` JSONB nên không cần migration).
+* **Tiêu chí hoàn thành:** `make validate-cases` qua.
+
+#### `TASK-S20-02` [P0] 🧠: API danh sách ca (AVP-147)
+* **Mô tả:**
+  * `GET /api/v1/cases` và `GET /api/v1/cases/{id}` chỉ trả DTO cho thẻ ca: id, version, khối `catalog`, `review.status`, tuổi, giới, ai trả lời, chuyên khoa.
+  * `diagnosis` chỉ trả khi gọi với `reveal=true`.
+  * **Không bao giờ trả** `exam`, `rubric`, `history`, `labs`, `management` hay `fallback_lines`.
+  * `POST /sessions` trả lỗi `{error:{code,message}}` khi `case_id` không tồn tại hoặc không active.
+  * `load_cases.py` nạp mọi file trong `data/cases/` (bỏ qua file `_*.draft.json`).
+* **File liên quan:** `apps/api/avp_api/routers/cases.py` (mới), `apps/api/avp_api/schemas/case.py` (mới), `apps/api/avp_api/db/repositories/`, `apps/api/avp_api/services/session_service.py`, `scripts/load_cases.py`, `docs/specs/openapi.yaml`, `apps/web/src/lib/api-client/`.
+* **Không đổi:** bảng `cases` (không migration), Patient Agent, Evaluator.
+* **Tiêu chí hoàn thành:**
+  * `make test` qua, gồm test các trường bị cấm không xuất hiện trong phản hồi và test `case_id` sai;
+  * `make lint`;
+  * `make gen-client`.
+
+#### `TASK-S20-03` [P0] 🤖: Trang `/cases` "Thư viện ca bệnh" (AVP-148)
+* **Mô tả:**
+  * Dựng theo thiết kế UI/UX ở đầu slice: lưới thẻ bento, chip lọc, công tắc "Hiện tên bệnh" (chỉ ở Luyện tập), ba trạng thái tải/lỗi/rỗng.
+  * Bộ lọc nằm trên URL.
+  * Huy hiệu nháp.
+  * Dữ liệu lấy qua client sinh tự động; số lần luyện lấy từ `GET /sessions` khi đã đăng nhập.
+  * Dùng token và primitive của `ui-design.md`.
+* **File liên quan:** `apps/web/src/app/cases/page.tsx` (mới), `apps/web/src/components/cases/*` (mới), `apps/web/messages/vi.json`.
+* **Không đổi:** trang Setup, trang khám.
+* **Tiêu chí hoàn thành:**
+  * `tsc`, `eslint`, `npm test`, `next build` qua;
+  * axe 0 lỗi ở 375px và 1440px;
+  * thẻ ca không hiện tên bệnh khi công tắc tắt.
+
+#### `TASK-S20-04` [P0] 🤖: Setup theo ca đã chọn (AVP-149)
+* **Mô tả:**
+  * `/setup` đọc `?case=`; thiếu hoặc sai thì chuyển về `/cases`.
+  * `CaseProfile` lấy tên ca, lý do khám, ảnh bìa từ `GET /cases/{id}` thay vì `vi.json`.
+  * Nút "Bắt đầu" ở landing và header trỏ tới `/cases`.
+  * `/history` và debrief hiện tên ca của từng phiên.
+* **File liên quan:** `apps/web/src/app/setup/page.tsx`, `apps/web/src/components/setup/CaseProfile.tsx`, `apps/web/src/components/landing/*` (CTA), `apps/web/src/components/shell/SiteHeader.tsx`, `apps/web/src/app/history/*`, `apps/web/messages/vi.json`.
+* **Không đổi:** bố cục và 4 bước của AVP-145, câu chữ đồng ý, API tạo phiên (chỉ truyền đúng `case_id`).
+* **Tiêu chí hoàn thành:**
+  * tạo phiên được với 2 ca khác nhau, phiên lưu đúng `case_id`;
+  * link cũ `/setup` không vỡ (chuyển về `/cases`);
+  * `tsc`, `eslint`, `next build` qua.
+
+#### `TASK-S20-05` [P0] 🧠: Trang khám 2D cho ca chưa có model 3D (AVP-150)
+* **Mô tả:**
+  * `ClinicStage` chọn sân khấu theo `catalog.exam_mode`:
+    * `3d`: giữ nguyên cảnh mẹ bế bé;
+    * `2d`: ảnh minh hoạ cùng các điểm vùng khám lấy từ `catalog.exam_regions`, dùng chung thẻ kết quả `ExamResultCard` và phím tắt số.
+  * `exam_service.py` thay bảng cố định `UI_TO_CASE_REGION` bằng vùng khám của từng ca; HFMD giữ đúng ánh xạ cũ.
+  * Sinh hiệu: ca chưa có máy trạng thái thì `GET /vitals` trả "không áp dụng" và UI ẩn phần này. Không tự sinh số.
+* **File liên quan:** `apps/web/src/components/avatar/ClinicStage.tsx`, `apps/web/src/components/exam2d/*` (mới), `apps/api/avp_api/services/exam_service.py`, `apps/api/avp_api/services/vitals_service.py`, `apps/api/tests/`.
+* **Không đổi:** cảnh 3D của HFMD, nguồn kết quả khám (`exam[]`), Patient Agent.
+* **Tiêu chí hoàn thành:**
+  * khám đủ vùng của một ca 2D, kết quả khớp `exam[]`;
+  * test HFMD cũ vẫn qua;
+  * `make test`, `make lint`, `next build` qua.
+
+#### `TASK-S20-06` [P1] 🧠: RAG theo ca (AVP-151)
+* **Mô tả:**
+  * Mỗi ca khai báo bộ tài liệu Bộ Y tế của nó.
+  * `ingest_guidelines.py` nạp nhiều file corpus trong `data/guidelines/`.
+  * Truy vấn của Debriefing Agent lọc theo ca, để không trích QĐ 1003 cho ca không phải HFMD.
+  * Ca chưa có tài liệu thì debrief ghi rõ "chưa có nguồn trích dẫn" và không bịa nguồn.
+* **File liên quan:** `apps/api/avp_api/services/rag_corpus.py`, `apps/api/avp_api/services/debrief_agent.py`, `apps/api/avp_api/db/repositories/rag_repo.py`, `scripts/ingest_guidelines.py`, `docs/specs/agents-and-rag.md`.
+* **Không đổi:** contract trích dẫn, hot path (vẫn không gọi RAG mỗi lượt).
+* **Tiêu chí hoàn thành:**
+  * test lọc theo ca qua;
+  * ca không có corpus không có trích dẫn nào;
+  * `make test` qua.
+* **Lưu ý:** nếu cần thêm cột như `case_id` trên bảng chunk thì phải làm migration, và phải hỏi người phụ trách trước (Hard Rule 8).
+
+#### `TASK-S20-07` → `TASK-S20-11` 🧑‍⚕️: 5 ca mới (AVP-152 → AVP-156)
+| Task | Mã | Ưu tiên | Nhóm người bệnh | Bệnh | Kiểu khám |
+| :--- | :--- | :---: | :--- | :--- | :--- |
+| `TASK-S20-07` | AVP-152 | P0 | Trẻ em (mẹ trả lời) | Sốt xuất huyết Dengue | 3D (dùng lại cảnh mẹ bế bé) |
+| `TASK-S20-08` | AVP-153 | P0 | Trẻ em (mẹ trả lời) | Viêm phổi trẻ em | 3D hoặc 2D |
+| `TASK-S20-09` | AVP-154 | P0 | Người lớn (tự trả lời) | Viêm ruột thừa cấp | 2D |
+| `TASK-S20-10` | AVP-155 | P1 | Người lớn (tự trả lời) | Tăng huyết áp | 2D |
+| `TASK-S20-11` | AVP-156 | P1 | Người cao tuổi | Đợt cấp COPD hoặc suy tim (bác sĩ chọn) | 2D |
+
+* **Mỗi ca là một task, một PR.** Mỗi PR gồm:
+  * file `data/cases/case-0N-<slug>.json` theo `case-schema.md`, có `catalog`, rubric và các câu dự phòng;
+  * ảnh bìa 2D;
+  * danh sách tài liệu Bộ Y tế cần ingest cho S20-06.
+* **Quy tắc lâm sàng (Hard Rule 1, 2):**
+  * Mọi nội dung là `origin: author_added` và `review.status: draft`.
+  * **Không tự bịa** sinh hiệu, xét nghiệm, liều thuốc. Thiếu nguồn hoặc nguồn mâu thuẫn thì để `TODO(clinician)` và báo lại.
+  * Tên bệnh chỉ nằm trong `diagnosis`, không có trong `display_complaint`.
+* **Không đổi:** code (trừ khi task S20-02 đến S20-05 chưa đủ cho ca đó; khi ấy tách thành task riêng).
+* **Tiêu chí hoàn thành:**
+  * `make validate-cases` qua;
+  * `make redteam` chạy cho ca đó, kết quả lưu trong `evals/results/`;
+  * thẻ ca hiện trên `/cases` với huy hiệu "Nháp".
+
+**Còn mở của Slice 20:**
+- Bác sĩ duyệt cả 5 ca mới, giống AVP-016 của ca HFMD.
+- Nguồn ảnh minh hoạ 2D: tự dựng hoặc vẽ, không dùng ảnh bệnh nhân thật.
+- Có làm máy trạng thái sinh hiệu cho từng ca mới hay không: cần bác sĩ quyết các mức.
+- Model 3D cho người lớn và người cao tuổi: để một slice sau.
+- Landing và trang minh bạch hiện chỉ nói về ca HFMD. Cần sửa câu chữ khi có ca thứ hai, và không ghi số ca "đã duyệt" khi các ca còn là bản nháp.
+
+---
+
 ## Ngoài phạm vi Giai đoạn 2 (cần Product Owner duyệt nếu muốn làm)
 | Tính năng | Lý do chưa đưa vào |
 |---|---|
-| Nhiều ca bệnh / thư viện ca | `product-scope.md` chốt đúng 1 ca HFMD |
+| ~~Nhiều ca bệnh / thư viện ca~~ | → Đã đưa vào **Slice 20** (Product Owner duyệt ngày 17/11/2026) |
 | Dashboard giảng viên xem bài sinh viên | Gần với LMS (bị loại); cần quyết định về quyền xem dữ liệu cá nhân |
 | Thanh toán, gói thuê bao | Bị loại khỏi MVP |
 | Giao diện tiếng Anh (i18n đa ngôn ngữ) | Người dùng mục tiêu là sinh viên Việt Nam |
