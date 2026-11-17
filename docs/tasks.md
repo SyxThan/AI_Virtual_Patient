@@ -82,6 +82,11 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | ✅ Merged (PR #58) |
 | **AVP-158** | **Docs** | Cập nhật trạng thái Slice 20 (S20-01 → S20-06) trong `docs/tasks.md` | **P2** | ✅ Merged (PR #64) |
 | **AVP-159** | **Slice 20** | Patient Agent đóng đúng vai theo `patient.informant` của từng ca (trước đây cố định "mẹ của bé 18 tháng") | **P0** | ✅ Merged (PR #69) |
+| **AVP-160** | **Slice 20** | Cảnh 3D theo từng ca (contract `avp-case-scene/1`): model, vùng khám, người nói, lớp minh hoạ, nhịp thở đọc từ dữ liệu ca; ca HFMD giữ nguyên | **P1** | ✅ Merged (PR #75) |
+| **AVP-161** | **Slice 20** | Ca Dengue khám trên cảnh 3D (bé nằm, mẹ ngồi cạnh) | **P1** | ✅ Merged (PR #71; minh hoạ, chờ bác sĩ duyệt) |
+| **AVP-162** | **Slice 20** | Ca viêm phổi trẻ em khám trên cảnh 3D (có nhịp thở) | **P1** | ✅ Merged (PR #73; minh hoạ, chờ bác sĩ duyệt) |
+| **AVP-163** | **Slice 20** | Ca viêm ruột thừa khám trên cảnh 3D | **P1** | ✅ Merged (PR #72; minh hoạ, chờ bác sĩ duyệt) |
+| **AVP-164** | **Slice 20** | Ca tăng huyết áp khám trên cảnh 3D | **P1** | ✅ Merged (PR #74; minh hoạ, chờ bác sĩ duyệt) |
 
 ---
 
