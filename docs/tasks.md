@@ -68,18 +68,19 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | ✅ Merged (PR #54) |
 | **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | ✅ Merged (PR #55) |
 | **AVP-145** | **Slice 19** (`TASK-S19-03`) | Làm lại trang Chuẩn bị (`/setup`): hồ sơ ca có ảnh dựng từ mô hình 3D, 4 bước thiết lập đánh số, kiểm tra WebGL/micro, tải trước mô hình khi rảnh, chuyển cảnh View Transition sang phòng khám | **P1** | ✅ Merged (PR #56) |
-| **AVP-146** | **Slice 20** (`TASK-S20-01`) | Spec thư viện ca: sửa phạm vi (`product-scope.md`), khối `catalog` trong case schema, mục "Thư viện ca" trong `ui-design.md` | **P0** | ❌ Chưa làm |
-| **AVP-147** | **Slice 20** (`TASK-S20-02`) | API `GET /cases`, `GET /cases/{id}` (chỉ trả thông tin cho thẻ ca, không lộ đáp án), `POST /sessions` kiểm tra ca | **P0** | ❌ Chưa làm |
-| **AVP-148** | **Slice 20** (`TASK-S20-03`) | Trang `/cases` "Thư viện ca bệnh": lưới thẻ ca, lọc theo nhóm người bệnh/chuyên khoa, ẩn tên bệnh | **P0** | ❌ Chưa làm |
-| **AVP-149** | **Slice 20** (`TASK-S20-04`) | Setup theo ca (`/setup?case=`), hồ sơ ca lấy từ API, CTA trỏ tới `/cases`, Lịch sử hiện tên ca | **P0** | ❌ Chưa làm |
-| **AVP-150** | **Slice 20** (`TASK-S20-05`) | Trang khám 2D cho ca chưa có model 3D: ảnh minh hoạ + điểm vùng khám theo từng ca | **P0** | ❌ Chưa làm |
-| **AVP-151** | **Slice 20** (`TASK-S20-06`) | RAG theo ca: mỗi ca có bộ tài liệu riêng, truy vấn lọc theo ca | **P1** | ❌ Chưa làm |
+| **AVP-146** | **Slice 20** (`TASK-S20-01`) | Spec thư viện ca: sửa phạm vi (`product-scope.md`), khối `catalog` trong case schema, mục "Thư viện ca" trong `ui-design.md` | **P0** | ✅ Merged (PR #59) |
+| **AVP-147** | **Slice 20** (`TASK-S20-02`) | API `GET /cases`, `GET /cases/{id}` (chỉ trả thông tin cho thẻ ca, không lộ đáp án), `POST /sessions` kiểm tra ca | **P0** | ✅ Merged (PR #60) |
+| **AVP-148** | **Slice 20** (`TASK-S20-03`) | Trang `/cases` "Thư viện ca bệnh": lưới thẻ ca, lọc theo nhóm người bệnh/chuyên khoa, ẩn tên bệnh | **P0** | ✅ Merged (PR #62; PR #61 lỡ merge vào nhánh `feat/avp-147-cases-api`) |
+| **AVP-149** | **Slice 20** (`TASK-S20-04`) | Setup theo ca (`/setup?case=`), hồ sơ ca lấy từ API, CTA trỏ tới `/cases`, Lịch sử hiện tên ca | **P0** | ✅ Merged (PR #63) |
+| **AVP-150** | **Slice 20** (`TASK-S20-05`) | Trang khám 2D cho ca chưa có model 3D: ảnh minh hoạ + điểm vùng khám theo từng ca | **P0** | ✅ Merged (PR #63) |
+| **AVP-151** | **Slice 20** (`TASK-S20-06`) | RAG theo ca: mỗi ca có bộ tài liệu riêng, truy vấn lọc theo ca | **P1** | ✅ Merged (PR #63; migration `0003` mới chạy trên dev, chưa chạy trên demo) |
 | **AVP-152** | **Slice 20** (`TASK-S20-07`) | Ca nhi: Sốt xuất huyết Dengue (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
 | **AVP-153** | **Slice 20** (`TASK-S20-08`) | Ca nhi: Viêm phổi trẻ em (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
 | **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
 | **AVP-155** | **Slice 20** (`TASK-S20-10`) | Ca người lớn: Tăng huyết áp (bản nháp, chờ bác sĩ) | **P1** | ❌ Chưa làm |
 | **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ❌ Chưa làm |
-| **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | 🟡 PR mở |
+| **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | ✅ Merged (PR #58) |
+| **AVP-158** | **Docs** | Cập nhật trạng thái Slice 20 (S20-01 → S20-06) trong `docs/tasks.md` | **P2** | 🟡 PR mở |
 
 ---
 
@@ -106,7 +107,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
 | **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | ✅ Merged (PR #46–#50); đồng thuận evaluator còn chờ nhãn giảng viên (S14-03) |
 | **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | ✅ Hoàn tất (PR #53, #54, #56) |
-| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | ❌ Chưa làm (kế hoạch đã merge, PR #57) |
+| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | 🟡 Đang làm: S20-01 → S20-06 đã merge (PR #59, #60, #62, #63); còn 5 ca mới S20-07 → S20-11 |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
