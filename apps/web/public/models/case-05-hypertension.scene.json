@@ -1,0 +1,88 @@
+{
+  "contract": "avp-case-scene/1",
+  "caseId": "case-05-hypertension",
+  "model": "/models/case-05-hypertension.glb",
+  "speakerLabel": "Người bệnh",
+  "draft": true,
+  "camera": {
+    "home": {
+      "pos": [
+        3.3,
+        2.5,
+        4.6
+      ],
+      "target": [
+        -0.35,
+        0.8,
+        -0.25
+      ]
+    },
+    "exam": {
+      "pos": [
+        0.55,
+        1.25,
+        1.55
+      ],
+      "target": [
+        0.0,
+        0.88,
+        -0.2
+      ]
+    }
+  },
+  "regions": [
+    {
+      "id": "arm_right_bp",
+      "overlays": []
+    },
+    {
+      "id": "arm_left_bp",
+      "overlays": []
+    },
+    {
+      "id": "neck_carotid",
+      "overlays": []
+    },
+    {
+      "id": "chest_heart_lungs",
+      "overlays": [
+        {
+          "type": "focus",
+          "landmark": "apex_beat",
+          "p1": 0.028,
+          "p2": 0.005,
+          "color": "#3d8fb5",
+          "strength": 0.8
+        }
+      ]
+    },
+    {
+      "id": "abdomen",
+      "overlays": [
+        {
+          "type": "edge",
+          "landmark": "umbilicus",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "p1": 0.2,
+          "p2": 0.007,
+          "dash": 0,
+          "color": "#f2b84b",
+          "strength": 0.95
+        }
+      ]
+    },
+    {
+      "id": "legs_feet",
+      "overlays": []
+    }
+  ]
+}
