@@ -1,0 +1,969 @@
+{
+  "schema_version": "1",
+  "id": "case-05-hypertension",
+  "title": {
+    "vi": "Tăng huyết áp (người lớn)",
+    "en": "Newly detected grade 1 hypertension (adult)"
+  },
+  "specialty": "Nội - Tim mạch",
+  "source": {
+    "document": "Hướng dẫn chẩn đoán và điều trị tăng huyết áp (Quyết định 3192/QĐ-BYT ngày 31/08/2010)",
+    "year": 2010,
+    "section": "3.2 Phân độ huyết áp (Bảng 2); 3.3 Yếu tố nguy cơ, tổn thương cơ quan đích; Phụ lục 2 Quy trình đo huyết áp; Phụ lục 4 Phân tầng nguy cơ",
+    "case_number": 1
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-10, AVP-155). Converted from the team's S20 data pack (case-05-hypertension.draft.md + case-05-hypertension.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the 3192/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
+      "TODO(clinician): source.case_number is required by the schema (1..53) but hypertension is not a case in the team's 53-disease table (as far as the pack shows). The value 1 is a PLACEHOLDER, not a reference to 'Bài 1'. The case follows 3192/QĐ-BYT. Making case_number optional is a separate schema task.",
+      "Teaching aim (proposed): newly detected, untreated, no known complication. The student must measure BP correctly (both arms, twice, average), look for risk factors, target-organ damage and clues to secondary hypertension, grade and risk-stratify, and counsel lifestyle change. The case does not teach drug doses.",
+      "The 3192/QĐ-BYT text was read through a web copy (pack source.json, checked 2026-11-18 by an agent web search), not the official PDF on kcb.vn. TODO(clinician): check the case against the original PDF. 3192 is from 2010; newer VNHA/VSH 2022 and ESC 2024 targets are lower.",
+      "TODO(clinician): scenario: keep 'newly detected' (proposed), or change to a follow-up visit or a hypertensive crisis?",
+      "TODO(clinician): BP target standard for scoring r-target-followup: 3192 (< 140/90; < 130/80 when risk is high), VNHA/VSH 2022, or ESC 2024 (systolic 120-129 if tolerated)?",
+      "TODO(clinician): risk stratification: the pack proposes 'nguy cơ cao' (grade 1 + 3 or more risk factors, 3192 Phụ lục 4), but the web copy of that table is missing cells. Confirm against the original 3192 table before r-risk-strat is scored.",
+      "TODO(clinician): fundoscopy: include it or not, and with which result (pack proposes normal or 'động mạch hơi hẹp')? Not added to exam[] until decided.",
+      "TODO(clinician): optional trap 'measured before resting' (pack example 166/102 mmHg). Not wired: vitals are fixed and the 2D exam shows one finding per region.",
+      "TODO(clinician): vitals are fixed (no state machine), as the pack proposes. vitals_service only supports case-01-hfmd.",
+      "TODO(clinician): age 52 was chosen so that age is not yet a risk factor in 3192 (men > 55). The father's stroke at 58 is NOT premature cardiovascular disease in 3192 (men before 55). Confirm both.",
+      "e-vitals shows the three BP readings (right 158/98 and left 152/94 on the first measurement after 10 minutes rest; right 154/96 two minutes later) but not the average 156/97, so the student computes it (r-bp-grade). presentation.vitals holds the average. The two right-arm readings differ by <= 10 mmHg, so no third reading is needed (3192 Phụ lục 2).",
+      "TODO(clinician): every lab value is simulated to fit the criteria (pack: 'Giá trị giả lập'); confirm each number. Reference ranges are left null on purpose (none in the pack).",
+      "TODO(clinician): uric acid 410 µmol/L has no interpretation in the pack; its flag 'normal' is a placeholder. Also decide whether to compute eGFR from creatinine 88 µmol/L.",
+      "TODO(clinician): diagnosis.differentials holds only 'secondary hypertension' (the pack says 'nghĩ nhiều THA nguyên phát' and has no differential list). Add or confirm.",
+      "TODO(clinician): management[] has no drug name or dose on purpose (the brief excludes drug doses). Decide whether the student should name a drug class.",
+      "OSCE conversion: levels dat / dat_mot_phan / chua_dat map to anchors 2 / 1 / 0 (pack coefficients 1.0 / 0.5 / 0; TODO(clinician): keep or change). red_flag maps to critical (H01 target-organ symptoms, E01 BP technique). The OSCE 'exam' domain maps to physical_exam; R01/R02 (grading, risk) to diagnosis; R03 (labs) to investigations.",
+      "TODO(clinician): the OSCE has no epidemiology item; H02 (risk factors: smoking, alcohol, salt, exercise, family history) was mapped to the epidemiology domain so all seven domains are covered. Confirm the mapping.",
+      "TODO(clinician): weights and critical flags are the pack's proposals; confirm. In 2D mode the student cannot perform the BP technique, so r-bp-technique is scored only on what the student says (rest, both arms, two readings, cuff, posture).",
+      "The patient was told at the company check-up that his 'chỉ số huyết áp cao', so 'huyết áp cao' is NOT in forbidden_terms (he may say it). 'tăng huyết áp' and the grading/risk terms are forbidden, because nobody has diagnosed or graded him yet.",
+      "Corpus: data/guidelines/hypertension_chunks.json ingests only 3192/QĐ-BYT. VNHA/VSH 2022 and ESC 2024 are not ingested (rights not confirmed by owner); the OSCE still mentions them as possible scoring standards.",
+      "Known app gap (not clinical): the Patient Agent system prompt (apps/api/avp_api/services/patient_agent.py) is hard-coded as 'the mother of an 18-month-old'. This case has informant 'self' (an adult man speaking in the first person). A code task must make the prompt follow patient.informant and persona before this case is usable."
+    ]
+  },
+  "catalog": {
+    "patient_group": "adult",
+    "display_complaint": "Công ty khám sức khỏe, cô y tá đo chỉ số cao quá nên dặn tôi đi khám lại cho chắc.",
+    "cover": "/cases/hypertension-cover.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "general",
+        "label": "Toàn trạng",
+        "x": 0.5,
+        "y": 0.05
+      },
+      {
+        "id": "neuro",
+        "label": "Thần kinh",
+        "x": 0.5,
+        "y": 0.14
+      },
+      {
+        "id": "neck",
+        "label": "Cổ, động mạch cảnh",
+        "x": 0.5,
+        "y": 0.215
+      },
+      {
+        "id": "chest",
+        "label": "Tim, phổi",
+        "x": 0.5,
+        "y": 0.33
+      },
+      {
+        "id": "vitals",
+        "label": "Huyết áp hai tay, sinh hiệu",
+        "x": 0.29,
+        "y": 0.37
+      },
+      {
+        "id": "abdomen",
+        "label": "Bụng, nghe quanh rốn",
+        "x": 0.5,
+        "y": 0.46
+      },
+      {
+        "id": "anthropometry",
+        "label": "Chiều cao, cân nặng, vòng bụng",
+        "x": 0.5,
+        "y": 0.555
+      },
+      {
+        "id": "pulses",
+        "label": "Mạch ngoại biên",
+        "x": 0.79,
+        "y": 0.6
+      },
+      {
+        "id": "legs",
+        "label": "Hai chi dưới",
+        "x": 0.4,
+        "y": 0.82
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 5
+  },
+  "patient": {
+    "name": "Anh Trần Văn H.",
+    "age": {
+      "value": 52,
+      "unit": "years"
+    },
+    "sex": "male",
+    "occupation": "Tài xế xe tải, ngồi nhiều",
+    "informant": {
+      "role": "self"
+    },
+    "persona": {
+      "personality": "điềm đạm, xuề xoà, trả lời ngắn",
+      "dialect": "north",
+      "emotional_state": "hơi chủ quan, nghĩ mình vẫn khỏe, đi khám vì công ty dặn",
+      "speech_style": "nam 52 tuổi, tài xế xe tải; xưng tôi, gọi bác sĩ; tự kể về mình"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Công ty khám sức khỏe, cô y tá đo chỉ số cao quá nên dặn tôi đi khám lại cho chắc.",
+    "triage_note": "Nam 52 tuổi, đi khám lại theo lời dặn sau đợt khám sức khỏe công ty 2 tuần trước (được báo huyết áp cao, không nhớ trị số). Chưa điều trị gì.",
+    "severity_state": {
+      "label": "tha-do-1",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 82,
+      "temp_c": 36.7,
+      "resp_rate": 16,
+      "bp_systolic": 156,
+      "bp_diastolic": 97,
+      "spo2": 98
+    }
+  },
+  "history": [
+    {
+      "id": "h-company-check",
+      "topic": "Lần khám sức khỏe ở công ty",
+      "polarity": "positive",
+      "lay_response": "Hai tuần trước công ty tổ chức khám sức khỏe, cô y tá đo xong bảo chỉ số huyết áp của tôi cao, dặn đi khám lại cho chắc. Bao nhiêu thì tôi không nhớ.",
+      "clinical_note": "Phát hiện huyết áp cao khi khám sức khỏe định kỳ 2 tuần trước; người bệnh không nhớ trị số.",
+      "intents": [
+        "vì sao đi khám",
+        "đo huyết áp ở đâu",
+        "huyết áp đo được bao nhiêu",
+        "phát hiện từ khi nào",
+        "ai bảo đi khám"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-headache",
+      "topic": "Nhức đầu",
+      "polarity": "positive",
+      "lay_response": "Thỉnh thoảng sáng ngủ dậy tôi thấy nhức đầu ở sau gáy, tháng chừng hai ba lần, một lúc là tự hết. Tôi cũng không nghĩ là bệnh.",
+      "clinical_note": "Nhức đầu vùng gáy buổi sáng, khoảng 2-3 lần/tháng, tự hết.",
+      "intents": [
+        "có nhức đầu không",
+        "đau đầu chỗ nào",
+        "đau đầu lúc nào",
+        "bao lâu bị một lần"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-prior-bp",
+      "topic": "Huyết áp trước đây",
+      "polarity": "unknown",
+      "lay_response": "Trước giờ tôi ít đi khám lắm, huyết áp ngày xưa bao nhiêu tôi cũng chẳng biết.",
+      "clinical_note": "Không biết trị số huyết áp trước đây (unknown).",
+      "intents": [
+        "trước đây huyết áp bao nhiêu",
+        "đã đo huyết áp lần nào chưa",
+        "huyết áp cao từ bao giờ"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-glucose-lipid",
+      "topic": "Đường máu, mỡ máu",
+      "polarity": "unknown",
+      "lay_response": "Đường máu với mỡ máu thì tôi chưa đi thử lần nào, nên tôi không biết cao hay thấp.",
+      "clinical_note": "Chưa từng xét nghiệm đường máu, mỡ máu; người bệnh không biết (unknown). Kết quả chỉ có khi sinh viên chỉ định xét nghiệm.",
+      "intents": [
+        "có bị tiểu đường không",
+        "đường máu thế nào",
+        "mỡ máu có cao không",
+        "đã thử máu bao giờ chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-chest-dyspnea",
+      "topic": "Đau ngực, khó thở",
+      "polarity": "negative",
+      "lay_response": "Không, tôi không đau ngực. Leo cầu thang hay làm nặng cũng không thấy khó thở, đêm nằm ngủ cũng không bị khó thở.",
+      "clinical_note": "Không đau ngực, không khó thở khi gắng sức, không khó thở về đêm.",
+      "intents": [
+        "có đau ngực không",
+        "có khó thở không",
+        "gắng sức có khó thở không",
+        "đêm có khó thở không",
+        "nằm có phải kê gối cao không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-neuro-vision",
+      "topic": "Nhìn mờ, yếu tê nửa người, nói khó",
+      "polarity": "negative",
+      "lay_response": "Mắt tôi vẫn nhìn rõ. Tôi chưa bao giờ bị yếu hay tê nửa người, cũng không bị nói khó, kể cả thoáng qua một lúc cũng không.",
+      "clinical_note": "Không nhìn mờ, không yếu hay tê nửa người, không nói khó, kể cả thoáng qua.",
+      "intents": [
+        "có nhìn mờ không",
+        "có yếu tay chân không",
+        "có tê nửa người không",
+        "có nói khó không",
+        "có méo miệng không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-edema-urine",
+      "topic": "Phù chân, đi tiểu",
+      "polarity": "negative",
+      "lay_response": "Chân tôi không bị phù. Đêm cũng không phải dậy đi tiểu nhiều, nước tiểu không thấy có bọt.",
+      "clinical_note": "Không phù chân, không tiểu đêm nhiều, không tiểu bọt.",
+      "intents": [
+        "có phù chân không",
+        "có tiểu đêm không",
+        "nước tiểu có bọt không",
+        "đi tiểu thế nào"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-claudication",
+      "topic": "Đau chân khi đi bộ",
+      "polarity": "negative",
+      "lay_response": "Đi bộ xa thì tôi cũng không bị đau bắp chân phải dừng lại nghỉ.",
+      "clinical_note": "Không đau cách hồi khi đi bộ.",
+      "intents": [
+        "đi bộ có đau chân không",
+        "có đau bắp chân không",
+        "đi xa có phải dừng lại không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-paroxysm",
+      "topic": "Cơn hồi hộp, vã mồ hôi, nhức đầu dữ dội",
+      "polarity": "negative",
+      "lay_response": "Không, tôi không có cơn nào tự dưng hồi hộp, vã mồ hôi hay nhức đầu dữ dội cả.",
+      "clinical_note": "Không có cơn hồi hộp, vã mồ hôi, nhức đầu dữ dội từng cơn.",
+      "intents": [
+        "có hồi hộp không",
+        "có vã mồ hôi không",
+        "có cơn nhức đầu dữ dội không",
+        "tim có hay đập nhanh không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-muscle",
+      "topic": "Yếu cơ, chuột rút",
+      "polarity": "negative",
+      "lay_response": "Tôi không thấy yếu cơ, cũng không hay bị chuột rút.",
+      "clinical_note": "Không yếu cơ, không chuột rút nhiều.",
+      "intents": [
+        "có yếu cơ không",
+        "có hay bị chuột rút không",
+        "tay chân có mỏi yếu không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-snoring",
+      "topic": "Ngáy, ngưng thở khi ngủ",
+      "polarity": "negative",
+      "lay_response": "Vợ tôi bảo tôi ngủ không ngáy to, cũng không thấy lúc nào ngừng thở.",
+      "clinical_note": "Vợ không thấy ngáy to hay ngưng thở khi ngủ.",
+      "intents": [
+        "ngủ có ngáy không",
+        "có ngưng thở khi ngủ không",
+        "ngủ có hay giật mình không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-meds",
+      "topic": "Thuốc đang dùng",
+      "polarity": "positive",
+      "lay_response": "Tôi không uống thuốc gì thường xuyên. Thỉnh thoảng nhức đầu thì uống viên paracetamol thôi.",
+      "clinical_note": "Không dùng thuốc thường xuyên; thỉnh thoảng uống paracetamol khi nhức đầu (không có liều trong ca).",
+      "intents": [
+        "đang uống thuốc gì",
+        "có dùng thuốc thường xuyên không",
+        "nhức đầu thì uống thuốc gì",
+        "đã uống thuốc hạ áp chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-bp-raising-drugs",
+      "topic": "Thuốc kháng viêm, corticoid, thuốc nhỏ mũi, cam thảo",
+      "polarity": "negative",
+      "lay_response": "Không, tôi không uống thuốc giảm đau kháng viêm hay thuốc có corticoid, không xài thuốc nhỏ mũi, cũng không uống cam thảo.",
+      "clinical_note": "Không dùng thuốc giảm đau kháng viêm, corticoid, thuốc nhỏ mũi co mạch, cam thảo (chỉ trả lời khi được hỏi đích danh).",
+      "intents": [
+        "có uống thuốc kháng viêm không",
+        "có dùng corticoid không",
+        "có xịt nhỏ mũi không",
+        "có uống cam thảo không",
+        "có uống thuốc nam không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-past-history",
+      "topic": "Tiền sử bản thân",
+      "polarity": "negative",
+      "lay_response": "Từ trước tới giờ tôi chưa bị bệnh gì mạn tính cả, cũng ít khi phải đi viện.",
+      "clinical_note": "Chưa phát hiện bệnh mạn tính.",
+      "intents": [
+        "trước đây có bệnh gì không",
+        "có bệnh mạn tính không",
+        "đã nằm viện chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-allergy",
+      "topic": "Dị ứng",
+      "polarity": "negative",
+      "lay_response": "Tôi không dị ứng thuốc hay đồ ăn gì cả.",
+      "clinical_note": "Không dị ứng.",
+      "intents": [
+        "có dị ứng thuốc không",
+        "có dị ứng gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-smoking",
+      "topic": "Hút thuốc lá",
+      "polarity": "positive",
+      "lay_response": "Có, tôi hút thuốc lá, ngày một bao, hai mươi điếu. Hút được hai mươi lăm năm rồi, giờ vẫn đang hút.",
+      "clinical_note": "Hút thuốc lá 1 bao (20 điếu)/ngày trong 25 năm (25 bao-năm), vẫn đang hút.",
+      "intents": [
+        "có hút thuốc không",
+        "hút bao nhiêu",
+        "hút bao lâu rồi",
+        "đã bỏ thuốc chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-alcohol",
+      "topic": "Rượu bia",
+      "polarity": "positive",
+      "lay_response": "Cuối tuần thì tôi uống bia, một hôm ba bốn lon. Ngày thường phải chạy xe nên ít uống.",
+      "clinical_note": "Bia 3-4 lon/ngày vào cuối tuần, ngày thường ít uống.",
+      "intents": [
+        "có uống rượu bia không",
+        "uống bao nhiêu",
+        "uống thường xuyên không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-diet",
+      "topic": "Ăn uống",
+      "polarity": "positive",
+      "lay_response": "Tôi ăn mặn quen rồi, bữa nào cũng phải chấm nước mắm. Rau thì ăn ít thôi.",
+      "clinical_note": "Thích ăn mặn, hay chấm nước mắm, ăn ít rau.",
+      "intents": [
+        "ăn uống thế nào",
+        "có ăn mặn không",
+        "có ăn nhiều rau không",
+        "hay ăn món gì"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-exercise",
+      "topic": "Vận động",
+      "polarity": "positive",
+      "lay_response": "Tôi lái xe tải, ngồi suốt ngày, về nhà thì hầu như chẳng tập thể dục gì.",
+      "clinical_note": "Tài xế ngồi nhiều, hầu như không tập thể dục (ít vận động).",
+      "intents": [
+        "có tập thể dục không",
+        "công việc thế nào",
+        "có vận động không",
+        "làm nghề gì"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-family",
+      "topic": "Tiền sử gia đình",
+      "polarity": "positive",
+      "lay_response": "Bố tôi bị đột quỵ năm năm mươi tám tuổi, mất rồi. Mẹ tôi thì bị tiểu đường.",
+      "clinical_note": "Bố đột quỵ năm 58 tuổi, đã mất (không tính là bệnh tim mạch sớm ở nam theo 3192: trước 55 tuổi). Mẹ đái tháo đường.",
+      "intents": [
+        "gia đình có ai bị bệnh gì không",
+        "bố mẹ có bệnh gì không",
+        "bố bị đột quỵ năm bao nhiêu tuổi",
+        "nhà có ai bị huyết áp không",
+        "nhà có ai tiểu đường không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-general",
+      "region": "general",
+      "action": "Đánh giá toàn trạng",
+      "finding": "Tỉnh, tiếp xúc tốt, thể trạng béo bụng. Không có dấu hiệu Cushing.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-anthropometry",
+      "region": "anthropometry",
+      "action": "Đo chiều cao, cân nặng, vòng bụng",
+      "finding": "Chiều cao 168 cm, cân nặng 76 kg (BMI 26,9 kg/m²). Vòng bụng 96 cm.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-vitals",
+      "region": "vitals",
+      "action": "Đo huyết áp hai tay theo quy trình và đo sinh hiệu",
+      "finding": "Sau nghỉ 10 phút. Lần 1: tay phải 158/98 mmHg, tay trái 152/94 mmHg. Lần 2 (sau 2 phút), tay phải: 154/96 mmHg. Mạch 82 lần/phút, đều. Nhịp thở 16 lần/phút. Nhiệt độ 36,7°C. SpO2 98% khí trời.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-heart",
+      "region": "chest",
+      "action": "Khám tim",
+      "finding": "Mỏm tim ở khoang liên sườn V đường trung đòn trái. Tim đều, không âm thổi, không tiếng ngựa phi.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-lungs",
+      "region": "chest",
+      "action": "Nghe phổi",
+      "finding": "Rì rào phế nang rõ, không ran.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-pulses",
+      "region": "pulses",
+      "action": "Bắt mạch ngoại biên hai bên",
+      "finding": "Mạch quay, mạch bẹn, mạch mu chân bắt rõ, đều hai bên. Không chênh mạch tay - chân.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-carotid-bruit",
+      "region": "neck",
+      "action": "Nghe động mạch cảnh",
+      "finding": "Không nghe âm thổi động mạch cảnh hai bên.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abdomen",
+      "region": "abdomen",
+      "action": "Khám bụng",
+      "finding": "Bụng mềm, không sờ thấy thận to.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-renal-bruit",
+      "region": "abdomen",
+      "action": "Nghe âm thổi quanh rốn",
+      "finding": "Không nghe âm thổi quanh rốn (động mạch thận).",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-legs",
+      "region": "legs",
+      "action": "Khám phù chi dưới",
+      "finding": "Hai chi dưới không phù.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-neuro",
+      "region": "neuro",
+      "action": "Khám thần kinh",
+      "finding": "Không có dấu thần kinh khu trú.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-glucose",
+      "name": "Glucose máu lúc đói",
+      "aliases": [
+        "glucose",
+        "đường máu",
+        "đường huyết",
+        "glucose máu đói"
+      ],
+      "result_text": "Glucose máu lúc đói 5,6 mmol/L.",
+      "value": 5.6,
+      "unit": "mmol/L",
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-lipid",
+      "name": "Bộ mỡ máu (cholesterol toàn phần, LDL-C, HDL-C, triglycerid)",
+      "aliases": [
+        "mỡ máu",
+        "lipid máu",
+        "bilan lipid",
+        "cholesterol",
+        "LDL",
+        "HDL",
+        "triglycerid"
+      ],
+      "result_text": "Cholesterol toàn phần 6,2 mmol/L; LDL-C 4,1 mmol/L; HDL-C 0,9 mmol/L; triglycerid 2,4 mmol/L.",
+      "value": null,
+      "unit": "mmol/L",
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-creatinine",
+      "name": "Creatinin máu",
+      "aliases": [
+        "creatinin",
+        "creatinine",
+        "chức năng thận"
+      ],
+      "result_text": "Creatinin 88 µmol/L.",
+      "value": 88,
+      "unit": "µmol/L",
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-potassium",
+      "name": "Kali máu",
+      "aliases": [
+        "kali",
+        "K+",
+        "điện giải",
+        "điện giải đồ"
+      ],
+      "result_text": "Kali 4,1 mmol/L.",
+      "value": 4.1,
+      "unit": "mmol/L",
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-uric-acid",
+      "name": "Acid uric máu",
+      "aliases": [
+        "acid uric",
+        "axit uric",
+        "uric"
+      ],
+      "result_text": "Acid uric 410 µmol/L.",
+      "value": 410,
+      "unit": "µmol/L",
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-hb-hct",
+      "name": "Hemoglobin, hematocrit",
+      "aliases": [
+        "hemoglobin",
+        "Hb",
+        "hematocrit",
+        "Hct",
+        "công thức máu",
+        "CTM"
+      ],
+      "result_text": "Hb 148 g/L; Hct 44%.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-urinalysis",
+      "name": "Tổng phân tích nước tiểu",
+      "aliases": [
+        "nước tiểu",
+        "tổng phân tích nước tiểu",
+        "protein niệu",
+        "TPTNT"
+      ],
+      "result_text": "Protein âm tính, không có hồng cầu.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "negative",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-ecg",
+      "name": "Điện tâm đồ",
+      "aliases": [
+        "điện tim",
+        "điện tâm đồ",
+        "ECG",
+        "EKG"
+      ],
+      "result_text": "Nhịp xoang 80 lần/phút, không dày thất trái.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    }
+  ],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "Tăng huyết áp độ 1, phát hiện mới, nghĩ nhiều tăng huyết áp nguyên phát",
+    "severity_grade": "tha-do-1",
+    "differentials": [
+      "Tăng huyết áp thứ phát"
+    ],
+    "acceptable_alternatives": [
+      "Tăng huyết áp độ 1",
+      "THA độ 1",
+      "Tăng huyết áp nguyên phát độ 1"
+    ]
+  },
+  "management": [
+    "Xác nhận chẩn đoán: đo lại huyết áp, tự đo huyết áp tại nhà hoặc Holter huyết áp 24 giờ.",
+    "Làm xét nghiệm cơ bản theo 3192: glucose máu đói, mỡ máu, kali, creatinin, acid uric, Hb/Hct, tổng phân tích nước tiểu, điện tâm đồ.",
+    "Tư vấn thay đổi lối sống: ăn nhạt (muối < 6 g/ngày), bỏ thuốc lá, hạn chế bia, vận động 30-60 phút/ngày, giảm cân, đưa vòng bụng < 90 cm.",
+    "Hẹn tái khám; giải thích việc có cần dùng thuốc hay không tùy theo phân tầng nguy cơ.",
+    "TODO(clinician): huyết áp mục tiêu (3192: < 130/80 mmHg khi nguy cơ cao; ESC 2024: tâm thu 120-129 mmHg nếu dung nạp) và chuẩn chấm. Ca không có tên thuốc hay liều thuốc."
+  ],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-opening",
+        "domain": "communication",
+        "criterion": "Chào hỏi, giới thiệu bản thân, xác nhận danh tính người bệnh, giải thích mục đích buổi khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Làm 1-2 trong 3 việc",
+          "2": "Làm đủ 3 việc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chào anh, tôi là bác sĩ",
+          "Anh tên gì, năm nay bao nhiêu tuổi",
+          "Hôm nay tôi sẽ hỏi và khám cho anh"
+        ],
+        "reliability": "low"
+      },
+      {
+        "id": "r-target-organ",
+        "domain": "history",
+        "criterion": "Hỏi triệu chứng gợi ý tổn thương cơ quan đích: đau ngực, khó thở, nhìn mờ, yếu liệt, phù, tiểu bọt",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Hỏi không quá 2 triệu chứng",
+          "1": "Hỏi 3-4 triệu chứng",
+          "2": "Hỏi ít nhất 5 trong 6 triệu chứng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Anh có đau ngực, khó thở không",
+          "Mắt có nhìn mờ không",
+          "Có bao giờ yếu hay tê nửa người, nói khó không",
+          "Chân có phù không",
+          "Nước tiểu có bọt không"
+        ]
+      },
+      {
+        "id": "r-risk-factors",
+        "domain": "epidemiology",
+        "criterion": "Hỏi yếu tố nguy cơ: thuốc lá, rượu bia, ăn mặn, vận động, tiền sử gia đình (kèm tuổi mắc), đái tháo đường, mỡ máu",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Hỏi không quá 3 yếu tố",
+          "1": "Hỏi 4-5 yếu tố",
+          "2": "Hỏi ít nhất 6 yếu tố, có hỏi tuổi của bố lúc bị đột quỵ"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Anh có hút thuốc không, bao nhiêu, bao lâu",
+          "Anh có uống rượu bia không",
+          "Anh có ăn mặn không",
+          "Anh có tập thể dục không",
+          "Gia đình có ai bị bệnh tim mạch, đột quỵ không, năm bao nhiêu tuổi",
+          "Anh có bị tiểu đường, mỡ máu không"
+        ]
+      },
+      {
+        "id": "r-secondary-clues",
+        "domain": "history",
+        "criterion": "Hỏi gợi ý tăng huyết áp thứ phát: thuốc (kháng viêm, corticoid, thuốc co mạch, cam thảo), cơn hồi hộp vã mồ hôi, ngáy hoặc ngưng thở khi ngủ, yếu cơ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi 1-2 mục",
+          "2": "Hỏi ít nhất 3 mục"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Anh có dùng thuốc kháng viêm, corticoid, thuốc nhỏ mũi, cam thảo không",
+          "Có cơn hồi hộp, vã mồ hôi, nhức đầu dữ dội không",
+          "Ngủ có ngáy to, ngưng thở không",
+          "Có yếu cơ, chuột rút không"
+        ]
+      },
+      {
+        "id": "r-bp-technique",
+        "domain": "physical_exam",
+        "criterion": "Đo huyết áp đúng quy trình: nghỉ 5-10 phút, tư thế, băng quấn đúng cỡ, đo cả hai tay lần đầu, đo ít nhất 2 lần cách 1-2 phút, lấy trung bình",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Đo một lần, không cho nghỉ",
+          "1": "Thiếu 1-2 bước",
+          "2": "Đủ các bước chính"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Anh ngồi nghỉ 5-10 phút rồi tôi đo huyết áp",
+          "Đo cả hai tay",
+          "Đo lại lần hai sau 1-2 phút",
+          "Lấy trung bình hai lần đo"
+        ]
+      },
+      {
+        "id": "r-anthropometry",
+        "domain": "physical_exam",
+        "criterion": "Đo chiều cao, cân nặng, tính BMI, đo vòng bụng",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không đo",
+          "1": "Đo nhưng thiếu vòng bụng",
+          "2": "Đủ chiều cao, cân nặng, BMI và vòng bụng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đo chiều cao, cân nặng",
+          "Tính BMI",
+          "Đo vòng bụng"
+        ]
+      },
+      {
+        "id": "r-cardio-exam",
+        "domain": "physical_exam",
+        "criterion": "Khám tim, mạch ngoại biên hai bên, nghe âm thổi động mạch cảnh và động mạch thận, khám phù chi dưới",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Khám không quá 1 mục",
+          "1": "Khám 2-3 mục",
+          "2": "Khám ít nhất 4 mục"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám tim",
+          "Bắt mạch hai tay, hai chân",
+          "Nghe động mạch cảnh, nghe quanh rốn",
+          "Khám phù chân"
+        ]
+      },
+      {
+        "id": "r-bp-grade",
+        "domain": "diagnosis",
+        "criterion": "Phân độ đúng tăng huyết áp độ 1 dựa trên trung bình các lần đo",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Phân độ sai hoặc không phân độ",
+          "1": "Đúng độ nhưng chỉ dựa vào một lần đo",
+          "2": "Đúng độ 1, dựa trên trung bình các lần đo"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Huyết áp trung bình bao nhiêu",
+          "Tăng huyết áp độ mấy"
+        ]
+      },
+      {
+        "id": "r-risk-strat",
+        "domain": "diagnosis",
+        "criterion": "Phân tầng nguy cơ tim mạch theo bảng: đếm yếu tố nguy cơ, tìm tổn thương cơ quan đích",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không phân tầng",
+          "1": "Phân tầng nhưng đếm thiếu yếu tố nguy cơ",
+          "2": "Phân tầng đúng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Anh có mấy yếu tố nguy cơ",
+          "Có tổn thương cơ quan đích không",
+          "Phân tầng nguy cơ tim mạch"
+        ]
+      },
+      {
+        "id": "r-basic-labs",
+        "domain": "investigations",
+        "criterion": "Chỉ định xét nghiệm cơ bản: glucose, lipid máu, điện giải (kali), creatinin, nước tiểu, điện tâm đồ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Chỉ định không quá 2 xét nghiệm",
+          "1": "Chỉ định 3-4 xét nghiệm",
+          "2": "Chỉ định ít nhất 5 xét nghiệm"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho làm đường máu lúc đói, mỡ máu",
+          "Làm kali, creatinin",
+          "Tổng phân tích nước tiểu",
+          "Đo điện tim"
+        ]
+      },
+      {
+        "id": "r-lifestyle",
+        "domain": "management",
+        "criterion": "Tư vấn thay đổi lối sống có số cụ thể: muối < 6 g/ngày, bỏ thuốc lá, hạn chế bia rượu, vận động 30-60 phút/ngày, giảm cân và vòng bụng",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Không tư vấn",
+          "1": "Tư vấn 2-3 mục",
+          "2": "Tư vấn ít nhất 4 mục, có con số cụ thể"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Ăn nhạt, dưới 6 gam muối mỗi ngày",
+          "Anh nên bỏ thuốc lá",
+          "Hạn chế bia",
+          "Đi bộ, tập thể dục 30-60 phút mỗi ngày",
+          "Giảm cân, giảm vòng bụng"
+        ]
+      },
+      {
+        "id": "r-target-followup",
+        "domain": "management",
+        "criterion": "Nêu huyết áp mục tiêu và kế hoạch theo dõi, tái khám; khuyên đo huyết áp tại nhà",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không nêu",
+          "1": "Nêu một phần",
+          "2": "Nêu đủ mục tiêu, theo dõi, tái khám và đo tại nhà"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Huyết áp mục tiêu của anh là bao nhiêu",
+          "Anh nên tự đo huyết áp ở nhà",
+          "Hẹn anh tái khám"
+        ]
+      },
+      {
+        "id": "r-closing",
+        "domain": "communication",
+        "criterion": "Tóm tắt lại cho người bệnh, hỏi còn thắc mắc gì không, dùng từ dễ hiểu và giải thích thuật ngữ",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Chỉ tóm tắt hoặc chỉ hỏi lại",
+          "2": "Tóm tắt và hỏi lại thắc mắc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Tóm lại tình trạng của anh",
+          "Anh còn thắc mắc gì không"
+        ],
+        "reliability": "low"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "Hướng dẫn chẩn đoán và điều trị tăng huyết áp (Quyết định 3192/QĐ-BYT ngày 31/08/2010)",
+      "section": "3.2 Phân độ huyết áp (Bảng 2); 3.3 Yếu tố nguy cơ tim mạch; Phụ lục 2 Quy trình đo huyết áp; 4.2 Thay đổi lối sống",
+      "url": "https://kcb.vn/upload/2005611/20210723//huong_dan_chan_doan_dieu_tri_tha.pdf"
+    }
+  ],
+  "forbidden_terms": [
+    "tăng huyết áp",
+    "phân độ",
+    "độ 1",
+    "nguy cơ cao",
+    "phân tầng",
+    "cơ quan đích",
+    "nguyên phát",
+    "thứ phát",
+    "rối loạn lipid"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Cái đó tôi không rõ, bác sĩ ạ.",
+      "Tôi không để ý chuyện đó, không chắc nữa."
+    ],
+    "not_ordered_lab": [
+      "Cái đó tôi chưa đi làm xét nghiệm bao giờ, bác sĩ ạ."
+    ],
+    "out_of_scope": [
+      "Tôi chỉ biết là công ty dặn đi khám lại thôi, bác sĩ xem giúp tôi."
+    ]
+  }
+}

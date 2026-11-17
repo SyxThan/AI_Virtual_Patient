@@ -1,0 +1,72 @@
+{
+  "corpus": "hypertension-guidelines",
+  "corpus_version": 1,
+  "case_id": "case-05-hypertension",
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-10, AVP-155). Mỗi chunk là bản TÓM TẮT do tác giả viết lại (origin: author_added), không phải trích nguyên văn. Chưa có bác sĩ đối chiếu.",
+      "TODO(clinician): bảng phân tầng nguy cơ (Phụ lục 4 của 3192/QĐ-BYT) trích từ bản web bị thiếu ô. Đối chiếu PDF chính thức trên kcb.vn trước khi dùng để chấm điểm.",
+      "TODO(clinician): 3192/2010 đặt mục tiêu < 140/90 mmHg (< 130/80 khi nguy cơ cao); ESC 2024 đặt mục tiêu tâm thu 120-129 mmHg cho đa số người đang điều trị. Chọn chuẩn chấm cho ca.",
+      "Theo brief: ca không dạy liều thuốc. Các tên thuốc trong 3192 cố ý không đưa vào corpus.",
+      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-10).",
+      "Not ingested: rights not confirmed by owner: vnha-vsh-2022 (Khuyến cáo chẩn đoán và điều trị tăng huyết áp 2022 (Phân hội THA / Hội Tim mạch học Việt Nam)). Removed from this file; the case review.notes still name it as a possible scoring standard.",
+      "Not ingested: rights not confirmed by owner: esc-2024-bp (2024 ESC Guidelines for the management of elevated blood pressure and hypertension (Eur Heart J 2024)). Removed from this file; the case review.notes still name it as a possible scoring standard."
+    ]
+  },
+  "documents": [
+    {
+      "source_key": "moh-qd-3192-2010",
+      "title": "Hướng dẫn chẩn đoán và điều trị tăng huyết áp (Quyết định 3192/QĐ-BYT ngày 31/08/2010)",
+      "publisher": "Bộ Y tế",
+      "year": 2010,
+      "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
+      "rights_checked": true,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "1. Định nghĩa; 3.1 Ngưỡng chẩn đoán theo cách đo (Bảng 1)",
+          "text": "Tóm tắt: tăng huyết áp khi huyết áp tâm thu từ 140 mmHg và/hoặc tâm trương từ 90 mmHg, do cán bộ y tế đo đúng quy trình. Ngưỡng theo cách đo khác: máy đo huyết áp tự động 24 giờ từ 130/80 mmHg; tự đo tại nhà (nhiều lần) từ 135/85 mmHg."
+        },
+        {
+          "section": "3.2 Phân độ huyết áp (Bảng 2)",
+          "text": "Tóm tắt: phân độ theo trị số do cán bộ y tế đo (mmHg, tâm thu / tâm trương): tối ưu < 120 và < 80; bình thường 120-129 và/hoặc 80-84; bình thường cao 130-139 và/hoặc 85-89; THA độ 1: 140-159 và/hoặc 90-99; THA độ 2: 160-179 và/hoặc 100-109; THA độ 3: từ 180 và/hoặc từ 110; THA tâm thu đơn độc: từ 140 và tâm trương < 90. Nếu tâm thu và tâm trương thuộc hai độ khác nhau thì xếp theo độ cao hơn."
+        },
+        {
+          "section": "2. Nguyên nhân",
+          "text": "Tóm tắt: phần lớn THA ở người trưởng thành không rõ nguyên nhân (THA nguyên phát, khoảng 90%). Nghĩ tới THA thứ phát khi THA ở người trẻ (dưới 30 tuổi), THA kháng trị, THA tiến triển hoặc ác tính. Nguyên nhân thứ phát: bệnh thận cấp hoặc mạn, hẹp động mạch thận, thận đa nang; u tủy thượng thận, cường aldosteron nguyên phát, hội chứng Cushing; bệnh tuyến giáp, cận giáp, tuyến yên; thuốc (kháng viêm không steroid, thuốc tránh thai, corticoid, cam thảo, thuốc co mạch chống nghẹt mũi); hẹp eo động mạch chủ, bệnh Takayasu; tiền sản giật; ngừng thở khi ngủ."
+        },
+        {
+          "section": "3.3 Yếu tố nguy cơ tim mạch",
+          "text": "Tóm tắt: tăng huyết áp; rối loạn lipid máu; đái tháo đường; microalbumin niệu hoặc mức lọc cầu thận ước tính < 60 ml/phút; tuổi (nam > 55, nữ > 65); tiền sử gia đình mắc bệnh tim mạch sớm (nam trước 55 tuổi, nữ trước 65 tuổi); thừa cân, béo phì, béo bụng; hút thuốc lá, thuốc lào; uống nhiều rượu bia; ít vận động; căng thẳng; ăn mặn, ít rau quả."
+        },
+        {
+          "section": "3.3 Tổn thương cơ quan đích và biến chứng",
+          "text": "Tóm tắt: não (đột quỵ, cơn thiếu máu não thoáng qua, sa sút trí tuệ, hẹp động mạch cảnh); tim (phì đại thất trái trên điện tim hoặc siêu âm tim, suy tim, nhồi máu cơ tim, cơn đau thắt ngực); bệnh động mạch ngoại biên; mắt (xuất huyết, xuất tiết võng mạc, phù gai thị); thận (protein niệu, tăng creatinin huyết, suy thận)."
+        },
+        {
+          "section": "3.4 Xét nghiệm cơ bản",
+          "text": "Tóm tắt: glucose máu lúc đói; lipid máu (cholesterol toàn phần, HDL-C, LDL-C, triglycerid); điện giải, đặc biệt kali; acid uric, creatinin; hemoglobin, hematocrit; tổng phân tích nước tiểu (albumin, vi thể); điện tâm đồ. Nếu có điều kiện: siêu âm tim, siêu âm Doppler động mạch cảnh, định lượng protein niệu, chỉ số huyết áp cổ chân/cánh tay, soi đáy mắt, nghiệm pháp dung nạp glucose, Holter huyết áp 24 giờ, đo vận tốc sóng mạch."
+        },
+        {
+          "section": "Phụ lục 2 - Quy trình đo huyết áp",
+          "text": "Tóm tắt: nghỉ trong phòng yên tĩnh ít nhất 5-10 phút; không dùng cà phê, thuốc lá, rượu bia trong 2 giờ trước đo. Ngồi tựa lưng, tay đặt trên bàn, nếp khuỷu ngang mức tim; người cao tuổi hoặc đái tháo đường đo thêm tư thế đứng để phát hiện hạ huyết áp tư thế. Băng quấn: bóng hơi dài ít nhất 80% và rộng ít nhất 40% chu vi cánh tay, mép dưới cách nếp khuỷu khoảng 2 cm. Bơm hơi trên mức mất mạch khoảng 30 mmHg, xả 2-3 mmHg mỗi nhịp; tâm thu là tiếng đập đầu tiên (pha I Korotkoff), tâm trương là lúc mất tiếng đập (pha V). Lần đầu đo cả hai tay, lấy tay có trị số cao hơn để theo dõi. Đo ít nhất 2 lần cách nhau 1-2 phút; nếu hai lần chênh trên 10 mmHg thì nghỉ thêm trên 5 phút rồi đo lại; ghi trung bình 2 lần cuối. Không nói chuyện khi đo."
+        },
+        {
+          "section": "4.1 Mục tiêu điều trị",
+          "text": "Tóm tắt: THA là bệnh mạn tính, cần theo dõi đều và điều trị lâu dài. Huyết áp mục tiêu chung dưới 140/90 mmHg và thấp hơn nếu dung nạp được; người nguy cơ tim mạch cao đến rất cao cần đạt dưới 130/80 mmHg. Tránh hạ huyết áp quá nhanh, trừ tình huống cấp cứu, để không gây thiếu máu cơ quan đích."
+        },
+        {
+          "section": "4.2 Thay đổi lối sống",
+          "text": "Tóm tắt: áp dụng cho mọi người bệnh. Ăn nhạt (dưới 6 g muối/ngày, khoảng 1 thìa cà phê), nhiều rau quả tươi, hạn chế mỡ động vật. Giữ chỉ số khối cơ thể 18,5-22,9 kg/m2; vòng bụng dưới 90 cm ở nam, dưới 80 cm ở nữ. Hạn chế rượu bia: nam dưới 3 cốc chuẩn/ngày và dưới 14 cốc chuẩn/tuần; nữ dưới 2 cốc chuẩn/ngày và dưới 9 cốc chuẩn/tuần (1 cốc chuẩn chứa 10 g ethanol, tương đương 330 ml bia, 120 ml rượu vang hoặc 30 ml rượu mạnh). Ngừng hoàn toàn thuốc lá, thuốc lào. Vận động mức trung bình 30-60 phút mỗi ngày. Tránh căng thẳng, nghỉ ngơi hợp lý, tránh lạnh đột ngột."
+        },
+        {
+          "section": "Chuyển tuyến chuyên khoa",
+          "text": "Tóm tắt: chuyển tuyến trên hoặc chuyên khoa tim mạch khi: THA tiến triển, dọa biến chứng (cơn thiếu máu não thoáng qua, suy tim) hoặc đã có biến cố tim mạch; nghi THA thứ phát, THA ở người trẻ, hoặc cần đánh giá tổn thương cơ quan đích; THA kháng trị dù đã dùng ít nhất 3 thuốc (trong đó có lợi tiểu), không dung nạp thuốc hạ áp hoặc có nhiều bệnh nặng phối hợp; phụ nữ có thai và các trường hợp đặc biệt khác."
+        }
+      ]
+    }
+  ]
+}
