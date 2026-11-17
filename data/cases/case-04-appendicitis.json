@@ -34,88 +34,94 @@
       "Rubric mapping from the OSCE file: C01 r-opening, H01 r-pain-history, H02 r-gi-symptoms, H03 r-exclusion-history, H04 r-background, E01 r-abdomen-technique, E02 r-peritoneal-signs, E03 r-maneuvers, E04 r-groin-scrotum, R01 r-investigations, R02 r-scores, R03 r-dx-differentials, M01 r-initial-management, M02 r-explain-plan, C99 r-closing. Levels: chua_dat=0, dat_mot_phan=1, dat=2; red_flag -> critical. Domains: exam -> physical_exam; R01 -> investigations; R02, R03 -> diagnosis.",
       "TODO(clinician): the OSCE file has no epidemiology criterion. H04 (past surgery, medicines, allergy, last meal) is mapped to the 'epidemiology' domain as background history, the way Dengue's r-epi-history covers past history, so all 7 domains are covered. Confirm, or add a real epidemiology criterion.",
       "TODO(clinician): E04 (scrotal/groin exam) has no partial level in the pack ('—'); anchor 1 says not applicable. Confirm.",
-      "Exam layout: the pack's 'Dấu hiệu' row is one hotspot (e-abd-signs, Blumberg, Rovsing, psoas, obturator, pain on coughing). Palpation is split into four quadrant hotspots; 'không sờ thấy khối' (pack: no mass) is repeated in each quadrant. Patient's right is on the viewer's left of the cover.",
+      "Exam layout: the pack's 'Dấu hiệu' row is one hotspot (e-abd-signs, Blumberg, Rovsing, psoas, obturator, pain on coughing). Palpation keeps four quadrant exam entries; 'không sờ thấy khối' (pack: no mass) is repeated in each quadrant. Patient's right is on the viewer's left of the cover.",
       "management[] has no antibiotic or analgesic drug or dose on purpose (pack: the case does not teach antibiotic doses). The patient-reported paracetamol 500 mg tablet is history, not a recommendation.",
-      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67)."
+      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67).",
+      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays are illustrative, TODO(clinician) review. AVP-163 mapping (collider -> exam region): abdomen_rlq -> abdomen_rlq (e-palp-rlq); abdomen_other -> abdomen_other (e-palp-ruq, e-palp-luq, e-palp-llq re-tagged from abdomen_ruq/luq/llq, findings unchanged and joined); flank_lumbar -> flank; tongue_mouth -> mouth; right_hip -> abdomen_signs (psoas and obturator signs live in e-abd-signs; no separate exam entry added so the finding text is not duplicated); groin -> groin_scrotum. Exam regions without a collider stay as list entries: general, vitals, abdomen_inspect, abdomen_percussion, abdomen_signs. The demo's 'rectal' item has no exam entry (draft.md leaves it to [BS]), so the app answers 'no record'. Findings, labels and methods in the pack's demo/case.json are NOT used; findings come only from exam[]. Cover kept as the SVG: preview.png shows the patient lying with one knee flexed, which matches the exam finding 'nằm co chân phải'."
     ]
   },
   "catalog": {
     "patient_group": "adult",
     "display_complaint": "Em bị đau bụng từ tối qua, giờ đau dồn xuống bụng dưới bên phải, đi lại đau lắm.",
     "cover": "/cases/appendicitis-cover.svg",
-    "exam_mode": "2d",
+    "exam_mode": "3d",
     "exam_regions": [
+      {
+        "id": "abdomen_rlq",
+        "label": "Bụng: hố chậu phải",
+        "exam_region": "abdomen_rlq",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "abdomen_other",
+        "label": "Bụng: các vùng còn lại",
+        "exam_region": "abdomen_other",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "flank_lumbar",
+        "label": "Hố thắt lưng",
+        "exam_region": "flank",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "tongue_mouth",
+        "label": "Lưỡi",
+        "exam_region": "mouth",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "right_hip",
+        "label": "Háng, đùi phải",
+        "exam_region": "abdomen_signs",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "groin",
+        "label": "Bẹn, bìu",
+        "exam_region": "groin_scrotum",
+        "x": null,
+        "y": null
+      },
       {
         "id": "general",
         "label": "Toàn trạng",
-        "x": 0.5,
-        "y": 0.075
-      },
-      {
-        "id": "mouth",
-        "label": "Lưỡi",
-        "x": 0.5,
-        "y": 0.16
+        "exam_region": "general",
+        "x": null,
+        "y": null
       },
       {
         "id": "vitals",
         "label": "Sinh hiệu",
-        "x": 0.19,
-        "y": 0.59
+        "exam_region": "vitals",
+        "x": null,
+        "y": null
       },
       {
         "id": "abdomen_inspect",
         "label": "Nhìn bụng",
-        "x": 0.5,
-        "y": 0.35
-      },
-      {
-        "id": "abdomen_ruq",
-        "label": "Sờ hạ sườn phải",
-        "x": 0.39,
-        "y": 0.42
-      },
-      {
-        "id": "abdomen_luq",
-        "label": "Sờ hạ sườn trái",
-        "x": 0.61,
-        "y": 0.42
+        "exam_region": "abdomen_inspect",
+        "x": null,
+        "y": null
       },
       {
         "id": "abdomen_percussion",
         "label": "Gõ, nghe bụng",
-        "x": 0.5,
-        "y": 0.49
-      },
-      {
-        "id": "abdomen_rlq",
-        "label": "Sờ hố chậu phải",
-        "x": 0.39,
-        "y": 0.565
-      },
-      {
-        "id": "abdomen_llq",
-        "label": "Sờ hố chậu trái",
-        "x": 0.61,
-        "y": 0.565
+        "exam_region": "abdomen_percussion",
+        "x": null,
+        "y": null
       },
       {
         "id": "abdomen_signs",
         "label": "Các nghiệm pháp bụng",
-        "x": 0.5,
-        "y": 0.62
-      },
-      {
-        "id": "flank",
-        "label": "Hố thắt lưng hai bên",
-        "x": 0.307,
-        "y": 0.49
-      },
-      {
-        "id": "groin_scrotum",
-        "label": "Bìu, bẹn",
-        "x": 0.5,
-        "y": 0.725
+        "exam_region": "abdomen_signs",
+        "x": null,
+        "y": null
       }
     ],
     "estimated_minutes": null,
@@ -479,7 +485,7 @@
     },
     {
       "id": "e-palp-ruq",
-      "region": "abdomen_ruq",
+      "region": "abdomen_other",
       "action": "Sờ bụng vùng hạ sườn phải",
       "finding": "Bụng mềm ở hạ sườn phải. Không sờ thấy khối.",
       "red_flag": false,
@@ -487,7 +493,7 @@
     },
     {
       "id": "e-palp-luq",
-      "region": "abdomen_luq",
+      "region": "abdomen_other",
       "action": "Sờ bụng vùng hạ sườn trái",
       "finding": "Bụng mềm ở hạ sườn trái. Không sờ thấy khối.",
       "red_flag": false,
@@ -495,7 +501,7 @@
     },
     {
       "id": "e-palp-llq",
-      "region": "abdomen_llq",
+      "region": "abdomen_other",
       "action": "Sờ bụng vùng hố chậu trái",
       "finding": "Bụng mềm ở hố chậu trái. Không sờ thấy khối.",
       "red_flag": false,
