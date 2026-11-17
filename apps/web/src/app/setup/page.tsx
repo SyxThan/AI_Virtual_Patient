@@ -2,68 +2,87 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import vi from "../../../messages/vi.json";
-import { useAuth } from "@/components/auth/AuthProvider";
-import Badge from "@/components/ui/Badge";
-import Button from "@/components/ui/Button";
-import PageShell from "@/components/ui/PageShell";
-import Tile, { TILE_MUTED } from "@/components/ui/Tile";
+import CaseProfile from "@/components/setup/CaseProfile";
+import DeviceCheck from "@/components/setup/DeviceCheck";
+import { ChoiceRow, StepHeading } from "@/components/setup/SetupControls";
+import SetupTopBar from "@/components/setup/SetupTopBar";
+import {
+  DEFAULT_PREFS,
+  MODES,
+  ROLES,
+  enterStartsSession,
+  getPrefsSnapshot,
+  subscribePrefs,
+  updatePrefs,
+} from "@/components/setup/setupPrefs";
+import { useClinicPreload, useMicCheck, useWebgl } from "@/components/setup/useDeviceCheck";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { API_URL, authHeaders, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
+import { navigateToStage } from "@/lib/stageTransition";
 
 const CASE_ID = "case-01-hfmd";
+const ux = vi.setupUx;
 
-type Role = "student" | "resident" | "practitioner";
-type Mode = "guided" | "exam";
-
-const ROLES: Role[] = ["student", "resident", "practitioner"];
-const MODES: Mode[] = ["guided", "exam"];
-
-/** Selected / unselected mark for an option tile (the state is not shown by color alone). */
-function SelectMark({ selected }: { selected: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-        selected ? "border-primary bg-primary text-white" : "border-line-strong bg-surface"
-      }`}
-    >
-      {selected && (
-        <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none">
-          <path
-            d="M3.5 8.5l3 3 6-7"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-    </span>
-  );
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-function optionClass(selected: boolean, layout: string): string {
-  return `flex w-full min-h-11 gap-3 rounded-card border-2 text-left ${layout} transition-[border-color,background-color,box-shadow] ${FOCUS_RING} ${
-    selected
-      ? "border-primary bg-primary-soft text-ink shadow-[0_0_0_4px_rgba(10,110,105,0.12)]"
-      : "border-line bg-surface text-ink hover:border-line-strong"
-  }`;
-}
-
+/**
+ * Setup screen: "HỒ SƠ CA" (left, 7/12) and "THIẾT LẬP" (right, 5/12) with the
+ * four real steps in order (role, mode, device check, consent) and the start
+ * area pinned to the panel's bottom (a fixed bar below 1024px). The start
+ * button is always enabled: pressing it without consent points at step 4.
+ * The API call is unchanged (`POST /api/v1/sessions`).
+ */
 export default function SetupPage() {
   const router = useRouter();
-  const { status } = useAuth();
-  const [role, setRole] = useState<Role>("student");
-  const [mode, setMode] = useState<Mode>("guided");
+  // Last role/mode, remembered in localStorage (consent is never remembered).
+  const { role, mode } = useSyncExternalStore(subscribePrefs, getPrefsSnapshot, () => DEFAULT_PREFS);
   const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
+  const [deviceError, setDeviceError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleStart() {
+  const consentBoxRef = useRef<HTMLInputElement>(null);
+  const consentStepRef = useRef<HTMLDivElement>(null);
+  const deviceStepRef = useRef<HTMLDivElement>(null);
+  const meterRef = useRef<HTMLDivElement>(null);
+
+  const webgl = useWebgl();
+  const preload = useClinicPreload(webgl);
+  const mic = useMicCheck(meterRef);
+  const finishMic = mic.finish;
+
+  const pointAt = useCallback((el: HTMLElement | null) => {
+    el?.scrollIntoView({ block: "center", behavior: prefersReducedMotion() ? "auto" : "smooth" });
+  }, []);
+
+  const handleStart = useCallback(async () => {
+    if (loading) return; // lock repeated presses while the session is created
+    if (!consent) {
+      setConsentError(true);
+      const step = consentStepRef.current;
+      if (step && !prefersReducedMotion()) {
+        // Restart the one-shot shake without remounting (focus must stay on the checkbox).
+        step.classList.remove("setup-shake");
+        void step.offsetWidth;
+        step.classList.add("setup-shake");
+      }
+      pointAt(step);
+      consentBoxRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    if (webgl === "unsupported") {
+      setDeviceError(true);
+      pointAt(deviceStepRef.current);
+      return;
+    }
     setLoading(true);
     setError(null);
+    finishMic(); // release the microphone before the workspace asks for it
     try {
       await whenAuthReady(); // a signed-in user's session is created under their account
       const res = await fetch(`${API_URL}/api/v1/sessions`, {
@@ -85,200 +104,210 @@ export default function SetupPage() {
       }
       const data: { id: string; guest_token?: string | null } = await res.json();
       if (data.guest_token) rememberGuestSession(data.id, data.guest_token);
-      router.push(`/session/${data.id}`);
+      navigateToStage(router.push, `/session/${data.id}`);
     } catch {
       setError(vi.setup.error.generic);
       setLoading(false);
     }
-  }
+  }, [loading, consent, webgl, mode, role, finishMic, pointAt, router.push]);
+
+  // Enter starts the session unless focus is on something Enter already drives.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || e.repeat || e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (!enterStartsSession(e.target as HTMLElement | null)) return;
+      e.preventDefault();
+      void handleStart();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleStart]);
+
+  const deviceDone = webgl === "ok" && preload.phase === "ready" && (mic.state === "ok" || mic.state === "skipped");
+  const summary = [vi.setup.role[role], vi.setup.mode[mode]].join(" · ");
 
   return (
-    <PageShell title={vi.setup.title} description={vi.setupUx.intro} width="default">
-      {error && (
-        <div
-          role="alert"
-          className="mb-4 flex items-start justify-between gap-4 rounded-card border border-warning/30 bg-warning-soft p-4 text-ink"
-        >
-          <span>{error}</span>
-          <button
-            type="button"
-            onClick={() => setError(null)}
-            className={`-my-2 min-h-11 shrink-0 rounded-control px-2 text-sm font-semibold text-warning underline ${FOCUS_RING}`}
-          >
-            {vi.setup.error.dismiss}
-          </button>
+    <div className="flex min-h-dvh flex-col lg:h-dvh lg:min-h-0 lg:overflow-hidden">
+      <SetupTopBar />
+
+      <main
+        id="main"
+        className="mx-auto grid w-full max-w-[1680px] flex-1 grid-cols-1 gap-6 px-4 pb-44 pt-2 lg:min-h-0 lg:grid-cols-12 lg:gap-8 lg:px-8 lg:pb-6 short:pb-4"
+      >
+        {/* ------------------------------------------------ HỒ SƠ CA (7/12) */}
+        <div className="setup-enter-stage min-w-0 lg:col-span-7 lg:min-h-0 short:col-span-6 lg:overflow-y-auto lg:pr-2">
+          <CaseProfile />
         </div>
-      )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
-        {/* Case: the one fixed MVP case, in the warm pediatric tone, read like a chart cover */}
-        <Tile tone="sand" as="section" aria-labelledby="case-title" className="overflow-hidden lg:col-span-4">
-          <CaseGlyph />
-          <p className="text-sm font-semibold">{vi.setup.case.label}</p>
-          <h2 id="case-title" className="font-display mt-2 max-w-[18ch] text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-            {vi.setup.case.title}
-          </h2>
-          <p className="mt-4 max-w-prose leading-relaxed text-ink">{vi.setup.case.summary}</p>
-          <p className="mt-5 flex items-start gap-2 rounded-control bg-surface/60 px-3 py-2 text-sm">
-            <WarnIcon />
-            {vi.setup.case.draftNotice}
-          </p>
-        </Tile>
-
-        {/* Account status */}
-        <Tile as="section" aria-labelledby="account-title" className="flex flex-col gap-3 lg:col-span-2">
-          <h2 id="account-title" className="font-display text-xl font-bold tracking-tight">
-            {vi.setupUx.accountTitle}
-          </h2>
-          {status === "loading" ? (
-            <div className="h-5 w-3/4 animate-pulse rounded-full bg-canvas motion-reduce:animate-none" />
-          ) : status === "signedIn" ? (
-            <p className="text-sm text-ink-muted">{vi.auth.setupSignedIn}</p>
-          ) : (
-            <>
-              <p className="text-sm text-ink-muted">{vi.auth.setupGuest}</p>
-              {status === "signedOut" && (
-                <Link
-                  href="/login?next=/setup"
-                  className={`inline-flex min-h-11 w-fit items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-strong ${FOCUS_RING}`}
-                >
-                  {vi.auth.setupSignIn}
-                </Link>
-              )}
-            </>
-          )}
-        </Tile>
-
-        {/* Role */}
-        <Tile as="fieldset" className="min-w-0 lg:col-span-2">
-          <legend className="font-display float-left mb-4 w-full text-xl font-bold tracking-tight">
-            {vi.setup.role.label}
-          </legend>
-          <div className="clear-both flex flex-col gap-2">
-            {ROLES.map((r) => (
-              <button
-                key={r}
-                type="button"
-                aria-pressed={role === r}
-                onClick={() => setRole(r)}
-                className={optionClass(role === r, "items-center px-4 py-3")}
-              >
-                <SelectMark selected={role === r} />
-                <span className="font-semibold">{vi.setup.role[r]}</span>
-              </button>
-            ))}
-          </div>
-        </Tile>
-
-        {/* Mode */}
-        <Tile as="fieldset" className="min-w-0 lg:col-span-4">
-          <legend className="font-display float-left mb-4 w-full text-xl font-bold tracking-tight">
-            {vi.setup.mode.label}
-          </legend>
-          <div className="clear-both grid gap-3 sm:grid-cols-2">
-            {MODES.map((m) => (
-              <button
-                key={m}
-                type="button"
-                aria-pressed={mode === m}
-                onClick={() => setMode(m)}
-                className={optionClass(mode === m, "h-full items-start p-4")}
-              >
-                <SelectMark selected={mode === m} />
-                <span className="min-w-0">
-                  <span className="font-display block text-xl font-bold tracking-tight">{vi.setup.mode[m]}</span>
-                  <span className="mt-1 block text-sm leading-relaxed text-ink-muted">
-                    {m === "guided" ? vi.setupUx.guidedDesc : vi.setupUx.examDesc}
-                  </span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </Tile>
-
-        {/* Consent, in its own card */}
-        <Tile as="section" aria-labelledby="consent-title" className="lg:col-span-4">
-          <h2 id="consent-title" className="font-display text-xl font-bold tracking-tight">
-            {vi.setupUx.consentTitle}
-          </h2>
-          <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-card border border-line bg-canvas p-4 text-sm leading-relaxed text-ink">
-            <input
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-              className={`mt-0.5 h-5 w-5 shrink-0 accent-primary ${FOCUS_RING}`}
-            />
-            <span>{vi.setup.consent.label}</span>
-          </label>
-          <Link
-            href="/privacy"
-            className={`mt-2 inline-flex min-h-11 w-fit items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-strong ${FOCUS_RING}`}
-          >
-            {vi.setupUx.privacyLink}
-          </Link>
-        </Tile>
-
-        {/* Start: the page's single primary action, on the dark stage */}
-        <Tile
-          as="section"
-          tone="ink"
-          aria-label={vi.setup.start}
-          className="flex flex-col justify-between gap-6 lg:col-span-2"
+        {/* ------------------------------------------------ THIẾT LẬP (5/12) */}
+        <section
+          aria-labelledby="setup-title"
+          className="setup-enter-panel flex min-w-0 flex-col lg:col-span-5 lg:min-h-0 short:col-span-6 lg:rounded-tile lg:bg-surface lg:shadow-lift lg:ring-1 lg:ring-line/70"
         >
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="primary">{vi.setup.role[role]}</Badge>
-            <Badge tone="info">{vi.setup.mode[mode]}</Badge>
-          </div>
-          <div className="flex flex-col gap-3">
-            <Button
-              variant="inverse"
-              size="lg"
-              disabled={!consent || loading}
-              aria-describedby={!consent ? "consent-hint" : undefined}
-              onClick={handleStart}
-              className="w-full"
-            >
-              {loading ? vi.setup.starting : vi.setup.start}
-            </Button>
-            {!consent && (
-              <p id="consent-hint" className={`text-sm ${TILE_MUTED.ink}`}>
-                {vi.setupUx.consentHint}
+          <h2
+            id="setup-title"
+            className="text-xs font-bold uppercase tracking-[0.14em] text-ink-muted lg:px-6 lg:pt-4"
+          >
+            {ux.setupLabel}
+          </h2>
+
+          <div className="flex flex-col divide-y divide-line lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:px-6">
+            {/* 1. Role */}
+            <fieldset className="min-w-0 py-3 short:py-2">
+              <legend className="float-left mb-2 w-full">
+                <StepHeading n={1} done>
+                  {vi.setup.role.label}
+                </StepHeading>
+              </legend>
+              <div className="clear-both flex flex-col gap-1.5 short:grid short:grid-cols-3">
+                {ROLES.map((r) => (
+                  <ChoiceRow key={r} name="role" value={r} checked={role === r} onSelect={() => updatePrefs({ role: r })}>
+                    {vi.setup.role[r]}
+                  </ChoiceRow>
+                ))}
+              </div>
+            </fieldset>
+
+            {/* 2. Mode: segmented, the description of the chosen mode below */}
+            <fieldset className="min-w-0 py-3 short:py-2" aria-describedby="mode-desc">
+              <legend className="float-left mb-2 w-full">
+                <StepHeading n={2} done>
+                  {vi.setup.mode.label}
+                </StepHeading>
+              </legend>
+              <div className="clear-both grid grid-cols-2 gap-2">
+                {MODES.map((m) => (
+                  <ChoiceRow key={m} name="mode" value={m} checked={mode === m} onSelect={() => updatePrefs({ mode: m })}>
+                    {vi.setup.mode[m]}
+                  </ChoiceRow>
+                ))}
+              </div>
+              <p id="mode-desc" key={mode} className="setup-fade mt-1.5 text-sm leading-snug text-ink-muted">
+                {mode === "guided" ? ux.guidedDesc : ux.examDesc}
               </p>
-            )}
+            </fieldset>
+
+            {/* 3. Device check (does not block, except without WebGL) */}
+            <div ref={deviceStepRef} role="group" aria-labelledby="device-title" className="py-3 short:py-2">
+              <h3 id="device-title" className="mb-2">
+                <StepHeading n={3} done={deviceDone}>
+                  {ux.deviceTitle}
+                </StepHeading>
+              </h3>
+              <DeviceCheck
+                webgl={webgl}
+                preload={preload}
+                mic={mic.state}
+                micRunning={mic.running}
+                meterRef={meterRef}
+                onMicTest={() => void mic.start()}
+                onMicStop={mic.finish}
+                onMicSkip={mic.skip}
+              />
+              {deviceError && webgl === "unsupported" && (
+                <p className="mt-2 text-sm font-semibold text-danger">{ux.webglError}</p>
+              )}
+            </div>
+
+            {/* 4. Consent: the whole box is the checkbox's label */}
+            <div
+              ref={consentStepRef}
+              role="group"
+              aria-labelledby="consent-title"
+              onAnimationEnd={(e) => e.target === e.currentTarget && e.currentTarget.classList.remove("setup-shake")}
+              className="py-3 short:py-2"
+            >
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3">
+                <h3 id="consent-title">
+                  <StepHeading n={4} done={consent}>
+                    {ux.consentTitle}
+                  </StepHeading>
+                </h3>
+                <Link
+                  href="/privacy"
+                  className={`-my-2 inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-strong ${FOCUS_RING}`}
+                >
+                  {ux.privacyLink}
+                </Link>
+              </div>
+              <label
+                className={`flex cursor-pointer items-start gap-3 rounded-control border-2 p-3 text-sm leading-snug text-ink transition-[border-color,background-color] duration-150 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary has-[:focus-visible]:ring-offset-2 ${
+                  consent
+                    ? "border-primary bg-primary-soft"
+                    : consentError
+                      ? "border-danger bg-danger-soft"
+                      : "border-line-strong/70 bg-surface hover:border-ink-muted"
+                }`}
+              >
+                <input
+                  ref={consentBoxRef}
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => {
+                    setConsent(e.target.checked);
+                    if (e.target.checked) setConsentError(false);
+                  }}
+                  aria-invalid={consentError || undefined}
+                  aria-describedby="consent-error"
+                  className="mt-0.5 h-6 w-6 shrink-0 cursor-pointer accent-primary focus-visible:outline-none"
+                />
+                <span>{vi.setup.consent.label}</span>
+              </label>
+              <p id="consent-error" aria-live="polite" className="mt-2 text-sm font-semibold text-danger empty:hidden">
+                {consentError && !consent ? ux.consentError : ""}
+              </p>
+            </div>
           </div>
-        </Tile>
-      </div>
-    </PageShell>
-  );
-}
 
-/** Mother holding the child, drawn large and faint in the case tile's corner (decorative). */
-function CaseGlyph() {
-  return (
-    <svg
-      viewBox="0 0 160 160"
-      className="pointer-events-none absolute -right-6 -top-4 h-44 w-44 text-sand-ink/15 sm:h-56 sm:w-56"
-      fill="currentColor"
-      aria-hidden="true"
-    >
-      <circle cx="66" cy="44" r="22" />
-      <path d="M20 150c3-38 22-60 46-60s43 22 46 60z" />
-      <circle cx="112" cy="86" r="15" />
-      <path d="M86 150c2-22 12-36 26-36s24 14 26 36z" />
-    </svg>
-  );
-}
-
-function WarnIcon() {
-  return (
-    <svg viewBox="0 0 20 20" className="mt-0.5 h-4 w-4 shrink-0" fill="none" aria-hidden="true">
-      <path
-        d="M10 3l7.5 13h-15L10 3z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path d="M10 8.5v3.5M10 14.2v.3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
+          {/* Start area: bottom of the panel on desktop, a fixed bar on smaller screens. */}
+          <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-12px_32px_-20px_rgba(16,35,31,0.35)] backdrop-blur lg:static lg:z-auto lg:rounded-b-tile lg:bg-surface lg:px-6 lg:pb-4 lg:pt-3 lg:shadow-none">
+            {error && (
+              <div
+                role="alert"
+                className="mb-3 flex items-start justify-between gap-3 rounded-control border border-warning/30 bg-warning-soft px-3 py-2 text-sm text-ink"
+              >
+                <span className="py-2.5">{error}</span>
+                <button
+                  type="button"
+                  onClick={() => setError(null)}
+                  className={`min-h-11 shrink-0 rounded-control px-2 font-semibold text-warning underline ${FOCUS_RING}`}
+                >
+                  {vi.setup.error.dismiss}
+                </button>
+              </div>
+            )}
+            <div className="mb-2 flex items-center justify-between gap-3 text-sm text-ink-muted">
+              <p className="min-w-0 truncate">
+                <span className="sr-only">{ux.summaryLabel}: </span>
+                {summary}
+              </p>
+              <p className="hidden shrink-0 text-xs lg:block">
+                <kbd className="rounded border border-line-strong bg-canvas px-1.5 py-0.5 font-sans font-semibold text-ink">
+                  {ux.enterKey}
+                </kbd>{" "}
+                {ux.enterHint}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleStart()}
+              aria-disabled={loading || undefined}
+              aria-busy={loading || undefined}
+              className={`flex h-14 w-full items-center justify-center gap-3 rounded-control bg-primary px-6 text-base font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition-[background-color,transform] duration-150 hover:bg-primary-strong active:translate-y-px ${FOCUS_RING} ${
+                loading ? "cursor-progress" : ""
+              }`}
+            >
+              {loading && (
+                <span
+                  aria-hidden="true"
+                  className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none"
+                />
+              )}
+              {loading ? ux.preparing : vi.setup.start}
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
   );
 }

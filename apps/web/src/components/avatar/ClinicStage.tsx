@@ -6,6 +6,7 @@ import vi from "../../../messages/vi.json";
 import { EXAM_REGIONS, VIEWS, type AnchorId, type ExamRegionId, type RegionFindings, type ViewId } from "./avatarContract";
 import type { AvatarSceneApi, AvatarSceneProps, HoverTarget, SceneStatus } from "./AvatarScene";
 import { prefetchModelBytes } from "./modelBytes";
+import { STAGE_TRANSITION_NAME } from "@/lib/stageTransition";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { fmt } from "@/lib/sessionAuth";
 
@@ -204,7 +205,11 @@ export default function ClinicStage({
       className="relative flex min-h-0 min-w-0 flex-col md:h-full md:overflow-hidden md:rounded-tile md:ring-1 md:ring-line/70 [&:fullscreen]:h-full [&:fullscreen]:rounded-none [&:fullscreen]:bg-canvas"
     >
       {/* ------------------------------------------------------------ canvas box */}
-      <div className="relative h-[45dvh] shrink-0 overflow-hidden rounded-tile bg-gradient-to-b from-sand-soft to-canvas ring-1 ring-line/70 md:h-full md:rounded-none md:ring-0 [:fullscreen_&]:h-full">
+      {/* Shares `patient-stage` with the setup cover: the cover grows into this box (lib/stageTransition.ts). */}
+      <div
+        data-stage-transition
+        style={{ viewTransitionName: STAGE_TRANSITION_NAME }}
+        className="relative h-[45dvh] shrink-0 overflow-hidden rounded-tile bg-gradient-to-b from-sand-soft to-canvas ring-1 ring-line/70 md:h-full md:rounded-none md:ring-0 [:fullscreen_&]:h-full">
         <p className="sr-only">{vi.avatar.sceneLabel}</p>
         {!unsupported && (
           <AvatarScene

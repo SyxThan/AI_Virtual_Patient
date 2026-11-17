@@ -67,6 +67,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
 | **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | 🟡 PR mở |
 | **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | 🟡 PR mở |
+| **AVP-145** | **Slice 19** (`TASK-S19-03`) | Làm lại trang Chuẩn bị (`/setup`): hồ sơ ca có ảnh dựng từ mô hình 3D, 4 bước thiết lập đánh số, kiểm tra WebGL/micro, tải trước mô hình khi rảnh, chuyển cảnh View Transition sang phòng khám | **P1** | 🟡 PR mở |
 
 ---
 
@@ -489,6 +490,13 @@ Thay hình khối procedural của Slice 5 bằng cảnh `mother_child.glb` do t
 * **File liên quan:** `apps/web/src/app/session/[id]/page.tsx`, `apps/web/src/components/avatar/{ClinicStage,ExamResultCard,AvatarScene}.tsx`, `apps/web/src/components/workspace/*`, `apps/web/src/components/guide/GuidedChecklist.tsx`, `apps/web/src/components/shell/ChromeGate.tsx`.
 * **Không đổi:** API, logic hội thoại, chấm điểm, nội dung ca bệnh, câu chữ cảnh báo lâm sàng. Thêm vào `useVoiceSession` một hàm chỉ đọc `micLevel()` (vẽ sóng âm; không gửi đi đâu).
 * **Tiêu chí hoàn thành:** `tsc`, `eslint`, `npm test`, `next build` qua; ở 1920×1080 canvas ≥ 1100×700 và trang không có thanh cuộn; khám một vùng bằng phím 1–4 hiện thẻ kết quả cạnh vùng đó.
+
+#### `TASK-S19-03` [P1]: Làm lại trang "Chuẩn bị phiên luyện tập" (AVP-145)
+* **Mô tả:** `/setup` thành hai cột vừa một màn hình từ 1024px (ẩn header/footer chung qua `ChromeGate`, thanh trên riêng có chip "Phiên khách"/tài khoản thay khối "Tài khoản"). Trái 7/12 "Hồ sơ ca": ảnh `public/cases/hfmd-cover.webp` (dựng từ chính `mother_child.glb`, góc "Trò chuyện"), tên ca là tiêu đề lớn nhất, đoạn lý do đến khám giữ nguyên, chip chỉ nhắc lại thông tin đã có trong đoạn đó (không tô đỏ "giật mình"), cảnh báo nháp. Phải 5/12 "Thiết lập": 1 Vai trò, 2 Chế độ (mô tả đổi theo chế độ), 3 Kiểm tra thiết bị (dò WebGL khi vào trang, tải trước model + Draco + chunk three.js bằng `requestIdleCallback` qua đúng module cache của phòng khám, micro chỉ xin quyền khi bấm, có "Bỏ qua, tôi sẽ gõ câu hỏi"), 4 Đồng ý lưu dữ liệu (cả khối là vùng bấm). Nút "Bắt đầu khám bệnh" luôn bấm được: chưa đồng ý thì cuộn tới bước 4, focus ô đồng ý, rung một lần, dòng lỗi `aria-live`; không có WebGL thì chỉ tới bước 3. Phím Enter. Nhớ vai trò/chế độ (localStorage), không nhớ ô đồng ý. Màn hình thấp (≤860px, ví dụ 1366×768) chia 6/6 và xếp 3 vai trò một hàng để vẫn vừa màn hình. Dưới 1024px một cột, nút bắt đầu thành thanh cố định đáy (`safe-area-inset-bottom`). Chuyển cảnh: ảnh và khung canvas của `ClinicStage` cùng `view-transition-name: patient-stage` (500ms; `prefers-reduced-motion` chỉ giữ mờ 150ms).
+* **File liên quan:** `apps/web/src/app/setup/page.tsx`, `apps/web/src/components/setup/*`, `apps/web/src/lib/stageTransition.ts`, `apps/web/src/components/avatar/ClinicStage.tsx`, `apps/web/src/components/shell/ChromeGate.tsx`, `apps/web/src/app/globals.css`, `apps/web/public/cases/hfmd-cover.webp`.
+* **Không đổi:** API tạo phiên (`POST /api/v1/sessions`), schema, dữ liệu ca, lựa chọn vai trò/chế độ, câu chữ đồng ý, liên kết chính sách, cảnh báo nháp.
+* **Tiêu chí hoàn thành:** `tsc`, `eslint`, `npm test`, `next build` qua; ở 1920×1080 và 1366×768 cả 4 bước và nút bắt đầu nằm trong màn hình đầu; tối đa 2 lần bấm (đồng ý, bắt đầu) khi lựa chọn đã được nhớ.
+* **Còn mở:** dòng "thời gian giới hạn" khi chọn Thi thử chưa hiện được: giới hạn nằm trong cấu hình máy chủ (`exam_time_limit_s`) và chỉ trả về theo từng phiên, chưa có endpoint đọc trước khi tạo phiên; tương tự với thời gian dự kiến trong dòng tóm tắt.
 
 ---
 
