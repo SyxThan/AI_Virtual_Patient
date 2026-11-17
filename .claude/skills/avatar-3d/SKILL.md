@@ -17,10 +17,11 @@ Guidance for implementing the Three.js 3D avatar (Mother holding child) and inte
 ## Directory Structure
 ```
 apps/web/src/components/avatar/
-  AvatarCanvas.tsx        # Tile UI: stage, view presets, tooltip, region buttons (main chunk, no three import)
-  AvatarScene.tsx         # three.js scene: renderer, picking, camera flights, render loop (dynamic, ssr:false)
+  ClinicStage.tsx         # Workspace stage UI: floating views/zoom/fullscreen, exam markers, exam bar, dock slots (no three import)
+  ExamResultCard.tsx      # Result card beside the examined region (finding verbatim from case JSON via backend)
+  AvatarScene.tsx         # three.js scene: renderer, picking, camera flights, overlay anchors, render loop (dynamic, ssr:false)
   avatarContract.ts       # Pure constants/helpers from the contract (tested with node --test)
-  modelBytes.ts           # One cached .glb download + progress; no three import (prefetch from AvatarCanvas)
+  modelBytes.ts           # One cached .glb download + progress; no three import (prefetch from ClinicStage)
   ModelLoader.ts          # GLTFLoader + DRACOLoader parse
   clinicRig.ts            # Contract checks, colliders, morphs, head look-at, blink, breathing
   lesionSkin.ts           # child_skin shader patch: region hover + ILLUSTRATIVE lesion reveal
@@ -28,8 +29,10 @@ apps/web/src/components/avatar/
   sceneRig.ts             # SceneRig interface shared by model and fallback
   AnatomyColliders.ts     # Procedural fallback rig
   LipSyncController.ts    # Audio amplitude -> mouth level (drives jawOpen)
-  ExamFindingPanel.tsx    # Finding modal (text verbatim from case JSON via backend)
 ```
+
+## HTML overlays that follow the model
+`AvatarScene` takes an `overlayRef`; every frame it projects the anchors (`AnchorId`: the 4 regions, `child`, `head`) and moves each `[data-anchor]` child of that layer by writing **only `style.transform`** (sizes read first, then writes). Markers are centred on their point and get `data-on-stage`; `data-anchor-kind="card"` elements sit beside the point (`placeBeside`) and dock (`data-floating="false"`) when the stage is narrower than 640 px. Region anchors are the collider vertex nearest a point in front of the region box, so "both hands" never floats between the hands. The page never scrolls, so the plain wheel zooms; flights between views take 500 ms (instant under `prefers-reduced-motion`).
 
 ## Safety rules specific to the avatar
 - The model carries no clinical data. Lesions are an illustrative procedural pattern, shown only for regions examined AND `documented === true`; never for unknown regions (Hard Rule 1). Label it "minh hoạ, chờ bác sĩ duyệt".

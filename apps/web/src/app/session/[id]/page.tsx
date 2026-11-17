@@ -2,34 +2,41 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import vi from "../../../../messages/vi.json";
 import {
+  EXAM_REGIONS,
+  VIEWS,
   parseFindings,
   type ExamRegionId,
   type RegionFindings,
 } from "@/components/avatar/avatarContract";
-import AvatarCanvas from "@/components/avatar/AvatarCanvas";
-import ExamFindingPanel, { type ExamActionResponse } from "@/components/avatar/ExamFindingPanel";
+import ClinicStage, { type StageController } from "@/components/avatar/ClinicStage";
+import ExamResultCard, { type ExamActionResponse, type ExamCardState } from "@/components/avatar/ExamResultCard";
 import { patientLipSync } from "@/components/avatar/LipSyncController";
-import GuidedChecklist, { type GuideItem } from "@/components/guide/GuidedChecklist";
+import GuidedChecklist, { useGuideTicks, type GuideItem } from "@/components/guide/GuidedChecklist";
 import OnboardingOverlay, { onboardingSeen } from "@/components/onboarding/OnboardingOverlay";
-import Badge from "@/components/ui/Badge";
 import Button, { buttonClass } from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
 import Tile from "@/components/ui/Tile";
 import ChatInput from "@/components/workspace/ChatInput";
+import CockpitFrame from "@/components/workspace/CockpitFrame";
+import ExamRecord from "@/components/workspace/ExamRecord";
 import FinishDialog from "@/components/workspace/FinishDialog";
-import PushToTalk from "@/components/workspace/PushToTalk";
+import SessionSidebar, { type SidebarTab } from "@/components/workspace/SessionSidebar";
 import SessionTimer from "@/components/workspace/SessionTimer";
+import SessionTopBar from "@/components/workspace/SessionTopBar";
+import StageCaption from "@/components/workspace/StageCaption";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
+import VoiceDock from "@/components/workspace/VoiceDock";
+import { examTargetOf, lastPatientLine, latestFindings, type ExamTarget } from "@/components/workspace/examTurns";
 import {
   useVoiceSession,
   type LockReason,
   type VoiceTranscript,
 } from "@/hooks/useVoiceSession";
 import type { components } from "@/lib/api-client/schema";
-import { API_URL, authHeaders, whenAuthReady } from "@/lib/sessionAuth";
+import { API_URL, authHeaders, fmt, whenAuthReady } from "@/lib/sessionAuth";
 
 type ExamActionRequest = components["schemas"]["ExamActionRequest"];
 
@@ -64,6 +71,18 @@ async function errorCode(res: Response): Promise<string | null> {
   }
 }
 
+/** The mother counts as replying until her voice has been quiet this long (no flicker between words). */
+const REPLY_HOLD_MS = 700;
+
+function isTypingTarget(el: EventTarget | null): boolean {
+  return (
+    el instanceof HTMLElement &&
+    (el.isContentEditable || el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT")
+  );
+}
+
+const regionLabel = (target: ExamTarget) => vi.exam.regions[target].toLowerCase();
+
 /** Exam findings kept for this tab (sessionStorage may be blocked: then none). */
 function readFindings(key: string): RegionFindings {
   try {
@@ -93,10 +112,16 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [finishError, setFinishError] = useState<string | null>(null);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
 
-  const [examOpen, setExamOpen] = useState(false);
-  const [examResult, setExamResult] = useState<ExamActionResponse | null>(null);
+  // Exam result card on the stage (replaces the old modal) and its announcement.
+  const [card, setCard] = useState<ExamCardState | null>(null);
+  const [cardPinned, setCardPinned] = useState(false);
   const [examLoading, setExamLoading] = useState(false);
-  const [examError, setExamError] = useState<string | null>(null);
+  const [examAnnounce, setExamAnnounce] = useState("");
+  const [tab, setTab] = useState<SidebarTab>("chat");
+  const [replying, setReplying] = useState(false);
+  const replyTimer = useRef<number | undefined>(undefined);
+  const stageRef = useRef<StageController | null>(null);
+  const { ticks, toggle: toggleTick } = useGuideTicks(id);
   // Regions examined in this session -> `documented` (drives the avatar's region
   // status and illustrative lesion layer). Per-viewer convenience only: kept in
   // sessionStorage so a reload keeps it; the transcript stays the source of truth.
@@ -321,12 +346,12 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  async function handleExam(body: ExamActionRequest) {
+  async function handleExam(body: ExamActionRequest, target: ExamTarget) {
     if (lock) return;
-    setExamOpen(true);
     setExamLoading(true);
-    setExamError(null);
-    setExamResult(null);
+    setCardPinned(false);
+    setCard({ source: "live", target, loading: true, error: null, result: null });
+    setExamAnnounce(fmt(vi.cockpit.announce.examLoading, { region: regionLabel(target) }));
     try {
       const res = await fetch(`${API_URL}/api/v1/sessions/${id}/actions`, {
         method: "POST",
@@ -335,19 +360,163 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       });
       if (!res.ok) throw new Error();
       const result = (await res.json()) as ExamActionResponse;
-      setExamResult(result);
+      setCard({ source: "live", target, loading: false, error: null, result });
+      setExamAnnounce(
+        fmt(vi.cockpit.announce.exam, {
+          region: regionLabel(target),
+          finding: result.documented ? (result.finding ?? "") : vi.exam.unknown,
+        }),
+      );
       if (result.action === "examine_region" && result.region) recordFinding(result.region, result.documented);
       // The exam was recorded as transcript turns: reload the canonical transcript.
       await reloadTurns();
     } catch {
-      setExamError(vi.exam.error);
+      setCard({ source: "live", target, loading: false, error: vi.exam.error, result: null });
+      setExamAnnounce(vi.exam.error);
     } finally {
       setExamLoading(false);
     }
   }
 
-  const examineRegion = (region: ExamRegionId) => handleExam({ action: "examine_region", region });
-  const observeChild = () => handleExam({ action: "observe_child" });
+  const examineRegion = (region: ExamRegionId) => handleExam({ action: "examine_region", region }, region);
+  const observeChild = () => handleExam({ action: "observe_child" }, "observe_child");
+
+  const closeCard = useCallback(() => {
+    setCard(null);
+    setCardPinned(false);
+  }, []);
+
+  /** Fly the camera to a region (or the whole child) without examining it. */
+  const goTo = useCallback((target: ExamTarget) => {
+    if (target === "observe_child") stageRef.current?.focusChild();
+    else stageRef.current?.focusRegion(target);
+  }, []);
+
+  /** Reopen a past exam from the transcript or the exam record. */
+  const openRecorded = useCallback(
+    (target: ExamTarget, finding: string | null) => {
+      goTo(target);
+      setCardPinned(false);
+      setCard({
+        source: "transcript",
+        target,
+        finding,
+        documented: target === "observe_child" ? undefined : examFindings[target],
+      });
+    },
+    [goTo, examFindings],
+  );
+
+  // The mother's voice (lip-sync level) drives the "replying" state, held a
+  // little after she falls silent so the button does not flicker between words.
+  const onSpeakingChange = useCallback((speaking: boolean) => {
+    window.clearTimeout(replyTimer.current);
+    if (speaking) setReplying(true);
+    else replyTimer.current = window.setTimeout(() => setReplying(false), REPLY_HOLD_MS);
+  }, []);
+  useEffect(() => () => window.clearTimeout(replyTimer.current), []);
+
+  const focusInput = useCallback(() => inputRef.current?.focus(), []);
+
+  // ----- keyboard shortcuts (never while typing or while a dialog is open) -----
+  const shortcuts = useRef<{
+    enabled: boolean;
+    canTalk: boolean;
+    examine: (region: ExamRegionId) => void;
+    talk: (down: boolean) => void;
+    escape: () => boolean;
+  }>({ enabled: false, canTalk: false, examine: () => {}, talk: () => {}, escape: () => false });
+  const spaceHeld = useRef(false);
+  useEffect(() => {
+    const onDown = (e: KeyboardEvent) => {
+      const k = shortcuts.current;
+      if (!k.enabled || e.ctrlKey || e.metaKey || e.altKey || isTypingTarget(e.target)) return;
+      if (e.key === "Escape") {
+        if (k.escape()) e.preventDefault();
+        return;
+      }
+      if (e.key === " ") {
+        // The push-to-talk button handles its own Space; elsewhere Space means "talk".
+        if ((e.target as Element | null)?.closest?.("[data-ptt]")) return;
+        e.preventDefault();
+        if (!e.repeat && k.canTalk && !spaceHeld.current) {
+          spaceHeld.current = true;
+          k.talk(true);
+        }
+        return;
+      }
+      if (e.repeat) return;
+      const key = e.key.toLowerCase();
+      const n = Number(e.key);
+      if (Number.isInteger(n) && n >= 1 && n <= EXAM_REGIONS.length) {
+        e.preventDefault();
+        k.examine(EXAM_REGIONS[n - 1]);
+      } else if (key === "q" || key === "w" || key === "e") {
+        e.preventDefault();
+        stageRef.current?.setView(VIEWS["qwe".indexOf(key)]);
+      } else if (key === "f") {
+        e.preventDefault();
+        stageRef.current?.toggleFullscreen();
+      } else if (e.key === "/") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    const onUp = (e: KeyboardEvent) => {
+      if (e.key !== " " || !spaceHeld.current) return;
+      spaceHeld.current = false;
+      e.preventDefault();
+      shortcuts.current.talk(false);
+    };
+    const onBlur = () => {
+      if (!spaceHeld.current) return;
+      spaceHeld.current = false;
+      shortcuts.current.talk(false);
+    };
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+    window.addEventListener("blur", onBlur);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
+  const recorded = useMemo(() => latestFindings(turns), [turns]);
+  const lastReply = useMemo(() => lastPatientLine(turns), [turns]);
+
+  // Latest values for the window key handlers (refreshed after every render).
+  useEffect(() => {
+    shortcuts.current = {
+      enabled: load === "ready" && !finishOpen && !onboardingOpen,
+      canTalk:
+        !lock &&
+        pending?.state !== "sending" &&
+        !replying &&
+        !voice.gaveUp &&
+        voice.micState !== "denied" &&
+        voice.micState !== "unsupported" &&
+        voice.status !== "processing" &&
+        voice.status !== "connecting" &&
+        voice.status !== "reconnecting",
+      examine: (region) => {
+        if (examLoading || lock) return;
+        stageRef.current?.focusRegion(region);
+        stageRef.current?.noteInteraction();
+        void examineRegion(region);
+      },
+      talk: (down) => {
+        if (down) void voice.start();
+        else voice.stop();
+      },
+      escape: () => {
+        if (!card) return false;
+        closeCard();
+        return true;
+      },
+    };
+  });
 
   // ----- non-ready states -----
   if (load !== "ready" || !meta) {
@@ -394,7 +563,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   }
 
   const exam = meta.mode === "exam";
-  const modeLabel = exam ? vi.session.mode.exam : vi.session.mode.guided;
   const startedAtMs = Date.parse(guide?.started_at ?? meta.created_at);
   const voiceBusy = voice.status === "processing" || voice.status === "recording";
   const lockedReason =
@@ -404,161 +572,146 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         ? vi.workspace.errors.finished
         : null;
 
+  const examined = new Set<ExamRegionId>(EXAM_REGIONS.filter((r) => r in recorded || r in examFindings));
+  const sending = pending?.state === "sending";
+  const guideItems = !exam && guide?.checklist_enabled ? guide.items : [];
+  const ticked = guideItems.filter((i) => ticks.has(i.criterion_id)).length;
+  const cardNode = card && (
+    <ExamResultCard state={card} pinned={cardPinned} onPin={setCardPinned} onClose={closeCard} />
+  );
+
   return (
-    <main id="main" className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
-      {/* Top bar: who the patient is, the mode, the clock, and the way out */}
-      <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-tile bg-surface px-5 py-4 shadow-lift ring-1 ring-line/70 sm:px-6">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-          <h1 className="font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
-            {vi.session.patientName}
-          </h1>
-          <Badge tone={exam ? "info" : "primary"}>
-            <span className="sr-only">{vi.session.modeLabel}: </span>
-            {modeLabel}
-          </Badge>
-        </div>
-        <div className="grid w-full grid-cols-1 gap-2 min-[400px]:grid-cols-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
-          <div className="min-[400px]:col-span-2 sm:contents">
-            <SessionTimer
-              startedAtMs={startedAtMs}
-              offsetMs={clockOffset}
-              limitS={exam ? (guide?.time_limit_s ?? null) : null}
-              onExpire={() => setLock("timeUp")}
-            />
-          </div>
-          <Button variant="ghost" onClick={() => setOnboardingOpen(true)}>
-            {vi.workspace.help}
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={() => {
+    <>
+      <CockpitFrame
+        topBar={
+          <SessionTopBar
+            exam={exam}
+            timer={
+              <SessionTimer
+                startedAtMs={startedAtMs}
+                offsetMs={clockOffset}
+                limitS={exam ? (guide?.time_limit_s ?? null) : null}
+                onExpire={() => setLock("timeUp")}
+              />
+            }
+            onHelp={() => setOnboardingOpen(true)}
+            onFinish={() => {
               setFinishError(null);
               setFinishOpen(true);
             }}
-          >
-            {vi.session.finish}
-          </Button>
-        </div>
-      </header>
-
-      {lock === "timeUp" && (
-        <div
-          role="alert"
-          className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-card border border-warning/30 bg-warning-soft px-5 py-4 text-ink"
-        >
-          <div className="flex items-start gap-3">
-            <svg
-              viewBox="0 0 20 20"
-              className="mt-0.5 h-5 w-5 shrink-0 text-warning"
-              fill="none"
-              aria-hidden="true"
+          />
+        }
+        banner={
+          lock === "timeUp" && (
+            <div
+              role="alert"
+              className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-card border border-warning/30 bg-warning-soft px-4 py-2.5 text-ink"
             >
-              <circle cx="10" cy="10" r="7.5" stroke="currentColor" strokeWidth="1.6" />
-              <path d="M10 6v4.5l3 2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-            </svg>
-            <div>
-              <p className="font-bold text-warning">{vi.workspace.timer.timeUpTitle}</p>
-              <p className="text-sm">{vi.workspace.timer.timeUpBody}</p>
+              <p className="text-sm">
+                <span className="font-bold text-warning">{vi.workspace.timer.timeUpTitle}.</span>{" "}
+                {vi.workspace.timer.timeUpBody}
+              </p>
+              <Button variant="primary" onClick={() => setFinishOpen(true)}>
+                {vi.session.finish}
+              </Button>
             </div>
-          </div>
-          <Button variant="primary" onClick={() => setFinishOpen(true)}>
-            {vi.session.finish}
-          </Button>
-        </div>
-      )}
-
-      {/* < 1024 px: one column, avatar -> chat (-> checklist).
-          >= 1024 px: patient column left (5/12), chat column right (7/12). */}
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
-        <section
-          aria-label={vi.workspace.regions.patient}
-          className="flex min-w-0 flex-col gap-4 lg:col-span-5 lg:col-start-1 lg:row-start-1"
-        >
-          <AvatarCanvas
+          )
+        }
+        stage={
+          <ClinicStage
+            controllerRef={stageRef}
+            findings={examFindings}
+            examined={examined}
+            busy={examLoading || !!lock}
             onExamineRegion={examineRegion}
             onObserve={observeChild}
-            findings={examFindings}
-            busy={examLoading || !!lock}
-          />
-        </section>
-
-        <section
-          aria-label={vi.workspace.regions.chat}
-          className="flex h-[75vh] min-h-[26rem] min-w-0 flex-col overflow-hidden rounded-tile bg-surface shadow-lift ring-1 ring-line/70 lg:sticky lg:top-4 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:h-[calc(100vh-10rem)]"
-        >
-          <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-6">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand-soft text-sand-ink" aria-hidden="true">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
-                <circle cx="10" cy="7" r="3.2" />
-                <path d="M3.5 20c.6-5.4 3.4-8.4 6.5-8.4s5.9 3 6.5 8.4z" />
-                <circle cx="16.5" cy="12.5" r="2.2" />
-                <path d="M12.8 20c.3-3.1 1.8-5 3.7-5s3.4 1.9 3.7 5z" />
-              </svg>
-            </span>
-            <div className="min-w-0">
-              <p className="font-display text-base font-bold leading-tight text-ink">{vi.session.mother}</p>
-              <p className="text-xs text-ink-muted">{vi.landing.stage.status}</p>
-            </div>
-          </div>
-          <TranscriptBox
-            turns={turns}
-            pending={pending}
-            waiting={voice.status === "processing"}
-            onResend={() => pending && void sendTurn(pending.text)}
-            onDiscard={() => setPending(null)}
-          />
-          <div className="border-t border-line">
-            {!lock && (
-              <PushToTalk
+            onSpeakingChange={onSpeakingChange}
+            card={cardNode}
+            cardAnchor={card ? (card.target === "observe_child" ? "child" : card.target) : null}
+            caption={<StageCaption text={lastReply?.text ?? null} />}
+            voice={
+              <VoiceDock
                 status={voice.status}
-                error={voice.error}
-                notice={voice.notice}
                 micState={voice.micState}
                 gaveUp={voice.gaveUp}
-                disabled={pending?.state === "sending"}
+                error={voice.error}
+                notice={voice.notice}
+                replying={replying}
+                disabled={sending}
+                lockedReason={lockedReason}
+                micLevel={voice.micLevel}
                 onStart={() => void voice.start()}
                 onStop={voice.stop}
                 onRetry={voice.retryConnection}
+                onTypeInstead={focusInput}
               />
-            )}
-            <ChatInput
-              onSend={(t) => void sendTurn(t)}
-              busy={pending?.state === "sending" || voiceBusy}
-              lockedReason={lockedReason}
-              inputRef={inputRef}
-            />
-          </div>
-        </section>
-
-        {/* Guided mode only; exam mode gets no checklist from the API either. */}
-        {!exam && (
-          <div className="min-w-0 lg:col-span-5 lg:col-start-1 lg:row-start-2">
-            <GuidedChecklist
-              sessionId={id}
-              items={guide?.checklist_enabled ? guide.items : []}
-              state={guideState}
-              onRetry={() => void loadGuide()}
-            />
-          </div>
+            }
+          />
+        }
+        renderSidebar={(collapseButton) => (
+          <SessionSidebar
+            tab={tab}
+            onTab={setTab}
+            chatCount={turns.filter((t) => t.speaker !== "system" && !examTargetOf(t.text)).length}
+            examDone={examined.size}
+            examTotal={EXAM_REGIONS.length}
+            headerAction={collapseButton}
+            chat={
+              <TranscriptBox
+                turns={turns}
+                pending={pending}
+                waiting={voice.status === "processing"}
+                onResend={() => pending && void sendTurn(pending.text)}
+                onDiscard={() => setPending(null)}
+                onOpenExam={openRecorded}
+              />
+            }
+            record={<ExamRecord findings={recorded} onOpen={openRecorded} onGoTo={goTo} />}
+            composer={
+              <ChatInput
+                onSend={(t) => void sendTurn(t)}
+                busy={sending || voiceBusy}
+                lockedReason={lockedReason}
+                inputRef={inputRef}
+              />
+            }
+            drawer={
+              // Guided mode only; exam mode gets no checklist from the API either.
+              !exam && (
+                <GuidedChecklist
+                  sessionId={id}
+                  items={guideItems}
+                  state={guideState}
+                  ticks={ticks}
+                  onToggle={toggleTick}
+                  onRetry={() => void loadGuide()}
+                />
+              )
+            }
+          />
         )}
+      />
+
+      {/* One polite announcement per new reply and per exam result (the log itself stays quiet). */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {lastReply ? fmt(vi.cockpit.announce.reply, { text: lastReply.text }) : ""}
+      </div>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {examAnnounce}
       </div>
 
-      <ExamFindingPanel
-        open={examOpen}
-        result={examResult}
-        loading={examLoading}
-        error={examError}
-        onClose={() => setExamOpen(false)}
-      />
       <FinishDialog
         open={finishOpen}
         turnCount={turns.length}
+        unexamined={EXAM_REGIONS.length - examined.size}
+        regionTotal={EXAM_REGIONS.length}
+        unticked={guideItems.length > 0 ? { n: guideItems.length - ticked, total: guideItems.length } : null}
         finishing={finishing}
         error={finishError}
         onConfirm={() => void handleFinish()}
         onCancel={() => setFinishOpen(false)}
       />
       <OnboardingOverlay open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
-    </main>
+    </>
   );
 }

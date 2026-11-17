@@ -228,11 +228,6 @@
     "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
   "voice": {
-    "hold": "Giữ để nói",
-    "recording": "Đang ghi âm… thả ra để gửi",
-    "connecting": "Đang kết nối…",
-    "processing": "Đang xử lý giọng nói…",
-    "hint": "Giữ nút (hoặc phím Space) trong khi nói, thả ra để gửi. Bạn vẫn có thể gõ câu hỏi bên dưới.",
     "micDenied": "Trình duyệt chưa cho phép dùng micro. Hãy cấp quyền micro hoặc gõ câu hỏi.",
     "unsupported": "Trình duyệt này không hỗ trợ ghi âm. Bạn hãy gõ câu hỏi.",
     "disconnected": "Mất kết nối giọng nói. Nhấn nút để kết nối lại hoặc gõ câu hỏi.",
@@ -245,16 +240,12 @@
     "genericError": "Có lỗi với giọng nói. Bạn hãy thử lại hoặc gõ câu hỏi."
   },
   "avatar": {
-    "title": "Người mẹ bế bé",
-    "loading": "Đang tải mô hình 3D…",
     "illustrative": "Mô hình minh hoạ",
-    "hint": "Kéo để xoay góc nhìn, giữ Ctrl rồi cuộn để phóng to. Mô hình 3D chỉ để minh hoạ, không phải hình ảnh lâm sàng.",
     "sceneLabel": "Phòng khám nhi 3D: người mẹ ngồi ở mép giường khám, bế bé trong lòng.",
     "loadingProgress": "Đang tải phòng khám… {pct}%",
     "unsupported": "Trình duyệt này không hiển thị được 3D (WebGL). Bạn vẫn khám được bằng các nút bên dưới.",
     "fallbackModel": "Đang dùng mô hình đơn giản",
     "speaking": "Mẹ đang nói",
-    "wheelHint": "Giữ Ctrl rồi cuộn để phóng to",
     "lesionNote": "Ban trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt",
     "clickToExamine": "Bấm để khám",
     "examined": "Đã khám",
@@ -269,7 +260,6 @@
     }
   },
   "exam": {
-    "hintClick": "Bấm vào một vùng cơ thể của bé để khám.",
     "observe": "Quan sát trẻ nằm yên",
     "regions": {
       "palm_hands": "Lòng bàn tay",
@@ -283,9 +273,7 @@
     "finding": "Ghi nhận trong hồ sơ",
     "unknown": "Hồ sơ ca bệnh không có ghi nhận cho vùng này. (Điều này không có nghĩa là bình thường.)",
     "redFlag": "Dấu hiệu cảnh báo",
-    "illustrative": "Hình minh hoạ — không phải ảnh lâm sàng",
     "draft": "Nội dung lâm sàng đang ở trạng thái nháp, chưa được bác sĩ thẩm định.",
-    "close": "Đóng",
     "loading": "Đang khám…",
     "error": "Không thực hiện được thao tác khám. Vui lòng thử lại.",
     "systemLabel": "Kết quả khám"
@@ -618,19 +606,7 @@
       "title": "Kết thúc buổi khám?",
       "body": "Sau khi kết thúc, bạn sẽ không thể hỏi thêm hay khám thêm. Hệ thống sẽ chấm điểm dựa trên những gì đã diễn ra trong buổi khám.",
       "turns": "Hội thoại hiện có {n} lượt.",
-      "confirm": "Kết thúc và xem phản hồi",
       "cancel": "Tiếp tục khám"
-    },
-    "mic": {
-      "deniedTitle": "Micro đang bị chặn",
-      "deniedSteps": [
-        "Bấm biểu tượng ổ khoá hoặc micro ở cạnh thanh địa chỉ của trình duyệt.",
-        "Chọn Cho phép (Allow) cho Micro, rồi tải lại trang.",
-        "Trong lúc đó, bạn cứ gõ câu hỏi ở ô bên dưới."
-      ],
-      "unsupportedTitle": "Trình duyệt không hỗ trợ ghi âm",
-      "unsupportedBody": "Hãy dùng Chrome, Edge hoặc Firefox bản mới để nói, hoặc gõ câu hỏi ở ô bên dưới.",
-      "textMode": "Đã chuyển sang chế độ nhập chữ."
     },
     "voice": {
       "reconnecting": "Mất kết nối giọng nói, đang kết nối lại (lần {n}/{max})…",
@@ -674,7 +650,7 @@
       },
       {
         "title": "Khám trên avatar",
-        "body": "Bấm vào một vùng cơ thể của bé trên mô hình 3D, hoặc dùng các nút khám ngay dưới mô hình, để xem ghi nhận khám."
+        "body": "Ở góc nhìn “Khám bé”, mỗi vùng khám có một điểm sáng trên người bé: bấm vào đó, hoặc dùng các nút vùng khám ở đáy sân khấu (phím 1 đến 4). Kết quả hiện ngay cạnh vùng vừa khám."
       },
       {
         "title": "Kết thúc",
@@ -684,15 +660,28 @@
     "next": "Tiếp",
     "back": "Quay lại",
     "skip": "Bỏ qua",
-    "done": "Bắt đầu khám"
+    "done": "Bắt đầu khám",
+    "controls": {
+      "title": "Điều khiển và phím tắt",
+      "body": "Kéo để xoay quanh phòng khám, cuộn chuột hoặc chụm hai ngón để phóng to, nút ⟲ để đặt lại góc nhìn. Phím tắt không hoạt động khi bạn đang gõ trong ô nhập.",
+      "keysLabel": "Phím",
+      "actionLabel": "Tác dụng",
+      "keys": [
+        ["Space (giữ)", "Nói với người mẹ"],
+        ["1 – 4", "Khám lòng bàn tay, lòng bàn chân, miệng - họng, mông - đầu gối"],
+        ["Q · W · E", "Góc nhìn Toàn cảnh · Trò chuyện · Khám bé"],
+        ["F", "Sân khấu toàn màn hình"],
+        ["/", "Đưa con trỏ vào ô nhập câu hỏi"],
+        ["Esc", "Đóng thẻ kết quả, thoát toàn màn hình"]
+      ]
+    }
   },
   "a11y": {
     "skipToContent": "Bỏ qua đến nội dung chính",
     "openMenu": "Mở menu điều hướng",
     "closeMenu": "Đóng menu điều hướng",
     "mainNav": "Điều hướng chính",
-    "close": "Đóng",
-    "examButtons": "Khám bằng nút (dùng được với bàn phím)"
+    "close": "Đóng"
   },
   "setupUx": {
     "intro": "Chọn vai trò và chế độ, đồng ý lưu dữ liệu, rồi bắt đầu hỏi bệnh người mẹ.",
@@ -783,5 +772,77 @@
       "Phản hồi Auto-OSCE chỉ để luyện tập, không thay thế giảng viên."
     ],
     "backHome": "Về trang chủ"
+  },
+  "cockpit": {
+    "home": "Về trang chủ",
+    "finishShort": "Kết thúc",
+    "stageLabel": "Sân khấu 3D",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Thu nhỏ",
+    "resetView": "Đặt lại góc nhìn",
+    "firstHint": "Kéo để xoay · Cuộn hoặc chụm hai ngón để phóng to · Bấm điểm sáng trên người bé để khám",
+    "dismissHint": "Đã hiểu",
+    "examBar": "Vùng khám",
+    "markerTitle": "{region}: bấm để khám",
+    "caption": {
+      "label": "Phụ đề lời người mẹ",
+      "show": "Hiện phụ đề",
+      "hide": "Ẩn phụ đề"
+    },
+    "voice": {
+      "ready": "Giữ để nói",
+      "listening": "Đang nghe… thả ra để gửi",
+      "processing": "Đang xử lý…",
+      "connecting": "Đang kết nối…",
+      "replying": "Người mẹ đang trả lời…",
+      "typeInstead": "Gõ câu hỏi",
+      "deniedLine": "Micro đang bị chặn: bấm biểu tượng ổ khoá cạnh thanh địa chỉ, chọn Cho phép (Allow) cho Micro rồi tải lại trang.",
+      "unsupportedLine": "Trình duyệt này không ghi âm được. Hãy dùng Chrome, Edge hoặc Firefox bản mới, hoặc gõ câu hỏi.",
+      "hint": "Giữ nút hoặc giữ phím Space trong khi nói, thả ra để gửi."
+    },
+    "tabs": {
+      "label": "Hội thoại và phiếu khám",
+      "chat": "Trò chuyện",
+      "record": "Phiếu khám"
+    },
+    "newMessages": "Tin mới",
+    "examDone": "Đã khám {region}",
+    "observeDone": "Đã quan sát toàn trạng",
+    "examPending": "Chưa có kết quả",
+    "viewResult": "Xem lại kết quả",
+    "record": {
+      "notExamined": "Chưa khám",
+      "goTo": "Đi tới",
+      "goToLabel": "Đi tới vùng {region} trên mô hình",
+      "open": "Xem thẻ kết quả"
+    },
+    "checklist": {
+      "toggle": "Nhắc việc {done}/{total}",
+      "open": "Mở danh sách nhắc việc",
+      "close": "Thu gọn danh sách nhắc việc"
+    },
+    "sidebar": {
+      "collapse": "Thu gọn cột hội thoại",
+      "expand": "Mở cột hội thoại",
+      "resize": "Kéo để đổi độ rộng cột hội thoại",
+      "sheet": "Kéo hoặc bấm để đổi chiều cao khung hội thoại"
+    },
+    "card": {
+      "pin": "Ghim thẻ kết quả",
+      "unpin": "Bỏ ghim thẻ kết quả",
+      "close": "Đóng thẻ kết quả",
+      "fromTranscript": "Kết quả đã ghi trong hội thoại"
+    },
+    "finish": {
+      "unexamined": "Vùng chưa khám: {n}/{total}",
+      "allExamined": "Đã khám đủ {total} vùng.",
+      "unticked": "Mục nhắc việc chưa đánh dấu: {n}/{total}",
+      "confirm": "Kết thúc buổi khám"
+    },
+    "announce": {
+      "reply": "Người mẹ: {text}",
+      "exam": "Kết quả khám {region}: {finding}",
+      "examLoading": "Đang khám {region}…"
+    }
   }
 }

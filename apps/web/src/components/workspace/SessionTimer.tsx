@@ -74,15 +74,15 @@ export default function SessionTimer({
 
   return (
     <div
-      className={`flex h-11 w-full items-center gap-2 rounded-full border px-4 text-sm sm:w-auto ${
+      className={`flex h-11 items-center gap-2 rounded-full border px-3 text-sm sm:px-4 ${
         low ? "border-warning/40 bg-warning-soft text-warning" : "border-line bg-canvas text-ink"
       }`}
     >
-      <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0" fill="none" aria-hidden="true">
+      <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0 max-sm:hidden" fill="none" aria-hidden="true">
         <circle cx="10" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.6" />
         <path d="M10 7.5V11l2.2 1.6M8 2.5h4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
-      <span className={low ? "font-semibold" : "text-ink-muted"}>{label}</span>
+      <span className={`max-xl:sr-only ${low ? "font-semibold" : "text-ink-muted"}`}>{label}</span>
       <span role="timer" aria-label={label} className="tabular text-base font-bold">
         {now === null ? "--:--" : format(shown)}
       </span>

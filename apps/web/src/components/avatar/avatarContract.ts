@@ -129,3 +129,39 @@ export function aspectDistanceFactor(aspect: number, designAspect = 1.6): number
   if (!(aspect > 0)) return 1;
   return aspect >= designAspect ? 1 : Math.pow(designAspect / aspect, 0.85);
 }
+
+/**
+ * Screen-space anchors the scene projects every frame for HTML overlays:
+ * one per exam region (markers, result card), the child as a whole (the
+ * "observe" result) and the mother's head (the "speaking" badge).
+ */
+export type AnchorId = ExamRegionId | "child" | "head";
+export const ANCHOR_IDS: readonly AnchorId[] = [...EXAM_REGIONS, "child", "head"];
+export function isAnchorId(value: unknown): value is AnchorId {
+  return value === "child" || value === "head" || isExamRegion(value);
+}
+
+/**
+ * Top-left corner for a card of size `w`×`h` placed beside an anchor at
+ * (`x`, `y`) inside a `boxW`×`boxH` stage: to the right of the point, or to
+ * its left when it would overflow, vertically centred, always `margin` inside.
+ */
+export function placeBeside(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  boxW: number,
+  boxH: number,
+  gap = 28,
+  margin = 12,
+): { x: number; y: number; side: "left" | "right" } {
+  const fitsRight = x + gap + w <= boxW - margin;
+  const side = fitsRight || x < boxW / 2 ? "right" : "left";
+  const left = side === "right" ? x + gap : x - gap - w;
+  return {
+    x: clamp(left, margin, Math.max(margin, boxW - margin - w)),
+    y: clamp(y - h / 2, margin, Math.max(margin, boxH - margin - h)),
+    side,
+  };
+}

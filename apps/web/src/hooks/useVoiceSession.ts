@@ -106,6 +106,8 @@ export function useVoiceSession({
   const streamRef = useRef<MediaStream | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  // Read-only tap on the microphone for the push-to-talk waveform (never sent anywhere).
+  const micTapRef = useRef<{ source: MediaStreamAudioSourceNode; node: AnalyserNode; buf: Uint8Array<ArrayBuffer> } | null>(null);
   const playingRef = useRef<AudioBufferSourceNode | null>(null);
   const stopRequestedRef = useRef(false);
   const closingRef = useRef(false); // intentional close: never reconnect
@@ -383,6 +385,8 @@ export function useVoiceSession({
   }, [connect]);
 
   const releaseMic = useCallback(() => {
+    micTapRef.current?.source.disconnect();
+    micTapRef.current = null;
     streamRef.current?.getTracks().forEach((t) => t.stop());
     streamRef.current = null;
   }, []);
@@ -434,6 +438,14 @@ export function useVoiceSession({
     }
     const ws = wsRes.value;
     streamRef.current = stream;
+    const ctx = ctxRef.current;
+    if (ctx) {
+      const source = ctx.createMediaStreamSource(stream);
+      const node = ctx.createAnalyser();
+      node.fftSize = 512;
+      source.connect(node); // not connected to the speakers: no echo
+      micTapRef.current = { source, node, buf: new Uint8Array(node.fftSize) };
+    }
 
     const rec = new MediaRecorder(
       stream,
@@ -456,6 +468,16 @@ export function useVoiceSession({
     setStatus("recording");
     if (stopRequestedRef.current) rec.stop(); // released before the mic was ready
   }, [connect, releaseMic, armReplyTimer, prepareAudio, stopSpeaking]);
+
+  /** Microphone loudness 0..1 while recording (0 otherwise), for the waveform. */
+  const micLevel = useCallback((): number => {
+    const tap = micTapRef.current;
+    if (!tap) return 0;
+    tap.node.getByteTimeDomainData(tap.buf);
+    let sum = 0;
+    for (const v of tap.buf) sum += ((v - 128) / 128) ** 2;
+    return Math.min(1, Math.sqrt(sum / tap.buf.length) * 4);
+  }, []);
 
   /** Manual retry after `gaveUp`: a fresh set of reconnect attempts. */
   const retryConnection = useCallback(() => {
@@ -519,5 +541,6 @@ export function useVoiceSession({
     prepareAudio,
     speakTurn,
     stopSpeaking,
+    micLevel,
   };
 }
