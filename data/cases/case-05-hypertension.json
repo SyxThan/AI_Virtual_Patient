@@ -37,68 +37,85 @@
       "The patient was told at the company check-up that his 'chỉ số huyết áp cao', so 'huyết áp cao' is NOT in forbidden_terms (he may say it). 'tăng huyết áp' and the grading/risk terms are forbidden, because nobody has diagnosed or graded him yet.",
       "Corpus: data/guidelines/hypertension_chunks.json ingests only 3192/QĐ-BYT. VNHA/VSH 2022 and ESC 2024 are not ingested (rights not confirmed by owner); the OSCE still mentions them as possible scoring standards.",
       "Known app gap (not clinical): the Patient Agent system prompt (apps/api/avp_api/services/patient_agent.py) is hard-coded as 'the mother of an 18-month-old'. This case has informant 'self' (an adult man speaking in the first person). A code task must make the prompt follow patient.informant and persona before this case is usable.",
-      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67)."
+      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67).",
+      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays are illustrative, TODO(clinician) review. Mapping (AVP-164): arm_right_bp and arm_left_bp both reveal exam region 'vitals' (e-vitals is one entry whose sentence 'Lần 1: tay phải ..., tay trái ...' mixes both arms, so it is not split); neck_carotid -> neck, chest_heart_lungs -> chest, abdomen -> abdomen, legs_feet -> legs. general, neuro, anthropometry and pulses have no collider and stay as list entries. No exam[] entry was changed. Fundus is still not in exam[] (the draft only asks whether to include it)."
     ]
   },
   "catalog": {
     "patient_group": "adult",
     "display_complaint": "Công ty khám sức khỏe, cô y tá đo chỉ số cao quá nên dặn tôi đi khám lại cho chắc.",
-    "cover": "/cases/hypertension-cover.svg",
-    "exam_mode": "2d",
+    "cover": "/cases/hypertension-cover.png",
+    "exam_mode": "3d",
     "exam_regions": [
       {
-        "id": "general",
-        "label": "Toàn trạng",
-        "x": 0.5,
-        "y": 0.05
+        "id": "arm_right_bp",
+        "label": "Huyết áp tay phải",
+        "exam_region": "vitals",
+        "x": null,
+        "y": null
       },
       {
-        "id": "neuro",
-        "label": "Thần kinh",
-        "x": 0.5,
-        "y": 0.14
+        "id": "arm_left_bp",
+        "label": "Huyết áp tay trái",
+        "exam_region": "vitals",
+        "x": null,
+        "y": null
       },
       {
-        "id": "neck",
+        "id": "neck_carotid",
         "label": "Cổ, động mạch cảnh",
-        "x": 0.5,
-        "y": 0.215
+        "exam_region": "neck",
+        "x": null,
+        "y": null
       },
       {
-        "id": "chest",
+        "id": "chest_heart_lungs",
         "label": "Tim, phổi",
-        "x": 0.5,
-        "y": 0.33
-      },
-      {
-        "id": "vitals",
-        "label": "Huyết áp hai tay, sinh hiệu",
-        "x": 0.29,
-        "y": 0.37
+        "exam_region": "chest",
+        "x": null,
+        "y": null
       },
       {
         "id": "abdomen",
         "label": "Bụng, nghe quanh rốn",
-        "x": 0.5,
-        "y": 0.46
+        "exam_region": "abdomen",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "legs_feet",
+        "label": "Cẳng chân, bàn chân",
+        "exam_region": "legs",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "general",
+        "label": "Toàn trạng",
+        "exam_region": "general",
+        "x": null,
+        "y": null
       },
       {
         "id": "anthropometry",
         "label": "Chiều cao, cân nặng, vòng bụng",
-        "x": 0.5,
-        "y": 0.555
+        "exam_region": "anthropometry",
+        "x": null,
+        "y": null
       },
       {
         "id": "pulses",
         "label": "Mạch ngoại biên",
-        "x": 0.79,
-        "y": 0.6
+        "exam_region": "pulses",
+        "x": null,
+        "y": null
       },
       {
-        "id": "legs",
-        "label": "Hai chi dưới",
-        "x": 0.4,
-        "y": 0.82
+        "id": "neuro",
+        "label": "Thần kinh",
+        "exam_region": "neuro",
+        "x": null,
+        "y": null
       }
     ],
     "estimated_minutes": null,
