@@ -76,7 +76,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-151** | **Slice 20** (`TASK-S20-06`) | RAG theo ca: mỗi ca có bộ tài liệu riêng, truy vấn lọc theo ca | **P1** | ✅ Merged (PR #63; migration `0003` mới chạy trên dev, chưa chạy trên demo) |
 | **AVP-152** | **Slice 20** (`TASK-S20-07`) | Ca nhi: Sốt xuất huyết Dengue (bản nháp, chờ bác sĩ) | **P0** | ✅ Merged (PR #65; bản nháp, chờ bác sĩ duyệt; corpus `rights_checked: false`) |
 | **AVP-153** | **Slice 20** (`TASK-S20-08`) | Ca nhi: Viêm phổi trẻ em (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
-| **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
+| **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ✅ Merged (PR #68; bản nháp, chờ bác sĩ duyệt; chưa có nguồn trích dẫn) |
 | **AVP-155** | **Slice 20** (`TASK-S20-10`) | Ca người lớn: Tăng huyết áp (bản nháp, chờ bác sĩ) | **P1** | ❌ Chưa làm |
 | **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ❌ Chưa làm |
 | **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | ✅ Merged (PR #58) |
