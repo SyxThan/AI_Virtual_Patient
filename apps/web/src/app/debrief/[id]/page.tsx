@@ -12,6 +12,7 @@ import RedFlagAlertBanner from "@/components/debrief/RedFlagAlertBanner";
 import RubricEvidenceList from "@/components/debrief/RubricEvidenceList";
 import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
+import { caseVoiceOf, speakerText } from "@/components/workspace/caseVoice";
 import Button, { buttonClass } from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
 import { caseLabel, patientLine, useSessionCase } from "@/lib/caseSummary";
@@ -246,7 +247,12 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
           </div>
         </Tile>
       </div>
-      {focusTurn !== null && <TranscriptDrawer turns={turns} focusIdx={focusTurn} onClose={closeDrawer} />}
+      {focusTurn !== null && <TranscriptDrawer
+          turns={turns}
+          focusIdx={focusTurn}
+          patientLabel={speakerText(vi.debrief.transcript.patient, caseVoiceOf(sessionCase))}
+          onClose={closeDrawer}
+        />}
     </PageShell>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from "react";
 import vi from "../../../messages/vi.json";
+import { speakerText, useCaseVoice } from "@/components/workspace/caseVoice";
 import { patientLipSync } from "@/components/avatar/LipSyncController";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { useExamRegions } from "@/components/workspace/examRegions";
@@ -42,6 +43,7 @@ export default function Exam2DStage({
   caption?: ReactNode;
   voice?: ReactNode;
 }) {
+  const caseVoice = useCaseVoice();
   const regions = useExamRegions();
   const pointRefs = useRef(new Map<string, HTMLButtonElement>());
   const chipRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -92,10 +94,10 @@ export default function Exam2DStage({
       <div
         data-stage-transition
         style={{ viewTransitionName: STAGE_TRANSITION_NAME }}
-        className="relative h-[45dvh] shrink-0 overflow-hidden rounded-tile bg-gradient-to-b from-sand-soft to-canvas ring-1 ring-line/70 md:h-full md:rounded-none md:ring-0"
+        className="relative h-[45dvh] shrink-0 overflow-hidden rounded-tile bg-gradient-to-b from-sand-soft to-canvas ring-1 ring-line/70 md:h-auto md:min-h-0 md:flex-1 md:rounded-none md:ring-0"
       >
         {/* Size container: the figure is the largest box of the image's ratio that fits. */}
-        <div className="absolute inset-3 grid place-items-center [container-type:size] md:bottom-48">
+        <div className="absolute inset-3 grid place-items-center [container-type:size]">
         {regions.image ? (
           // The figure has exactly the image's aspect ratio, so % positions land on the same spot at any size.
           <figure
@@ -156,14 +158,14 @@ export default function Exam2DStage({
             speaking ? "opacity-100" : "opacity-0"
           }`}
         >
-          {vi.avatar.speaking}
+          {speakerText(vi.avatar.speakingWho, caseVoice)}
         </span>
 
         {card && <div className="absolute inset-x-3 bottom-3 z-20 md:inset-x-auto md:right-3 md:top-3 md:bottom-auto md:w-80">{card}</div>}
       </div>
 
-      {/* Dock: >= md floats over the bottom of the stage, < md sits below it. */}
-      <div className="pointer-events-none z-20 flex flex-col gap-2 pt-3 md:absolute md:inset-x-0 md:bottom-0 md:bg-gradient-to-t md:from-canvas/90 md:via-canvas/50 md:to-transparent md:px-4 md:pb-4 md:pt-10">
+      {/* Dock: always below the image (unlike the 3D scene, nothing may cover a hotspot). */}
+      <div className="pointer-events-none z-20 flex flex-col gap-2 pt-3 md:shrink-0 md:bg-canvas md:px-4 md:pb-4">
         <p className="pointer-events-auto text-xs leading-snug text-ink-muted">
           <span className="font-semibold text-ink">{vi.avatar.illustrative}</span> · {vi.exam2d.hint}
         </p>

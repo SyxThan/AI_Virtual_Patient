@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import vi from "../../../messages/vi.json";
+import { speakerText, useCaseVoice } from "@/components/workspace/caseVoice";
 import type { MicState, VoiceStatus } from "@/hooks/useVoiceSession";
 import { FOCUS_RING } from "@/components/ui/focus";
 
@@ -47,6 +48,7 @@ export default function VoiceDock({
   onRetry: () => void;
   onTypeInstead: () => void;
 }) {
+  const voice = useCaseVoice();
   const barsRef = useRef<HTMLSpanElement>(null);
   const recording = status === "recording";
 
@@ -127,7 +129,7 @@ export default function VoiceDock({
       : connecting
         ? vi.cockpit.voice.connecting
         : replying
-          ? vi.cockpit.voice.replying
+          ? speakerText(vi.cockpit.voice.replying, voice)
           : vi.cockpit.voice.ready;
   const tone = recording
     ? "bg-ink text-white ring-4 ring-glow/50"

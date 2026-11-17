@@ -30,6 +30,7 @@ import SessionTopBar from "@/components/workspace/SessionTopBar";
 import StageCaption from "@/components/workspace/StageCaption";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
 import VoiceDock from "@/components/workspace/VoiceDock";
+import { CaseVoiceContext, caseVoiceOf, speakerText } from "@/components/workspace/caseVoice";
 import { ExamRegionsContext, HFMD_REGIONS, regionsFromCase } from "@/components/workspace/examRegions";
 import { examTargetOf, lastPatientLine, latestFindings, type ExamTarget } from "@/components/workspace/examTurns";
 import {
@@ -130,6 +131,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     () => (sessionCase && examModeOf(sessionCase) === "3d" ? HFMD_REGIONS : regionsFromCase(sessionCase ?? null)),
     [sessionCase],
   );
+  const caseVoice = useMemo(() => caseVoiceOf(sessionCase), [sessionCase]);
   const is3d = regions.mode === "3d";
   const regionLabel = (target: ExamTarget) => regions.labelOf(target).toLowerCase();
   const { ticks, toggle: toggleTick } = useGuideTicks(id);
@@ -612,6 +614,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   );
 
   return (
+    <CaseVoiceContext.Provider value={caseVoice}>
     <ExamRegionsContext.Provider value={regions}>
       <CockpitFrame
         topBar={
@@ -728,7 +731,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
       {/* One polite announcement per new reply and per exam result (the log itself stays quiet). */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {lastReply ? fmt(vi.cockpit.announce.reply, { text: lastReply.text }) : ""}
+        {lastReply ? speakerText(vi.cockpit.announce.reply, caseVoice, { text: lastReply.text }) : ""}
       </div>
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {examAnnounce}
@@ -747,5 +750,6 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       />
       <OnboardingOverlay open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
     </ExamRegionsContext.Provider>
+    </CaseVoiceContext.Provider>
   );
 }

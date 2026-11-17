@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import vi from "../../../messages/vi.json";
+import { useCaseVoice } from "@/components/workspace/caseVoice";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 const OFF_KEY = "avp_caption_off_v1";
@@ -13,6 +14,7 @@ const OFF_KEY = "avp_caption_off_v1";
  * is remembered in this browser (a convenience only).
  */
 export default function StageCaption({ text }: { text: string | null }) {
+  const voice = useCaseVoice();
   const [off, setOff] = useState(false);
 
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function StageCaption({ text }: { text: string | null }) {
           key={text}
           className="line-clamp-2 max-w-3xl rounded-card bg-ink/85 px-4 py-2 text-center text-base leading-snug text-white shadow-lg backdrop-blur motion-safe:animate-[fade-in_var(--dur-base)_var(--ease-out)_both]"
         >
-          <span className="mr-1.5 font-semibold text-glow">{vi.session.mother}:</span>
+          <span className="mr-1.5 font-semibold text-glow">{voice.Who}:</span>
           {text}
         </p>
       )}

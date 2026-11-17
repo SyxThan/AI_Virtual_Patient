@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import vi from "../../../messages/vi.json";
+import { useCaseVoice } from "@/components/workspace/caseVoice";
 import BrandMark from "@/components/shell/BrandMark";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -24,6 +25,7 @@ export default function SessionTopBar({
   onHelp: () => void;
   onFinish: () => void;
 }) {
+  const voice = useCaseVoice();
   return (
     <header className="flex h-14 shrink-0 items-center gap-2 rounded-full bg-surface pl-2 pr-2 shadow-lift ring-1 ring-line/70 sm:gap-4 sm:pl-3">
       <Link
@@ -36,7 +38,7 @@ export default function SessionTopBar({
       </Link>
       <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
         <h1 className="max-sm:sr-only truncate font-display text-base font-bold tracking-tight text-ink sm:text-lg">
-          {vi.session.patientName}
+          {voice.title}
         </h1>
         <Badge tone={exam ? "info" : "primary"} className="shrink-0">
           <span className="sr-only">{vi.session.modeLabel}: </span>

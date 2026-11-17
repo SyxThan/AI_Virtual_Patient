@@ -2,6 +2,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import vi from "../../../messages/vi.json";
+import { speakerText, useCaseVoice } from "@/components/workspace/caseVoice";
 import Badge from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
@@ -47,6 +48,7 @@ export default function TranscriptBox({
   onDiscard: () => void;
   onOpenExam: (target: ExamTarget, finding: string | null) => void;
 }) {
+  const voice = useCaseVoice();
   const boxRef = useRef<HTMLDivElement>(null);
   const atBottomRef = useRef(true);
   const [unseen, setUnseen] = useState(false);
@@ -102,7 +104,7 @@ export default function TranscriptBox({
         className={`flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain p-4 ${FOCUS_RING} focus-visible:ring-inset focus-visible:ring-offset-0`}
       >
         {turns.length === 0 && !pending && (
-          <p className="m-auto max-w-sm text-center text-ink-muted">{vi.session.empty}</p>
+          <p className="m-auto max-w-sm text-center text-ink-muted">{speakerText(vi.session.empty, voice)}</p>
         )}
         {items.map((item) => {
           if (item.kind === "exam") {
@@ -145,7 +147,7 @@ export default function TranscriptBox({
               }`}
             >
               <span className={`mb-0.5 block text-xs font-semibold ${mine ? "text-primary-soft" : "text-sand-ink"}`}>
-                {mine ? vi.session.you : vi.session.mother}
+                {mine ? vi.session.you : voice.Who}
               </span>
               {t.text}
             </div>
@@ -179,7 +181,7 @@ export default function TranscriptBox({
                 />
               ))}
             </span>
-            {vi.workspace.waiting}
+            {speakerText(vi.workspace.waiting, voice)}
           </div>
         )}
 

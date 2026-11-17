@@ -205,7 +205,6 @@
   },
   "session": {
     "title": "Phiên hỏi bệnh",
-    "patientName": "Bệnh nhi 18 tháng tuổi — Tay chân miệng",
     "modeLabel": "Chế độ",
     "mode": {
       "guided": "Luyện tập",
@@ -219,11 +218,11 @@
       "desc": "Bé 18 tháng tuổi, mẹ bế đến khám. (Khu vực này sẽ hiển thị avatar 3D ở giai đoạn sau.)"
     },
     "you": "Bác sĩ",
-    "mother": "Người mẹ",
-    "inputPlaceholder": "Nhập câu hỏi cho người mẹ…",
+    "mother": "{Who}",
+    "inputPlaceholder": "Nhập câu hỏi cho {who}…",
     "send": "Gửi",
     "sending": "Mẹ bé đang trả lời…",
-    "empty": "Hãy bắt đầu hỏi bệnh. Ví dụ: “Chào chị, bé nhà mình bị sao ạ?”",
+    "empty": "Hãy bắt đầu hỏi bệnh. Ví dụ: “{example}”",
     "loadError": "Không tải được hội thoại.",
     "sendError": "Không gửi được câu hỏi. Vui lòng thử lại."
   },
@@ -233,7 +232,7 @@
     "disconnected": "Mất kết nối giọng nói. Nhấn nút để kết nối lại hoặc gõ câu hỏi.",
     "authFailed": "Không xác thực được phiên giọng nói. Hãy tải lại trang.",
     "sttFailed": "Không nhận diện được giọng nói. Bạn hãy nói lại hoặc gõ câu hỏi.",
-    "ttsFailed": "Không phát được giọng người mẹ; câu trả lời hiển thị dạng chữ.",
+    "ttsFailed": "Không phát được giọng nói; câu trả lời hiển thị dạng chữ.",
     "tooLarge": "Đoạn ghi âm quá dài. Bạn hãy nói ngắn hơn.",
     "patientUnavailable": "Người bệnh tạm thời không phản hồi được, vui lòng thử lại.",
     "playbackFailed": "Không phát được âm thanh; câu trả lời hiển thị dạng chữ.",
@@ -246,6 +245,7 @@
     "unsupported": "Trình duyệt này không hiển thị được 3D (WebGL). Bạn vẫn khám được bằng các nút bên dưới.",
     "fallbackModel": "Đang dùng mô hình đơn giản",
     "speaking": "Mẹ đang nói",
+    "speakingWho": "{Who} đang nói",
     "lesionNote": "Ban trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt",
     "clickToExamine": "Bấm để khám",
     "examined": "Đã khám",
@@ -343,7 +343,7 @@
       "close": "Đóng",
       "empty": "Không có lượt thoại nào.",
       "student": "Bạn",
-      "patient": "Người mẹ",
+      "patient": "{Who}",
       "system": "Ghi nhận khám"
     },
     "summary": {
@@ -586,15 +586,15 @@
     "retryLoad": "Thử lại",
     "backToSetup": "Tạo phiên mới",
     "redirecting": "Buổi khám đã kết thúc. Đang chuyển sang trang phản hồi…",
-    "waiting": "Người mẹ đang trả lời…",
+    "waiting": "{Who} đang trả lời…",
     "notSent": "Chưa gửi được",
     "resend": "Gửi lại",
     "discard": "Bỏ câu này",
-    "inputLabel": "Câu hỏi cho người mẹ",
+    "inputLabel": "Câu hỏi cho {who}",
     "inputDisabledTimeUp": "Đã hết thời gian, không thể hỏi thêm.",
     "help": "Hướng dẫn",
     "errors": {
-      "timeout": "Người mẹ chưa trả lời kịp (quá thời gian chờ). Câu hỏi chưa được ghi nhận, bạn hãy gửi lại.",
+      "timeout": "Chưa nhận được câu trả lời kịp (quá thời gian chờ). Câu hỏi chưa được ghi nhận, bạn hãy gửi lại.",
       "unavailable": "Người bệnh tạm thời không phản hồi được. Câu hỏi chưa được ghi nhận, bạn hãy gửi lại.",
       "network": "Không kết nối được máy chủ. Câu hỏi chưa được ghi nhận; kiểm tra mạng rồi gửi lại.",
       "tooLong": "Câu hỏi quá dài (tối đa 2000 ký tự). Hãy rút gọn rồi gửi lại.",
@@ -619,13 +619,13 @@
       "reconnecting": "Mất kết nối giọng nói, đang kết nối lại (lần {n}/{max})…",
       "gaveUp": "Không kết nối lại được giọng nói. Bạn hãy dùng ô nhập chữ bên dưới.",
       "retryVoice": "Thử kết nối giọng nói lại",
-      "timeout": "Người mẹ chưa trả lời kịp qua giọng nói. Bạn hãy nói lại hoặc gõ câu hỏi.",
+      "timeout": "Chưa nhận được câu trả lời kịp qua giọng nói. Bạn hãy nói lại hoặc gõ câu hỏi.",
       "timeUp": "Đã hết thời gian thi thử, không thể hỏi thêm.",
       "finished": "Buổi khám đã kết thúc."
     },
     "regions": {
       "patient": "Bệnh nhân",
-      "chat": "Hội thoại với người mẹ",
+      "chat": "Hội thoại với {who}",
       "transcript": "Nội dung hội thoại"
     }
   },
@@ -653,7 +653,7 @@
     "steps": [
       {
         "title": "Hỏi bệnh",
-        "body": "Giữ nút “Giữ để nói” (hoặc phím Space) rồi nói, hoặc gõ câu hỏi vào ô nhập chữ. Người mẹ chỉ trả lời theo hồ sơ ca bệnh."
+        "body": "Giữ nút “Giữ để nói” (hoặc phím Space) rồi nói, hoặc gõ câu hỏi vào ô nhập chữ. Người bệnh ảo chỉ trả lời theo hồ sơ ca bệnh."
       },
       {
         "title": "Khám trên avatar",
@@ -674,7 +674,7 @@
       "keysLabel": "Phím",
       "actionLabel": "Tác dụng",
       "keys": [
-        ["Space (giữ)", "Nói với người mẹ"],
+        ["Space (giữ)", "Nói với người bệnh ảo"],
         ["1 – 4", "Khám lòng bàn tay, lòng bàn chân, miệng - họng, mông - đầu gối"],
         ["Q · W · E", "Góc nhìn Toàn cảnh · Trò chuyện · Khám bé"],
         ["F", "Sân khấu toàn màn hình"],
@@ -768,6 +768,18 @@
       "father": "bố đưa đến khám",
       "other": "người nhà đưa đến khám"
     },
+    "speaker": {
+      "self": "người bệnh",
+      "mother": "người mẹ",
+      "father": "người bố",
+      "other": "người nhà"
+    },
+    "askExample": {
+      "mother": "Chào chị, bé nhà mình bị sao ạ?",
+      "father": "Chào anh, bé nhà mình bị sao ạ?",
+      "other": "Chào anh/chị, hôm nay mình đến khám vì vấn đề gì ạ?"
+    },
+    "workspaceTitle": "Phiên hỏi bệnh",
     "defaultCase": "Ca mặc định"
   },
   "exam2d": {
@@ -880,7 +892,7 @@
       "listening": "Đang nghe… thả ra để gửi",
       "processing": "Đang xử lý…",
       "connecting": "Đang kết nối…",
-      "replying": "Người mẹ đang trả lời…",
+      "replying": "{Who} đang trả lời…",
       "typeInstead": "Gõ câu hỏi",
       "deniedLine": "Micro đang bị chặn: bấm biểu tượng ổ khoá cạnh thanh địa chỉ, chọn Cho phép (Allow) cho Micro rồi tải lại trang.",
       "unsupportedLine": "Trình duyệt này không ghi âm được. Hãy dùng Chrome, Edge hoặc Firefox bản mới, hoặc gõ câu hỏi.",
@@ -926,7 +938,7 @@
       "confirm": "Kết thúc buổi khám"
     },
     "announce": {
-      "reply": "Người mẹ: {text}",
+      "reply": "{Who}: {text}",
       "exam": "Kết quả khám {region}: {finding}",
       "examLoading": "Đang khám {region}…"
     }
