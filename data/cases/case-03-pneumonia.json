@@ -35,7 +35,7 @@
       "Rubric converted from the pack's OSCE checklist (levels chua_dat/dat_mot_phan/dat -> anchors 0/1/2, red_flag -> critical; weights and red flags are the pack's proposals). Domain mapping: H03 (aspiration, recurrent wheeze, vaccination, smoke, sick contacts) -> epidemiology; E03 (SpO2) -> investigations, because the checklist has no investigations criterion; R01 -> diagnosis. TODO(clinician): if the X-ray and blood tests stay, add an investigations criterion for ordering and reading them.",
       "TODO(clinician): the pack's scoring coefficients are dat 1.0 / dat_mot_phan 0.5 / chua_dat 0; here they are anchors 2/1/0 under weight. Keep or change?",
       "Day count: the pack puts day 1 (runny nose, dry cough) 4 days before the visit; the day number of the visit itself is not stated, so the case does not state one.",
-      "TODO(clinician): exam stays 2D; decide whether to add the chest to the 3D model later (separate code task).",
+      "Exam is 3D since AVP-162 (team's avp-case-scene/1 pack, chest included); the old 2D illustration stays as a fallback asset.",
       "Corpus data/guidelines/pneumonia-child_chunks.json holds only the 101/QĐ-BYT document. Not ingested: rights not confirmed by owner: who-pneumonia-diarrhoea-2024 (WHO 2024, CC BY-NC-SA 3.0 IGO) and who-pocketbook-2013 (WHO Pocket Book 2013). They are still named as the origin of some thresholds in these notes.",
       "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08).",
       "source.case_number=29 is 'Bài 29. Viêm phổi ở trẻ em' in the team's 53-disease table (BV Bệnh Nhiệt đới TP.HCM 2023); the case itself follows 101/QĐ-BYT.",
