@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" role="img" aria-label="Hình minh hoạ giản lược một bé gái nhỏ để chọn vùng khám">
+  <!-- Neutral illustration for case-03-pneumonia (AVP-153): a toddler, so a large head and short limbs. Not a clinical image: it shows no finding. -->
+  <rect width="300" height="400" fill="#f3f0ea"/>
+  <g fill="#d9e4ea" stroke="#7a8f9a" stroke-width="3" stroke-linejoin="round">
+    <circle cx="96" cy="82" r="11"/>
+    <circle cx="204" cy="82" r="11"/>
+    <circle cx="150" cy="80" r="54"/>
+    <rect x="138" y="130" width="24" height="12" rx="6"/>
+    <path d="M98 144 Q150 132 202 144 Q216 200 210 262 Q150 276 90 262 Q84 200 98 144 Z"/>
+    <path d="M100 150 L58 228 L70 238 L112 178 Z"/>
+    <path d="M200 150 L242 228 L230 238 L188 178 Z"/>
+    <circle cx="63" cy="237" r="13"/>
+    <circle cx="237" cy="237" r="13"/>
+    <path d="M100 258 L104 370 L140 370 L146 268 Z"/>
+    <path d="M200 258 L196 370 L160 370 L154 268 Z"/>
+  </g>
+  <g fill="none" stroke="#7a8f9a" stroke-width="2.5" stroke-linecap="round">
+    <path d="M132 76 h7 M161 76 h7"/>
+    <path d="M140 102 Q150 108 160 102"/>
+    <path d="M120 34 Q150 22 180 34"/>
+  </g>
+  <text x="150" y="394" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b7b82">Hình minh hoạ, không phải ảnh lâm sàng</text>
+</svg>

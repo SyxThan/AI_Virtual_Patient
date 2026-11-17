@@ -1,0 +1,58 @@
+{
+  "corpus": "pneumonia-child-guidelines",
+  "corpus_version": 1,
+  "case_id": "case-03-pneumonia",
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-08, AVP-153). Mỗi chunk là bản TÓM TẮT do tác giả viết lại (origin: author_added), không phải trích nguyên văn. Chưa có bác sĩ đối chiếu.",
+      "TODO(clinician): bản web của 101/QĐ-BYT bị lỗi ký hiệu ở ngưỡng thở nhanh cho trẻ < 2 tháng và 2-< 12 tháng, và ngưỡng SpO2 của viêm phổi nặng. Chunk dùng ngưỡng WHO (60 / 50 lần/phút; SpO2 < 90%) và ghi rõ. Đối chiếu PDF gốc.",
+      "TODO(clinician): 101/QĐ-BYT (2014) và WHO 2024 khác nhau về xử trí trẻ có rút lõm lồng ngực mà không có dấu hiệu nguy hiểm (WHO 2024: amoxicillin uống ngoại trú 5 ngày). Chọn nguồn chính cho ca.",
+      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08).",
+      "Not ingested: rights not confirmed by owner: who-pneumonia-diarrhoea-2024 (Guideline on management of pneumonia and diarrhoea in children up to 10 years of age (WHO 2024), CC BY-NC-SA 3.0 IGO); who-pocketbook-2013 (Pocket book of hospital care for children, 2nd edition (WHO 2013), WHO, sử dụng cho đào tạo cần ghi nguồn). Removed from this file; the case notes still name them as the origin of some thresholds."
+    ]
+  },
+  "documents": [
+    {
+      "source_key": "moh-qd-101-2014",
+      "title": "Hướng dẫn xử trí viêm phổi cộng đồng ở trẻ em (Quyết định 101/QĐ-BYT ngày 09/01/2014)",
+      "publisher": "Bộ Y tế",
+      "year": 2014,
+      "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
+      "rights_checked": true,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "Định nghĩa",
+          "text": "Tóm tắt: viêm phổi là tổn thương viêm nhu mô phổi, có thể lan tỏa cả hai phổi hoặc khu trú ở một thùy. Viêm phổi cộng đồng là viêm phổi mắc ngoài cộng đồng hoặc trong 48 giờ đầu nằm viện."
+        },
+        {
+          "section": "Chẩn đoán - Thở nhanh theo tuổi",
+          "text": "Tóm tắt: đếm nhịp thở đủ 1 phút khi trẻ nằm yên. Thở nhanh khi: trẻ dưới 2 tháng từ 60 lần/phút; 2 đến dưới 12 tháng từ 50 lần/phút; 1-5 tuổi từ 40 lần/phút; trên 5 tuổi từ 30 lần/phút. (Hai ngưỡng đầu lấy theo WHO vì bản web bị lỗi ký hiệu; hai ngưỡng sau đọc được từ văn bản.)"
+        },
+        {
+          "section": "Chẩn đoán - Viêm phổi",
+          "text": "Tóm tắt: trẻ ho, sốt kèm ít nhất một trong các dấu hiệu: thở nhanh theo tuổi; rút lõm lồng ngực (phần dưới lồng ngực lõm vào khi hít vào); khám phổi bất thường (giảm thông khí, ran)."
+        },
+        {
+          "section": "Chẩn đoán - Viêm phổi nặng",
+          "text": "Tóm tắt: trẻ có dấu hiệu viêm phổi kèm ít nhất một trong các dấu hiệu: bỏ bú hoặc không uống được; rối loạn tri giác (li bì hoặc khó đánh thức); co giật; suy hô hấp nặng (thở rên, rút lõm lồng ngực rất nặng); tím tái hoặc SpO2 thấp (WHO dùng ngưỡng SpO2 < 90%; ngưỡng trong bản web của văn bản không đọc được)."
+        },
+        {
+          "section": "Cận lâm sàng",
+          "text": "Tóm tắt: ở cơ sở có máy, X-quang phổi là bằng chứng khách quan để chẩn đoán viêm phổi; trong 2-3 ngày đầu X-quang có thể bình thường. Công thức máu và CRP thường tăng khi do vi khuẩn, bình thường khi do vi rút hoặc vi khuẩn không điển hình. Có thể soi, cấy dịch hầu họng tìm vi khuẩn."
+        },
+        {
+          "section": "Điều trị - Viêm phổi (ngoại trú)",
+          "text": "Tóm tắt: trẻ dưới 5 tuổi dùng amoxicillin uống 80 mg/kg/ngày, chia 2 lần, trong 5 ngày; có thể dùng amoxicillin-clavulanic với liều tương tự. Trẻ từ 5 tuổi trở lên dùng nhóm macrolid (erythromycin, azithromycin hoặc clarithromycin) 7 ngày (azithromycin 3-5 ngày). Trẻ không cải thiện, còn thở nhanh hoặc có dấu hiệu toàn thân nặng thì nhập viện."
+        },
+        {
+          "section": "Điều trị - Viêm phổi nặng (nội trú)",
+          "text": "Tóm tắt: trẻ viêm phổi nặng điều trị tại bệnh viện. Kháng sinh tiêm ban đầu: ampicillin 50 mg/kg tiêm tĩnh mạch hoặc tiêm bắp mỗi 6 giờ, phối hợp gentamicin 7,5 mg/kg một lần/ngày (có thể thay bằng amikacin 15 mg/kg). Dùng ceftriaxon 80 mg/kg/24 giờ khi thất bại hoặc dùng ngay từ đầu. Thời gian kháng sinh ít nhất 5 ngày. Chọn phương pháp thở oxy theo nhu cầu oxy và đáp ứng của trẻ."
+        }
+      ]
+    }
+  ]
+}
