@@ -247,6 +247,9 @@
     "speaking": "Mẹ đang nói",
     "speakingWho": "{Who} đang nói",
     "lesionNote": "Ban trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt",
+    "sceneLabelCase": "Phòng khám 3D của ca bệnh này: người bệnh và người trả lời câu hỏi.",
+    "sceneFailed": "Không tải được mô hình 3D của ca này. Bạn vẫn khám được bằng các nút bên dưới.",
+    "signNote": "Dấu hiệu trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt",
     "clickToExamine": "Bấm để khám",
     "examined": "Đã khám",
     "notExamined": "Chưa khám",
@@ -256,7 +259,8 @@
       "label": "Góc nhìn",
       "overview": "Toàn cảnh",
       "talk": "Trò chuyện",
-      "exam": "Khám bé"
+      "exam": "Khám bé",
+      "examCase": "Khám"
     }
   },
   "exam": {

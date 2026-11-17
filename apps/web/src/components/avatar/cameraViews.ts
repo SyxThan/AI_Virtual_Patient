@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { aspectDistanceFactor, clamp, type ExamRegionId, type ViewId } from "./avatarContract";
+import { aspectDistanceFactor, clamp, type ViewId } from "./avatarContract";
 import type { SceneRig } from "./sceneRig";
 
 /**
@@ -23,6 +23,12 @@ function place(target: THREE.Vector3, dir: THREE.Vector3, dist: number): CameraV
 
 export function presetView(id: ViewId, rig: SceneRig, aspect: number): CameraView {
   const f = aspectDistanceFactor(aspect);
+  const authored = rig.views?.[id];
+  if (authored) {
+    // Scene-authored preset (avp-case-scene/1): keep its direction, stretch the distance on narrow stages.
+    const offset = authored.position.clone().sub(authored.target);
+    return place(authored.target.clone(), offset.clone().normalize(), offset.length() * f);
+  }
   if (id === "overview") {
     const box = rig.sceneBox;
     const center = box.getCenter(new THREE.Vector3());
@@ -43,10 +49,10 @@ export function presetView(id: ViewId, rig: SceneRig, aspect: number): CameraVie
   return place(target, DIR.exam, dist * f);
 }
 
-export function regionView(id: ExamRegionId, rig: SceneRig, aspect: number): CameraView {
+export function regionView(id: string, rig: SceneRig, aspect: number): CameraView {
   const box = rig.regionBox(id);
   const target = box.getCenter(new THREE.Vector3());
-  const dir = new THREE.Vector3(0.3, id === "feet" ? 0.05 : 0.2, 1).normalize();
+  const dir = rig.regionViewDir?.(id)?.clone() ?? new THREE.Vector3(0.3, id === "feet" ? 0.05 : 0.2, 1).normalize();
   const dist = Math.max(0.6, box.getSize(new THREE.Vector3()).length() * 2.2);
   return place(target, dir, dist * aspectDistanceFactor(aspect));
 }

@@ -6,30 +6,32 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { buildProceduralRig } from "./AnatomyColliders";
 import { patientLipSync } from "./LipSyncController";
 import { loadClinicModel, onModelProgress } from "./ModelLoader";
-import {
-  clamp,
-  easeInOutCubic,
-  isAnchorId,
-  placeBeside,
-  type AnchorId,
-  type ExamRegionId,
-  type RegionFindings,
-  type ViewId,
-} from "./avatarContract";
+import { clamp, easeInOutCubic, placeBeside, type RegionFindings, type ViewId } from "./avatarContract";
 import { CameraFlight, partView, presetView, regionView, type CameraView } from "./cameraViews";
+import type { CaseSceneConfig } from "./caseScene";
+import { prepareCaseRig } from "./caseRig";
 import { prepareClinicRig } from "./clinicRig";
 import type { SceneRig } from "./sceneRig";
 
-export type HoverTarget = { kind: "region"; region: ExamRegionId } | { kind: "part"; label: string };
+export type HoverTarget = { kind: "region"; region: string } | { kind: "part"; label: string };
 
 export type SceneStatus =
   | { phase: "loading"; progress: number }
-  | { phase: "ready"; source: SceneRig["source"] }
-  | { phase: "unsupported" };
+  | { phase: "ready"; source: SceneRig["source"]; regions: readonly string[] }
+  | { phase: "unsupported" }
+  /** avp-case-scene/1 model missing or off-contract: the stage offers the exam buttons only. */
+  | { phase: "failed" };
+
+/**
+ * Which scene to build. Omitted: the Slice 16 HFMD scene (mother_child.glb,
+ * procedural fallback). `case`: an avp-case-scene/1 model; `regions` are the
+ * case catalog's exam region ids (colliders outside it are ignored).
+ */
+export type AvatarSceneSource = { kind: "case"; config: CaseSceneConfig; regions: readonly string[] };
 
 export type AvatarSceneApi = {
   setView: (view: ViewId) => void;
-  focusRegion: (region: ExamRegionId) => void;
+  focusRegion: (region: string) => void;
   /** Exam framing on the whole child, the mother glancing at it ("observe"). */
   focusChild: () => void;
   /** Dolly in (+1) or out (-1) one step toward the orbit target. */
@@ -37,12 +39,14 @@ export type AvatarSceneApi = {
 };
 
 export type AvatarSceneProps = {
+  /** Scene to build; HFMD (Slice 16) when omitted. Read once on mount. */
+  source?: AvatarSceneSource;
   /** Called when the student clicks (not drags) an exam region. Omit to disable exams. */
-  onExamineRegion?: (regionId: ExamRegionId) => void;
+  onExamineRegion?: (regionId: string) => void;
   /** Region -> `documented` for regions already examined (drives the lesion layer). */
   findings: RegionFindings;
   /** Region highlighted from outside the canvas (exam buttons). */
-  hoverRegion: ExamRegionId | null;
+  hoverRegion: string | null;
   /** Floating label element owned by the parent; the scene only moves it. */
   tooltipRef: RefObject<HTMLDivElement | null>;
   onHoverChange: (target: HoverTarget | null) => void;
@@ -73,7 +77,7 @@ const HEAD_BADGE_LIFT = 0.24; // metres above the head anchor
 /**
  * Three.js scene for the Clinical Workspace stage: the clinic room with the mother
  * holding the child (mother_child.glb, docs/specs/avatar-asset.md), or the
- * procedural fallback. Client-only: loaded through AvatarCanvas with
+ * procedural fallback; or, for another case, its avp-case-scene/1 model. Client-only: loaded through AvatarCanvas with
  * `dynamic(..., { ssr: false })`; touches window/document only inside effects.
  *
  * Performance: one scene for the page, static shadow map (rendered once),
@@ -146,8 +150,8 @@ export default function AvatarScene(props: AvatarSceneProps) {
     controls.target.set(-0.35, 0.8, -0.25);
 
     const clock = { last: performance.now(), elapsed: 0 };
-    function regionOf(o: THREE.Object3D | null): ExamRegionId | null {
-      for (let n = o; n; n = n.parent) if (n.userData.regionId) return n.userData.regionId as ExamRegionId;
+    function regionOf(o: THREE.Object3D | null): string | null {
+      for (let n = o; n; n = n.parent) if (n.userData.regionId) return n.userData.regionId as string;
       return null;
     }
     const flight = new CameraFlight();
@@ -179,8 +183,9 @@ export default function AvatarScene(props: AvatarSceneProps) {
       setView: (view: ViewId) => {
         if (rig) flyTo(presetView(view, rig, aspect()));
       },
-      focusRegion: (region: ExamRegionId) => {
-        if (!rig) return;
+      focusRegion: (region: string) => {
+        // Exam-bar-only hotspots (e.g. vitals) have no collider: nothing to fly to.
+        if (!rig || !rig.regionIds.includes(region)) return;
         flyTo(regionView(region, rig, aspect()), 0.6);
         glanceAt(rig.regionBox(region).getCenter(new THREE.Vector3()));
       },
@@ -206,7 +211,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
     // 3D points the HTML overlays follow. A region anchor sits on its
     // collider's surface on the camera side, not at the box centre (for "both
     // hands" the centre would float in the air between them).
-    const anchors = new Map<AnchorId, THREE.Vector3>();
+    const anchors = new Map<string, THREE.Vector3>();
     const computeAnchors = (r: SceneRig) => {
       anchors.clear();
       r.root.updateMatrixWorld(true);
@@ -217,7 +222,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
         if (!region || anchors.has(region)) continue;
         const box = r.regionBox(region);
         const size = box.getSize(new THREE.Vector3()).length();
-        const aim = box.getCenter(new THREE.Vector3()).addScaledVector(front, size);
+        const aim = box.getCenter(new THREE.Vector3()).addScaledVector(r.regionViewDir?.(region) ?? front, size);
         const best = new THREE.Vector3();
         let bestD = Infinity;
         // Every collider of this region (a region may be split across meshes).
@@ -250,6 +255,13 @@ export default function AvatarScene(props: AvatarSceneProps) {
       rig = next;
       rigRef.current = next;
       scene.add(next.root);
+      if (next.orbit) {
+        // Scene-authored camera directions (avp-case-scene/1) must stay reachable.
+        controls.minAzimuthAngle = next.orbit.minAzimuth;
+        controls.maxAzimuthAngle = next.orbit.maxAzimuth;
+        controls.minPolarAngle = next.orbit.minPolar;
+        controls.maxPolarAngle = next.orbit.maxPolar;
+      }
       computeAnchors(next);
       next.setFindings(p().findings);
       renderer.shadowMap.needsUpdate = true;
@@ -259,31 +271,42 @@ export default function AvatarScene(props: AvatarSceneProps) {
       controls.target.copy(overview.target);
       controls.update();
       flyTo(presetView("talk", next, aspect()), 1.6);
-      p().onStatus({ phase: "ready", source: next.source });
+      p().onStatus({ phase: "ready", source: next.source, regions: next.regionIds });
       p().onReady(api);
     };
 
+    const source = p().source;
     const stopProgress = onModelProgress((f) => {
       if (!rig) p().onStatus({ phase: "loading", progress: f });
-    });
-    loadClinicModel()
-      .then((gltf) => attach(prepareClinicRig(gltf)))
-      .catch((err: unknown) => {
-        // Network error, decoder failure or a file that breaks the contract (§9).
-        console.warn("[avatar] using the procedural fallback:", err);
-        attach(buildProceduralRig());
-      });
+    }, source?.config.model);
+    if (!source) {
+      loadClinicModel()
+        .then((gltf) => attach(prepareClinicRig(gltf)))
+        .catch((err: unknown) => {
+          // Network error, decoder failure or a file that breaks the contract (§9).
+          console.warn("[avatar] using the procedural fallback:", err);
+          attach(buildProceduralRig());
+        });
+    } else {
+      loadClinicModel(source.config.model)
+        .then((gltf) => attach(prepareCaseRig(gltf, source.config, source.regions)))
+        .catch((err: unknown) => {
+          // No procedural stand-in for these cases: the exam buttons stay usable.
+          console.warn("[avatar] case model unavailable, using the exam buttons:", err);
+          if (!disposed) p().onStatus({ phase: "failed" });
+        });
+    }
 
     // ---------------------------------------------------------------- picking
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
-    let pointerRegion: ExamRegionId | null = null;
+    let pointerRegion: string | null = null;
     let pointerOwner: THREE.Object3D | null = null;
     let lastHoverKey = "";
     let pendingMove: PointerEvent | null = null;
 
     type Hit =
-      | { kind: "region"; region: ExamRegionId }
+      | { kind: "region"; region: string }
       | { kind: "part"; owner: THREE.Object3D; label: string };
 
 
@@ -416,7 +439,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
       headPoint.y += HEAD_BADGE_LIFT;
       els.forEach((el, i) => {
         const id = el.dataset.anchor;
-        const point = id === "head" ? headPoint : isAnchorId(id) ? anchors.get(id) : undefined;
+        const point = id === "head" ? headPoint : id ? anchors.get(id) : undefined;
         if (!point) return;
         projected.copy(point).project(camera);
         const onStage = projected.z < 1 && Math.abs(projected.x) <= 1.02 && Math.abs(projected.y) <= 1.02;

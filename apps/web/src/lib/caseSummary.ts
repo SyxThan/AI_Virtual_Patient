@@ -113,7 +113,10 @@ export function localCover(c: CaseSummary): string | null {
   return cover && cover.startsWith("/") && !cover.startsWith("//") ? cover : null;
 }
 
-/** Exam stage of a case: 3D only when the case says so (HFMD); 2D otherwise. */
+/**
+ * Exam stage of a case: 3D only when the case says so (HFMD with mother_child.glb;
+ * another case with its avp-case-scene/1 model, AVP-160); 2D otherwise.
+ */
 export function examModeOf(c: CaseSummary | null | undefined): "3d" | "2d" {
   return c?.catalog?.exam_mode === "3d" ? "3d" : "2d";
 }
