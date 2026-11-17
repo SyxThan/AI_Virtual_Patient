@@ -9,8 +9,7 @@
   "source": {
     "document": "Hướng dẫn chẩn đoán và điều trị tăng huyết áp (Quyết định 3192/QĐ-BYT ngày 31/08/2010)",
     "year": 2010,
-    "section": "3.2 Phân độ huyết áp (Bảng 2); 3.3 Yếu tố nguy cơ, tổn thương cơ quan đích; Phụ lục 2 Quy trình đo huyết áp; Phụ lục 4 Phân tầng nguy cơ",
-    "case_number": 1
+    "section": "3.2 Phân độ huyết áp (Bảng 2); 3.3 Yếu tố nguy cơ, tổn thương cơ quan đích; Phụ lục 2 Quy trình đo huyết áp; Phụ lục 4 Phân tầng nguy cơ"
   },
   "review": {
     "status": "draft",
@@ -18,7 +17,6 @@
     "date": null,
     "notes": [
       "DRAFT (S20-10, AVP-155). Converted from the team's S20 data pack (case-05-hypertension.draft.md + case-05-hypertension.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the 3192/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
-      "TODO(clinician): source.case_number is required by the schema (1..53) but hypertension is not a case in the team's 53-disease table (as far as the pack shows). The value 1 is a PLACEHOLDER, not a reference to 'Bài 1'. The case follows 3192/QĐ-BYT. Making case_number optional is a separate schema task.",
       "Teaching aim (proposed): newly detected, untreated, no known complication. The student must measure BP correctly (both arms, twice, average), look for risk factors, target-organ damage and clues to secondary hypertension, grade and risk-stratify, and counsel lifestyle change. The case does not teach drug doses.",
       "The 3192/QĐ-BYT text was read through a web copy (pack source.json, checked 2026-11-18 by an agent web search), not the official PDF on kcb.vn. TODO(clinician): check the case against the original PDF. 3192 is from 2010; newer VNHA/VSH 2022 and ESC 2024 targets are lower.",
       "TODO(clinician): scenario: keep 'newly detected' (proposed), or change to a follow-up visit or a hypertensive crisis?",
@@ -38,7 +36,8 @@
       "TODO(clinician): weights and critical flags are the pack's proposals; confirm. In 2D mode the student cannot perform the BP technique, so r-bp-technique is scored only on what the student says (rest, both arms, two readings, cuff, posture).",
       "The patient was told at the company check-up that his 'chỉ số huyết áp cao', so 'huyết áp cao' is NOT in forbidden_terms (he may say it). 'tăng huyết áp' and the grading/risk terms are forbidden, because nobody has diagnosed or graded him yet.",
       "Corpus: data/guidelines/hypertension_chunks.json ingests only 3192/QĐ-BYT. VNHA/VSH 2022 and ESC 2024 are not ingested (rights not confirmed by owner); the OSCE still mentions them as possible scoring standards.",
-      "Known app gap (not clinical): the Patient Agent system prompt (apps/api/avp_api/services/patient_agent.py) is hard-coded as 'the mother of an 18-month-old'. This case has informant 'self' (an adult man speaking in the first person). A code task must make the prompt follow patient.informant and persona before this case is usable."
+      "Known app gap (not clinical): the Patient Agent system prompt (apps/api/avp_api/services/patient_agent.py) is hard-coded as 'the mother of an 18-month-old'. This case has informant 'self' (an adult man speaking in the first person). A code task must make the prompt follow patient.informant and persona before this case is usable.",
+      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67)."
     ]
   },
   "catalog": {

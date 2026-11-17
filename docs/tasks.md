@@ -75,12 +75,13 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-150** | **Slice 20** (`TASK-S20-05`) | Trang khám 2D cho ca chưa có model 3D: ảnh minh hoạ + điểm vùng khám theo từng ca | **P0** | ✅ Merged (PR #63) |
 | **AVP-151** | **Slice 20** (`TASK-S20-06`) | RAG theo ca: mỗi ca có bộ tài liệu riêng, truy vấn lọc theo ca | **P1** | ✅ Merged (PR #63; migration `0003` mới chạy trên dev, chưa chạy trên demo) |
 | **AVP-152** | **Slice 20** (`TASK-S20-07`) | Ca nhi: Sốt xuất huyết Dengue (bản nháp, chờ bác sĩ) | **P0** | ✅ Merged (PR #65; bản nháp, chờ bác sĩ duyệt; corpus `rights_checked: false`) |
-| **AVP-153** | **Slice 20** (`TASK-S20-08`) | Ca nhi: Viêm phổi trẻ em (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
-| **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ❌ Chưa làm |
+| **AVP-153** | **Slice 20** (`TASK-S20-08`) | Ca nhi: Viêm phổi trẻ em (bản nháp, chờ bác sĩ) | **P0** | ✅ Merged (PR #70; bản nháp, chờ bác sĩ duyệt) |
+| **AVP-154** | **Slice 20** (`TASK-S20-09`) | Ca người lớn: Viêm ruột thừa cấp (bản nháp, chờ bác sĩ) | **P0** | ✅ Merged (PR #68; bản nháp, chờ bác sĩ duyệt; chưa có nguồn trích dẫn) |
 | **AVP-155** | **Slice 20** (`TASK-S20-10`) | Ca người lớn: Tăng huyết áp (bản nháp, chờ bác sĩ) | **P1** | ✅ Merged (PR #66; bản nháp, chờ bác sĩ duyệt) |
-| **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ❌ Chưa làm |
+| **AVP-156** | **Slice 20** (`TASK-S20-11`) | Ca người cao tuổi: Đợt cấp COPD hoặc suy tim (bác sĩ chọn; bản nháp) | **P1** | ✅ Merged (PR #67; suy tim; bản nháp, chờ bác sĩ duyệt) |
 | **AVP-157** | **Docs** | Cập nhật trạng thái `docs/tasks.md` theo các PR đã merge (#48–#57) | **P2** | ✅ Merged (PR #58) |
-| **AVP-158** | **Docs** | Cập nhật trạng thái Slice 20 (S20-01 → S20-06) trong `docs/tasks.md` | **P2** | 🟡 PR mở |
+| **AVP-158** | **Docs** | Cập nhật trạng thái Slice 20 (S20-01 → S20-06) trong `docs/tasks.md` | **P2** | ✅ Merged (PR #64) |
+| **AVP-159** | **Slice 20** | Patient Agent đóng đúng vai theo `patient.informant` của từng ca (trước đây cố định "mẹ của bé 18 tháng") | **P0** | ✅ Merged (PR #69) |
 
 ---
 
@@ -107,7 +108,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
 | **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | ✅ Merged (PR #46–#50); đồng thuận evaluator còn chờ nhãn giảng viên (S14-03) |
 | **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | ✅ Hoàn tất (PR #53, #54, #56) |
-| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | 🟡 Đang làm: S20-01 → S20-06 đã merge (PR #59, #60, #62, #63); S20-07 Dengue đã merge (PR #65, nháp); còn S20-08 → S20-11 |
+| **Slice 20** | Thư viện nhiều ca bệnh: UI chọn ca, API ca, trang khám 2D, RAG theo ca, 5 ca mới (nháp) | **P0** | 🟡 Code và 6 ca đã merge (PR #59, #60, #62, #63, #65–#70); 5 ca mới S20-07 → S20-11 là bản nháp, chờ bác sĩ duyệt |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
