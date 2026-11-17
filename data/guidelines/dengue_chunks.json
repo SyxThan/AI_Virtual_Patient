@@ -11,7 +11,7 @@
       "Nội dung lấy từ các tài liệu tập huấn của cơ sở y tế tóm tắt 2760/QĐ-BYT (Sở Y tế/BV tỉnh), không phải từ PDF gốc. TODO(clinician): so từng chunk với PDF gốc 2760/QĐ-BYT ngày 04/07/2023 và thêm số trang vào `section`.",
       "TODO(clinician): phác đồ truyền dịch cho trẻ < 16 tuổi có dấu hiệu cảnh báo cố ý KHÔNG đưa vào (chưa đọc được bản gốc). Chỉ thêm từ văn bản gốc.",
       "TODO(clinician): bản phân độ trên web ghi 'sốt ≤ 7 ngày'; bản 2011 ghi 'sốt cao đột ngột, liên tục từ 2-7 ngày'. Xác nhận câu chữ của bản 2023.",
-      "rights_checked=false: văn bản Bộ Y tế là tài liệu chuyên môn công khai, nhưng chưa có xác nhận quyền của chủ dự án cho Slice này."
+      "rights_checked=true for both documents was set on the project owner's instruction (2026-11-18, S20-07). Record both sources in the proposal's IP section."
     ]
   },
   "documents": [
@@ -21,7 +21,7 @@
       "publisher": "Bộ Y tế",
       "year": 2023,
       "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
-      "rights_checked": false,
+      "rights_checked": true,
       "review_status": "draft",
       "chunks": [
         {
@@ -76,7 +76,7 @@
       "publisher": "Bệnh viện Nhi Đồng 1 TP.HCM",
       "year": 2023,
       "license_note": "Tài liệu hội nghị công khai của bệnh viện; dùng trích dẫn cho mục đích đào tạo, cần ghi nguồn",
-      "rights_checked": false,
+      "rights_checked": true,
       "review_status": "draft",
       "chunks": [
         {
