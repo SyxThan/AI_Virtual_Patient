@@ -1,0 +1,852 @@
+{
+  "schema_version": "1",
+  "id": "case-03-pneumonia",
+  "title": {
+    "vi": "Viêm phổi trẻ em",
+    "en": "Community-acquired pneumonia (child)"
+  },
+  "specialty": "Nhi - Hô hấp",
+  "source": {
+    "document": "Hướng dẫn xử trí viêm phổi cộng đồng ở trẻ em (Quyết định 101/QĐ-BYT ngày 09/01/2014)",
+    "year": 2014,
+    "section": "Chẩn đoán (thở nhanh theo tuổi, viêm phổi, viêm phổi nặng); cận lâm sàng; điều trị",
+    "case_number": null
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-08, AVP-153). Converted from the team's S20 data pack (case-03-pneumonia.draft.md + case-03-pneumonia.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED values picked to fit the 101/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
+      "source.case_number=null: this case is not mapped to an entry of the team's 53-case table (no pneumonia entry could be confirmed), so the schema now allows null. TODO(clinician): give the table number if the case should map to one.",
+      "Teaching aim (proposed): the student must count the breathing rate for a full minute, find lower chest wall indrawing, measure SpO2, ask every general danger sign, and classify correctly as pneumonia without signs of severe pneumonia.",
+      "The 101/QĐ-BYT text was read from a web copy with broken symbols, not from the original PDF. TODO(clinician): from the original 101/QĐ-BYT PDF, confirm the fast-breathing thresholds for < 2 months and 2-< 12 months and the SpO2 threshold for severe pneumonia (the pack took them from WHO).",
+      "TODO(clinician): choose the primary source: 101/QĐ-BYT (2014) or 3312/QĐ-BYT (07/08/2015, 'Hướng dẫn chẩn đoán và điều trị một số bệnh thường gặp ở trẻ em').",
+      "TODO(clinician): keep the child at 18 months / 10 kg (weight chosen near the WHO Child Growth Standards 2006 median for a girl of 18 months)?",
+      "TODO(clinician): keep the classification 'pneumonia, no signs of severe pneumonia' (RR 52, chest indrawing, SpO2 93%, right basal crackles), or change the case to severe pneumonia?",
+      "TODO(clinician): management scoring standard: 101/QĐ-BYT (oral amoxicillin, admit if no improvement or severe signs), WHO 2024 (2-59 months with chest indrawing and no danger sign: oral amoxicillin 5 days as outpatient), or the teaching hospital's protocol? r-management (M01) and management[] stay open until this is decided.",
+      "TODO(clinician): pulse 150 sits at the upper limit for age 1-2 (APLS 100-150) with fever; SpO2 93% on room air is >= 90% (no hypoxaemia criterion of severe pneumonia, WHO Pocket Book 2013). Confirm both.",
+      "TODO(clinician): keep the chest X-ray and blood tests (l-cxr, l-wbc, l-crp, l-cbc) in the case? All four values are simulated to fit the criteria; confirm each number. Reference ranges are left null on purpose (none in the pack).",
+      "TODO(clinician): must the student count the breathing rate for a full 60 seconds? The 2D exam shows the count of 52 at once; the pack's 'chưa đủ thời gian' message for a count under 1 minute is not implemented in the app.",
+      "TODO(clinician): the pack proposes fixed vitals for the MVP, or a 2-state machine (S0 pneumonia RR 52 SpO2 93%; S1 severe pneumonia RR 64, SpO2 88%, grunting, refuses feeds, e.g. when the student sends the child home without follow-up). Not wired: vitals_service only supports case-01-hfmd. Decide fixed vitals vs a state machine and the triggers.",
+      "TODO(clinician): may the mother show the vaccination book? Pneumococcal vaccination is currently unknown (h-vaccination): she only remembers 'tiêm đủ ở trạm y tế'.",
+      "TODO(clinician): option to make the mother have bought antibiotics herself for 2 days, to test counselling (h-antibiotic is currently negative).",
+      "TODO(clinician): differentials are empty on purpose: the pack lists none.",
+      "TODO(clinician): management[] has no antibiotic dose and no follow-up timing on purpose; doses exist only in the 101/QĐ-BYT corpus chunk, add them to the case only from the original document.",
+      "Rubric converted from the pack's OSCE checklist (levels chua_dat/dat_mot_phan/dat -> anchors 0/1/2, red_flag -> critical; weights and red flags are the pack's proposals). Domain mapping: H03 (aspiration, recurrent wheeze, vaccination, smoke, sick contacts) -> epidemiology; E03 (SpO2) -> investigations, because the checklist has no investigations criterion; R01 -> diagnosis. TODO(clinician): if the X-ray and blood tests stay, add an investigations criterion for ordering and reading them.",
+      "TODO(clinician): the pack's scoring coefficients are dat 1.0 / dat_mot_phan 0.5 / chua_dat 0; here they are anchors 2/1/0 under weight. Keep or change?",
+      "Day count: the pack puts day 1 (runny nose, dry cough) 4 days before the visit; the day number of the visit itself is not stated, so the case does not state one.",
+      "TODO(clinician): exam stays 2D; decide whether to add the chest to the 3D model later (separate code task).",
+      "Corpus data/guidelines/pneumonia-child_chunks.json holds only the 101/QĐ-BYT document. Not ingested: rights not confirmed by owner: who-pneumonia-diarrhoea-2024 (WHO 2024, CC BY-NC-SA 3.0 IGO) and who-pocketbook-2013 (WHO Pocket Book 2013). They are still named as the origin of some thresholds in these notes.",
+      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08)."
+    ]
+  },
+  "catalog": {
+    "patient_group": "child",
+    "display_complaint": "Con ho mấy hôm nay, hôm qua tới giờ thở nhanh, nhìn bụng phập phồng mà sốt hoài không dứt.",
+    "cover": "/cases/pneumonia-cover.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "general",
+        "label": "Toàn trạng, tri giác",
+        "x": 0.5,
+        "y": 0.09
+      },
+      {
+        "id": "ent",
+        "label": "Tai mũi họng",
+        "x": 0.31,
+        "y": 0.2
+      },
+      {
+        "id": "lips",
+        "label": "Môi",
+        "exam_region": "lips_limbs",
+        "x": 0.5,
+        "y": 0.26
+      },
+      {
+        "id": "heart",
+        "label": "Nghe tim",
+        "x": 0.58,
+        "y": 0.4
+      },
+      {
+        "id": "lungs",
+        "label": "Nghe phổi",
+        "x": 0.39,
+        "y": 0.46
+      },
+      {
+        "id": "chest_inspect",
+        "label": "Nhìn lồng ngực khi thở",
+        "x": 0.5,
+        "y": 0.53
+      },
+      {
+        "id": "breathing",
+        "label": "Đếm nhịp thở 1 phút",
+        "x": 0.5,
+        "y": 0.61
+      },
+      {
+        "id": "hydration",
+        "label": "Mắt, nếp véo da",
+        "x": 0.64,
+        "y": 0.59
+      },
+      {
+        "id": "vitals",
+        "label": "Sinh hiệu",
+        "x": 0.21,
+        "y": 0.59
+      },
+      {
+        "id": "limbs",
+        "label": "Đầu chi",
+        "exam_region": "lips_limbs",
+        "x": 0.79,
+        "y": 0.59
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 3
+  },
+  "patient": {
+    "name": "Bé Lê Ngọc H.",
+    "age": {
+      "value": 18,
+      "unit": "months"
+    },
+    "sex": "female",
+    "occupation": "Đi nhà trẻ",
+    "informant": {
+      "role": "mother"
+    },
+    "persona": {
+      "personality": "lo lắng, nói nhanh, hay kể thêm chuyện ở nhà trẻ",
+      "dialect": "south",
+      "emotional_state": "sốt ruột vì con sốt hoài không dứt và thở nhanh từ chiều qua",
+      "speech_style": "mẹ 28 tuổi, công nhân; xưng em, gọi bác sĩ"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Con ho mấy hôm nay, hôm qua tới giờ thở nhanh, nhìn bụng phập phồng mà sốt hoài không dứt.",
+    "triage_note": "Bé gái 18 tháng, 10 kg. Ho, sổ mũi từ 4 ngày trước, sốt từ ngày 2, thở nhanh từ chiều qua. Nhiệt độ 38,6°C, mạch 150 lần/phút, nhịp thở 52 lần/phút, SpO2 93% khí trời.",
+    "severity_state": {
+      "label": "viem-phoi-chua-nang",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 150,
+      "temp_c": 38.6,
+      "resp_rate": 52,
+      "spo2": 93
+    }
+  },
+  "history": [
+    {
+      "id": "h-cough",
+      "topic": "Ho, sổ mũi",
+      "polarity": "positive",
+      "lay_response": "Dạ bé bị sổ mũi với ho từ bốn hôm trước, lúc đầu ho ít, ho khan thôi. Qua hôm sau thì ho nhiều hơn, có đờm, em nghe trong ngực bé khò khè tiếng đờm.",
+      "clinical_note": "Ngày 1 (cách 4 ngày): sổ mũi, ho ít, ho khan. Ngày 2: ho nhiều hơn, có đờm (mẹ nghe tiếng khò khè đờm).",
+      "intents": [
+        "ho từ khi nào",
+        "ho mấy ngày rồi",
+        "ho khan hay có đờm",
+        "có sổ mũi không",
+        "ho thế nào"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-fever",
+      "topic": "Sốt",
+      "polarity": "positive",
+      "lay_response": "Bé sốt từ ngày thứ hai, em cặp nhiệt kế ở nhà thấy 38 độ rưỡi tới 39 độ. Uống thuốc hạ sốt thì bớt chút rồi sốt lại, tới giờ vẫn còn sốt hoài.",
+      "clinical_note": "Sốt từ ngày 2, nhiệt kế ở nhà 38,5-39°C; ngày 3-4 vẫn sốt.",
+      "intents": [
+        "sốt từ khi nào",
+        "sốt bao nhiêu độ",
+        "còn sốt không",
+        "uống thuốc hạ sốt có hạ không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-fast-breathing",
+      "topic": "Thở nhanh",
+      "polarity": "positive",
+      "lay_response": "Từ chiều hôm qua em thấy bé thở nhanh lắm, nhìn ngực với bụng bé phập phồng liên tục.",
+      "clinical_note": "Thở nhanh từ chiều hôm qua, mẹ thấy ngực và bụng phập phồng.",
+      "intents": [
+        "thở nhanh từ khi nào",
+        "có khó thở không",
+        "bé thở thế nào",
+        "thở có mệt không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-feeding",
+      "topic": "Ăn, bú, uống",
+      "polarity": "positive",
+      "lay_response": "Mấy bữa nay bé ăn với bú kém hơn, chừng một nửa so với mọi khi. Mà bé vẫn uống nước được, vẫn bú mẹ được, chưa có bỏ bú.",
+      "clinical_note": "Ăn, bú kém (khoảng một nửa), vẫn uống được và bú mẹ được: không bỏ bú, không bỏ uống hoàn toàn.",
+      "intents": [
+        "ăn uống thế nào",
+        "bé có bú được không",
+        "có bỏ bú không",
+        "uống nước được không",
+        "có uống được không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-vomiting",
+      "topic": "Nôn",
+      "polarity": "negative",
+      "lay_response": "Bé có ói một lần sau cơn ho thôi, còn ăn uống vô thì không có ói ra hết đâu bác sĩ.",
+      "clinical_note": "Không nôn tất cả mọi thứ; có nôn 1 lần sau cơn ho.",
+      "intents": [
+        "có nôn không",
+        "có ói không",
+        "ăn vào có nôn ra hết không",
+        "nôn mấy lần"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-seizure",
+      "topic": "Co giật",
+      "polarity": "negative",
+      "lay_response": "Dạ không, bé không có co giật lần nào.",
+      "clinical_note": "Không co giật.",
+      "intents": [
+        "có co giật không",
+        "có lên cơn giật không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-alertness",
+      "topic": "Quấy, li bì",
+      "polarity": "positive",
+      "lay_response": "Bé quấy hơn mọi ngày, hay khóc. Mà không có li bì đâu, lúc hạ sốt bé vẫn chơi được.",
+      "clinical_note": "Quấy hơn thường ngày; không li bì, vẫn chơi được lúc hạ sốt.",
+      "intents": [
+        "bé có li bì không",
+        "bé có tỉnh không",
+        "có ngủ nhiều khó đánh thức không",
+        "bé có quấy không",
+        "bé có chơi được không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-cyanosis-stridor",
+      "topic": "Tím môi, thở rít",
+      "polarity": "negative",
+      "lay_response": "Dạ em không thấy môi bé tím. Lúc bé nằm yên cũng không nghe thở rít.",
+      "clinical_note": "Không tím môi. Không thở rít khi nằm yên.",
+      "intents": [
+        "môi có tím không",
+        "có tím tái không",
+        "có thở rít không",
+        "thở có tiếng rít không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-diarrhoea",
+      "topic": "Tiêu chảy",
+      "polarity": "negative",
+      "lay_response": "Dạ bé không bị tiêu chảy.",
+      "clinical_note": "Không tiêu chảy.",
+      "intents": [
+        "có tiêu chảy không",
+        "đi cầu thế nào",
+        "có đi ngoài phân lỏng không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-aspiration",
+      "topic": "Sặc, hóc dị vật",
+      "polarity": "negative",
+      "lay_response": "Dạ không, bé không có bị sặc hay hóc cái gì hết, cái này em chắc chắn.",
+      "clinical_note": "Không có tiền sử sặc hay hóc dị vật (mẹ chắc chắn).",
+      "intents": [
+        "bé có bị sặc không",
+        "có hóc dị vật không",
+        "có nuốt phải đồ vật gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-meds",
+      "topic": "Thuốc đã dùng ở nhà",
+      "polarity": "positive",
+      "lay_response": "Em cho bé uống siro hạ sốt paracetamol, lúc nào sốt thì cho uống.",
+      "clinical_note": "Paracetamol dạng siro khi sốt.",
+      "intents": [
+        "đã uống thuốc gì",
+        "có cho uống thuốc hạ sốt không",
+        "ở nhà cho uống thuốc gì"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-antibiotic",
+      "topic": "Kháng sinh",
+      "polarity": "negative",
+      "lay_response": "Dạ chưa, em chưa cho bé uống kháng sinh, chỉ có siro hạ sốt thôi.",
+      "clinical_note": "Chưa dùng kháng sinh.",
+      "intents": [
+        "có uống kháng sinh không",
+        "có tự mua thuốc kháng sinh không",
+        "có uống thuốc trụ sinh không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-vaccination",
+      "topic": "Tiêm chủng, tiêm phế cầu",
+      "polarity": "unknown",
+      "lay_response": "Em chỉ nhớ là bé tiêm đủ ở trạm y tế. Còn có tiêm phế cầu hay không thì em không biết nữa.",
+      "clinical_note": "Mẹ nhớ 'tiêm đủ ở trạm y tế'; không biết có tiêm phế cầu không (unknown).",
+      "intents": [
+        "tiêm chủng đủ chưa",
+        "có tiêm phế cầu không",
+        "có sổ tiêm chủng không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-birth-history",
+      "topic": "Tiền sử sinh, nằm viện",
+      "polarity": "positive",
+      "lay_response": "Bé sinh đủ tháng, lúc sinh nặng 3 ký 1. Trước giờ bé chưa phải nằm viện lần nào.",
+      "clinical_note": "Sinh đủ tháng, cân nặng lúc sinh 3,1 kg. Chưa từng nằm viện.",
+      "intents": [
+        "bé sinh đủ tháng không",
+        "lúc sinh nặng bao nhiêu",
+        "trước đây có nằm viện không",
+        "bé có bệnh gì trước đây không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-recurrent-wheeze",
+      "topic": "Khò khè tái diễn",
+      "polarity": "negative",
+      "lay_response": "Trước giờ bé không có bị khò khè đi khò khè lại, lần này mới bị.",
+      "clinical_note": "Không khò khè tái diễn.",
+      "intents": [
+        "trước đây có hay khò khè không",
+        "có bị khò khè nhiều lần không",
+        "có bị hen không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-allergy",
+      "topic": "Dị ứng",
+      "polarity": "negative",
+      "lay_response": "Dạ bé không có dị ứng gì hết.",
+      "clinical_note": "Không dị ứng.",
+      "intents": [
+        "có dị ứng thuốc không",
+        "có dị ứng gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-smoke",
+      "topic": "Khói thuốc trong nhà",
+      "polarity": "positive",
+      "lay_response": "Ba bé có hút thuốc lá, hút trong nhà luôn bác sĩ.",
+      "clinical_note": "Bố hút thuốc lá trong nhà.",
+      "intents": [
+        "nhà có ai hút thuốc không",
+        "bé có hít khói thuốc không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-contacts",
+      "topic": "Người xung quanh bị bệnh, nhà trẻ",
+      "polarity": "positive",
+      "lay_response": "Anh hai của bé năm tuổi, tuần trước cũng bị ho, sổ mũi. Bé gửi nhà trẻ, trong lớp nhiều bé bị ho lắm.",
+      "clinical_note": "Anh trai 5 tuổi ho, sổ mũi tuần trước. Gửi nhà trẻ, lớp có nhiều trẻ ho.",
+      "intents": [
+        "nhà có ai bị ho không",
+        "xung quanh có ai bị bệnh không",
+        "bé có đi nhà trẻ không",
+        "ở lớp có bé nào bị bệnh không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-general",
+      "region": "general",
+      "action": "Đánh giá toàn trạng và tri giác",
+      "finding": "Tỉnh, quấy khóc khi khám, dỗ được. Không li bì.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-vitals",
+      "region": "vitals",
+      "action": "Đo sinh hiệu",
+      "finding": "Nhiệt độ 38,6°C. Mạch 150 lần/phút. Nhịp thở 52 lần/phút (đếm đủ 1 phút khi trẻ nằm yên). SpO2 93% khí trời. Cân nặng 10 kg.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-breathing",
+      "region": "breathing",
+      "action": "Đếm nhịp thở đủ 1 phút khi trẻ nằm yên",
+      "finding": "Nhịp thở 52 lần/phút, đếm đủ 1 phút khi trẻ nằm yên.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-chest-inspect",
+      "region": "chest_inspect",
+      "action": "Nhìn lồng ngực khi trẻ thở",
+      "finding": "Rút lõm lồng ngực: phần dưới lồng ngực lõm vào khi hít vào, thấy rõ khi trẻ nằm yên. Không thở rên. Không gật gù đầu theo nhịp thở. Không phập phồng cánh mũi.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-lungs",
+      "region": "lungs",
+      "action": "Nghe phổi",
+      "finding": "Ran nổ ở đáy phổi phải, rì rào phế nang giảm nhẹ đáy phải. Không ran rít.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-lips-limbs",
+      "region": "lips_limbs",
+      "action": "Khám môi và đầu chi",
+      "finding": "Môi hồng, không tím. Đầu chi ấm.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-ent",
+      "region": "ent",
+      "action": "Khám tai mũi họng",
+      "finding": "Mũi có dịch trong, họng đỏ nhẹ.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-heart",
+      "region": "heart",
+      "action": "Nghe tim",
+      "finding": "Tim nhịp nhanh, đều, không âm thổi.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-hydration",
+      "region": "hydration",
+      "action": "Đánh giá dấu hiệu mất nước",
+      "finding": "Không có dấu hiệu mất nước: mắt không trũng, nếp véo da mất nhanh.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-cxr",
+      "name": "X-quang ngực",
+      "aliases": [
+        "X-quang",
+        "X quang phổi",
+        "chụp phổi",
+        "phim phổi",
+        "XQ ngực"
+      ],
+      "result_text": "Đám mờ thùy dưới phổi phải, không tràn dịch màng phổi.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-wbc",
+      "name": "Số lượng bạch cầu",
+      "aliases": [
+        "bạch cầu",
+        "WBC"
+      ],
+      "result_text": "Bạch cầu 16,5 G/L, trung tính 70%.",
+      "value": 16.5,
+      "unit": "G/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-cbc",
+      "name": "Tổng phân tích tế bào máu",
+      "aliases": [
+        "CTM",
+        "công thức máu",
+        "CBC"
+      ],
+      "result_text": "Bạch cầu 16,5 G/L, trung tính 70%.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-crp",
+      "name": "CRP",
+      "aliases": [
+        "CRP",
+        "protein phản ứng C"
+      ],
+      "result_text": "CRP 48 mg/L.",
+      "value": 48,
+      "unit": "mg/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    }
+  ],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "Viêm phổi cộng đồng, chưa có dấu hiệu viêm phổi nặng",
+    "severity_grade": "viem-phoi-chua-nang",
+    "differentials": [],
+    "acceptable_alternatives": [
+      "Viêm phổi cộng đồng",
+      "Viêm phổi, không có dấu hiệu viêm phổi nặng"
+    ]
+  },
+  "management": [
+    "TODO(clinician): chọn chuẩn xử trí: 101/QĐ-BYT (kháng sinh uống amoxicillin, nhập viện nếu không cải thiện hoặc có dấu hiệu nặng), WHO 2024 (trẻ 2-59 tháng có rút lõm lồng ngực, không có dấu hiệu nguy hiểm: amoxicillin uống 5 ngày, ngoại trú) hay phác đồ của bệnh viện nhi.",
+    "Kháng sinh uống (amoxicillin) theo 101/QĐ-BYT; liều chỉ thêm từ bản gốc. Nhập viện nếu không cải thiện hoặc có dấu hiệu nặng.",
+    "Hẹn tái khám. TODO(clinician): thời điểm tái khám.",
+    "Dặn mẹ đưa bé đến ngay khi: không uống được, thở nhanh hơn hoặc khó thở, li bì, co giật, tím."
+  ],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-opening",
+        "domain": "communication",
+        "criterion": "Chào hỏi, giới thiệu bản thân, xác nhận danh tính bé và mẹ, giải thích mục đích buổi khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Làm 1-2 trong 3 việc",
+          "2": "Làm đủ 3 việc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chào chị, tôi là bác sĩ",
+          "Bé tên gì, mấy tháng tuổi",
+          "Hôm nay tôi sẽ hỏi và khám cho bé"
+        ],
+        "reliability": "low"
+      },
+      {
+        "id": "r-cough-fever-breathing",
+        "domain": "history",
+        "criterion": "Hỏi diễn tiến ho, sốt, thở nhanh và thời gian",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Thiếu thời gian hoặc một triệu chứng",
+          "2": "Hỏi đủ ba triệu chứng và thời gian"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé ho từ khi nào, ho khan hay có đờm",
+          "Bé sốt từ khi nào, sốt bao nhiêu độ",
+          "Bé thở nhanh từ lúc nào"
+        ]
+      },
+      {
+        "id": "r-danger-signs",
+        "domain": "history",
+        "criterion": "Hỏi đủ dấu hiệu nguy hiểm toàn thân: bỏ bú hoặc không uống được, nôn tất cả, co giật, li bì",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Hỏi không quá 1 dấu hiệu",
+          "1": "Hỏi 2-3 dấu hiệu",
+          "2": "Hỏi đủ 4 dấu hiệu"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé có bú được, uống được không",
+          "Ăn uống vào có nôn ra hết không",
+          "Bé có co giật không",
+          "Bé có li bì, khó đánh thức không"
+        ]
+      },
+      {
+        "id": "r-risk-factors",
+        "domain": "epidemiology",
+        "criterion": "Hỏi tiền sử sặc hoặc dị vật, khò khè tái diễn, tiêm chủng, tiếp xúc khói thuốc, người bệnh xung quanh",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi 1-2 mục",
+          "2": "Hỏi ít nhất 3 mục"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé có bị sặc, hóc dị vật không",
+          "Trước đây bé có hay khò khè không",
+          "Bé tiêm chủng đủ chưa, có tiêm phế cầu không",
+          "Nhà có ai hút thuốc không",
+          "Xung quanh, ở nhà trẻ có ai bị ho không"
+        ]
+      },
+      {
+        "id": "r-meds-antibiotic",
+        "domain": "history",
+        "criterion": "Hỏi thuốc đã dùng, đặc biệt kháng sinh tự mua",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Chỉ hỏi chung đã uống thuốc gì",
+          "2": "Hỏi rõ có dùng kháng sinh không"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Ở nhà đã cho bé uống thuốc gì",
+          "Có tự mua kháng sinh cho bé uống không"
+        ]
+      },
+      {
+        "id": "r-resp-count",
+        "domain": "physical_exam",
+        "criterion": "Đếm nhịp thở đủ 1 phút khi trẻ nằm yên và so với ngưỡng thở nhanh theo tuổi",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không đếm",
+          "1": "Đếm dưới 60 giây hoặc không so với ngưỡng",
+          "2": "Đếm đủ 60 giây và kết luận thở nhanh"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đếm nhịp thở của bé trong 1 phút",
+          "Nhịp thở 52 lần/phút là thở nhanh so với tuổi"
+        ]
+      },
+      {
+        "id": "r-chest-indrawing",
+        "domain": "physical_exam",
+        "criterion": "Quan sát rút lõm lồng ngực, thở rên, phập phồng cánh mũi, tím",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không quan sát",
+          "1": "Chỉ nhận ra rút lõm lồng ngực",
+          "2": "Nhận ra rút lõm lồng ngực và kiểm tra các dấu hiệu khác"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Nhìn lồng ngực bé khi thở",
+          "Có rút lõm lồng ngực không",
+          "Có thở rên, phập phồng cánh mũi, tím không"
+        ]
+      },
+      {
+        "id": "r-spo2",
+        "domain": "investigations",
+        "criterion": "Đo SpO2 và diễn giải",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không đo",
+          "1": "Đo nhưng không diễn giải",
+          "2": "Đo và diễn giải đúng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đo SpO2 cho bé",
+          "SpO2 93% khí trời, chưa dưới 90%"
+        ]
+      },
+      {
+        "id": "r-lung-auscultation",
+        "domain": "physical_exam",
+        "criterion": "Nghe phổi, mô tả ran nổ và vị trí",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không nghe phổi",
+          "1": "Nghe nhưng mô tả sai vị trí",
+          "2": "Mô tả đúng ran nổ đáy phổi phải"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Nghe phổi cho bé",
+          "Có ran nổ ở đáy phổi phải"
+        ]
+      },
+      {
+        "id": "r-hydration-consciousness",
+        "domain": "physical_exam",
+        "criterion": "Đánh giá mất nước và tri giác",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không đánh giá",
+          "1": "Đánh giá một trong hai",
+          "2": "Đánh giá cả mất nước và tri giác"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám dấu hiệu mất nước: mắt, nếp véo da",
+          "Đánh giá tri giác của bé"
+        ]
+      },
+      {
+        "id": "r-classification",
+        "domain": "diagnosis",
+        "criterion": "Phân loại đúng: viêm phổi, không có dấu hiệu viêm phổi nặng; giải thích dựa trên tiêu chí",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Phân loại sai hoặc không chẩn đoán",
+          "1": "Phân loại đúng nhưng không giải thích",
+          "2": "Phân loại đúng và giải thích dựa trên tiêu chí"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chẩn đoán bệnh gì, mức độ nào",
+          "Vì sao chưa phải viêm phổi nặng"
+        ]
+      },
+      {
+        "id": "r-management",
+        "domain": "management",
+        "criterion": "Xử trí phù hợp chuẩn đã chọn (kháng sinh uống và hẹn tái khám, hoặc nhập viện theo phác đồ)",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Sai hướng",
+          "1": "Đúng hướng nhưng thiếu hẹn tái khám",
+          "2": "Đúng chuẩn đã chọn"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho bé uống kháng sinh",
+          "Hẹn tái khám"
+        ]
+      },
+      {
+        "id": "r-return-signs",
+        "domain": "management",
+        "criterion": "Dặn mẹ dấu hiệu cần đưa trẻ đến ngay: không uống được, thở nhanh hơn hoặc khó thở, li bì, co giật, tím",
+        "weight": 2,
+        "critical": true,
+        "anchors": {
+          "0": "Dặn không quá 1 dấu hiệu",
+          "1": "Dặn 2-3 dấu hiệu",
+          "2": "Dặn ít nhất 4 dấu hiệu"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Nếu bé không uống được, thở nhanh hơn hay khó thở thì đưa đến ngay",
+          "Nếu bé li bì, co giật, tím môi thì đưa đến ngay"
+        ]
+      },
+      {
+        "id": "r-closing",
+        "domain": "communication",
+        "criterion": "Tóm tắt lại cho mẹ, hỏi còn thắc mắc gì không, dùng từ dễ hiểu và giải thích thuật ngữ",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Chỉ tóm tắt hoặc chỉ hỏi lại",
+          "2": "Tóm tắt và hỏi lại thắc mắc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Tóm lại tình trạng của bé cho mẹ",
+          "Chị còn thắc mắc gì không"
+        ],
+        "reliability": "low"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "Hướng dẫn xử trí viêm phổi cộng đồng ở trẻ em (Quyết định 101/QĐ-BYT ngày 09/01/2014)",
+      "section": "Chẩn đoán: thở nhanh theo tuổi, viêm phổi, viêm phổi nặng"
+    },
+    {
+      "document": "Hướng dẫn xử trí viêm phổi cộng đồng ở trẻ em (Quyết định 101/QĐ-BYT ngày 09/01/2014)",
+      "section": "Cận lâm sàng; điều trị viêm phổi"
+    }
+  ],
+  "forbidden_terms": [
+    "viêm phổi",
+    "phế viêm",
+    "rút lõm",
+    "ran nổ",
+    "suy hô hấp",
+    "giảm oxy",
+    "đông đặc"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Dạ cái đó em không rõ ạ.",
+      "Dạ em không để ý cái đó, em không chắc nữa bác sĩ."
+    ],
+    "not_ordered_lab": [
+      "Dạ bác sĩ chưa cho bé làm xét nghiệm đó ạ."
+    ],
+    "out_of_scope": [
+      "Dạ em chỉ biết bé bị như vậy thôi, bác sĩ coi giùm bé giúp em."
+    ]
+  }
+}

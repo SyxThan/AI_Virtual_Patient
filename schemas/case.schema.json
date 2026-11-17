@@ -75,7 +75,11 @@
           "minLength": 1
         },
         "case_number": {
-          "type": "integer",
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Entry number in the 53-case source table; null when the case is not mapped to an entry (S20-08).",
           "minimum": 1,
           "maximum": 53
         }
