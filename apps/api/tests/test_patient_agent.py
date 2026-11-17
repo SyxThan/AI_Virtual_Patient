@@ -60,3 +60,66 @@ def test_fake_provider_unknown_question_is_safe() -> None:
     )
     assert reply  # non-empty
     assert guardrail["violations"] == []
+
+
+# --- role follows the case's informant (AVP-159) ---------------------------------
+
+
+class _RecordingProvider(LLMProvider):
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, str | None]] = []
+
+    def generate(self, prompt, system_prompt=None, temperature=0.2) -> str:
+        self.calls.append((prompt, system_prompt))
+        return "Dạ."
+
+
+def _case_with(informant: str, age: dict, sex: str, name: str) -> dict:
+    case = dict(CASE)
+    case["patient"] = {
+        "name": name,
+        "age": age,
+        "sex": sex,
+        "occupation": "N/A",
+        "informant": {"role": informant},
+        "persona": {"personality": "bình tĩnh", "emotional_state": "mệt", "dialect": "north"},
+    }
+    return case
+
+
+def test_static_prefix_names_no_fixed_role() -> None:
+    # The old prefix hard-coded "the mother of an 18-month-old" for every case.
+    assert "18 tháng" not in patient_agent._STATIC_PREFIX
+    assert "NGƯỜI MẸ" not in patient_agent._STATIC_PREFIX
+
+
+def test_adult_self_case_plays_the_patient() -> None:
+    case = _case_with("self", {"value": 52, "unit": "years"}, "male", "Ông Lê Văn T.")
+    rec = _RecordingProvider()
+    patient_agent.respond(case, [], "Anh đau ở đâu?", rec)
+    prompt, system = rec.calls[0]
+    assert "Bạn CHÍNH LÀ người bệnh (Ông Lê Văn T., 52 tuổi, nam)" in system
+    assert "Bạn là mẹ" not in system
+    assert "Giọng miền Bắc." in system
+    assert prompt.endswith("Người bệnh:")
+    assert "Mẹ:" not in prompt
+
+
+def test_mother_case_keeps_the_mother_label() -> None:
+    case = _case_with("mother", {"value": 18, "unit": "months"}, "male", "Bé B.")
+    rec = _RecordingProvider()
+    transcript = [
+        {"speaker": "student", "text": "Chào chị"},
+        {"speaker": "patient", "text": "Dạ chào bác sĩ"},
+    ]
+    patient_agent.respond(case, transcript, "Bé sốt mấy ngày?", rec)
+    prompt, system = rec.calls[0]
+    assert "Bạn là mẹ của người bệnh (Bé B., 18 tháng tuổi, nam)" in system
+    assert "Mẹ: Dạ chào bác sĩ" in prompt
+    assert prompt.endswith("Mẹ:")
+
+
+def test_system_prompt_is_stable_per_case() -> None:
+    case = _case_with("father", {"value": 3, "unit": "years"}, "female", "Bé H.")
+    assert patient_agent.build_system_prompt(case) == patient_agent.build_system_prompt(case)
+    assert patient_agent.speaker_label(case) == "Bố"
