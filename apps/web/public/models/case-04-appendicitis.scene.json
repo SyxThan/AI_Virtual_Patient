@@ -1,0 +1,77 @@
+{
+  "contract": "avp-case-scene/1",
+  "caseId": "case-04-appendicitis",
+  "model": "/models/case-04-appendicitis.glb",
+  "speakerLabel": "Người bệnh",
+  "draft": true,
+  "camera": {
+    "home": {
+      "pos": [
+        3.3,
+        2.5,
+        4.6
+      ],
+      "target": [
+        -0.35,
+        0.8,
+        -0.25
+      ]
+    },
+    "exam": {
+      "pos": [
+        1.35,
+        1.85,
+        1.3
+      ],
+      "target": [
+        0.4,
+        0.62,
+        -0.4
+      ]
+    }
+  },
+  "regions": [
+    {
+      "id": "abdomen_rlq",
+      "overlays": [
+        {
+          "type": "focus",
+          "landmark": "mcburney",
+          "p1": 0.045,
+          "p2": 0.006,
+          "color": "#d9483b",
+          "strength": 0.9
+        }
+      ]
+    },
+    {
+      "id": "abdomen_other",
+      "overlays": [
+        {
+          "type": "focus",
+          "landmark": "left_lower_quadrant",
+          "p1": 0.03,
+          "p2": 0.005,
+          "color": "#3d8fb5",
+          "strength": 0.75
+        }
+      ]
+    },
+    {
+      "id": "flank_lumbar",
+      "overlays": []
+    },
+    {
+      "id": "tongue_mouth",
+      "overlays": []
+    },
+    {
+      "id": "right_hip",
+      "overlays": []
+    },
+    {
+      "id": "groin",
+      "overlays": []
+    }
+  ]
+}
