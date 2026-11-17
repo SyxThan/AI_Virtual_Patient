@@ -1,0 +1,89 @@
+{
+  "contract": "avp-case-scene/1",
+  "caseId": "case-03-pneumonia",
+  "model": "/models/case-03-pneumonia.glb",
+  "speakerLabel": "Mẹ",
+  "draft": true,
+  "camera": {
+    "home": {
+      "pos": [
+        3.3,
+        2.5,
+        4.6
+      ],
+      "target": [
+        -0.35,
+        0.8,
+        -0.25
+      ]
+    },
+    "exam": {
+      "pos": [
+        0.75,
+        1.15,
+        1.45
+      ],
+      "target": [
+        0.15,
+        0.82,
+        -0.02
+      ]
+    }
+  },
+  "breathing": {
+    "morph": "breathIn",
+    "rate": 52,
+    "amplitude": 1.0
+  },
+  "regions": [
+    {
+      "id": "chest_wall",
+      "overlays": [
+        {
+          "type": "edge",
+          "landmark": "subcostal_line",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "p1": 0.075,
+          "p2": 0.005,
+          "dash": 70,
+          "color": "#e07a3f",
+          "strength": 0.85
+        }
+      ]
+    },
+    {
+      "id": "lungs",
+      "overlays": [
+        {
+          "type": "focus",
+          "landmark": "lung_base_right",
+          "p1": 0.035,
+          "p2": 0.005,
+          "color": "#3d8fb5",
+          "strength": 0.85
+        }
+      ]
+    },
+    {
+      "id": "lips_mouth",
+      "overlays": []
+    },
+    {
+      "id": "hands_fingers",
+      "overlays": []
+    },
+    {
+      "id": "abdomen_skin",
+      "overlays": []
+    }
+  ]
+}

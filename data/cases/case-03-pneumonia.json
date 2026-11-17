@@ -35,79 +35,88 @@
       "Rubric converted from the pack's OSCE checklist (levels chua_dat/dat_mot_phan/dat -> anchors 0/1/2, red_flag -> critical; weights and red flags are the pack's proposals). Domain mapping: H03 (aspiration, recurrent wheeze, vaccination, smoke, sick contacts) -> epidemiology; E03 (SpO2) -> investigations, because the checklist has no investigations criterion; R01 -> diagnosis. TODO(clinician): if the X-ray and blood tests stay, add an investigations criterion for ordering and reading them.",
       "TODO(clinician): the pack's scoring coefficients are dat 1.0 / dat_mot_phan 0.5 / chua_dat 0; here they are anchors 2/1/0 under weight. Keep or change?",
       "Day count: the pack puts day 1 (runny nose, dry cough) 4 days before the visit; the day number of the visit itself is not stated, so the case does not state one.",
-      "TODO(clinician): exam stays 2D; decide whether to add the chest to the 3D model later (separate code task).",
+      "Exam is 3D since AVP-162 (team's avp-case-scene/1 pack, chest included); the old 2D illustration stays as a fallback asset.",
       "Corpus data/guidelines/pneumonia-child_chunks.json holds only the 101/QĐ-BYT document. Not ingested: rights not confirmed by owner: who-pneumonia-diarrhoea-2024 (WHO 2024, CC BY-NC-SA 3.0 IGO) and who-pocketbook-2013 (WHO Pocket Book 2013). They are still named as the origin of some thresholds in these notes.",
       "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-08).",
-      "source.case_number=29 is 'Bài 29. Viêm phổi ở trẻ em' in the team's 53-disease table (BV Bệnh Nhiệt đới TP.HCM 2023); the case itself follows 101/QĐ-BYT."
+      "source.case_number=29 is 'Bài 29. Viêm phổi ở trẻ em' in the team's 53-disease table (BV Bệnh Nhiệt đới TP.HCM 2023); the case itself follows 101/QĐ-BYT.",
+      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays and breathing animation are illustrative, TODO(clinician) review. Mapping (AVP-162, no exam[] entry changed): collider chest_wall -> chest_inspect, lungs -> lungs, lips_mouth -> lips_limbs, hands_fingers -> lips_limbs, abdomen_skin -> hydration; general, vitals, breathing (60-second count), heart, ent have no collider and stay as catalog entries. The demo's extra collider findings ('Bụng phập phồng theo nhịp thở', 'Không tím đầu chi', and nose/throat and heart under the lips/chest colliders) were not added: the first two are not exam findings in the draft (§2 is the mother's words), the rest are reachable via ent and heart. Scene breathing.rate 52 matches e-breathing; the demo's breathing note was dropped (clinical text)."
     ]
   },
   "catalog": {
     "patient_group": "child",
     "display_complaint": "Con ho mấy hôm nay, hôm qua tới giờ thở nhanh, nhìn bụng phập phồng mà sốt hoài không dứt.",
-    "cover": "/cases/pneumonia-cover.svg",
-    "exam_mode": "2d",
+    "cover": "/cases/pneumonia-cover.png",
+    "exam_mode": "3d",
     "exam_regions": [
       {
-        "id": "general",
-        "label": "Toàn trạng, tri giác",
-        "x": 0.5,
-        "y": 0.09
-      },
-      {
-        "id": "ent",
-        "label": "Tai mũi họng",
-        "x": 0.31,
-        "y": 0.2
-      },
-      {
-        "id": "lips",
-        "label": "Môi",
-        "exam_region": "lips_limbs",
-        "x": 0.5,
-        "y": 0.26
-      },
-      {
-        "id": "heart",
-        "label": "Nghe tim",
-        "x": 0.58,
-        "y": 0.4
+        "id": "chest_wall",
+        "label": "Nhìn lồng ngực khi thở",
+        "exam_region": "chest_inspect",
+        "x": null,
+        "y": null
       },
       {
         "id": "lungs",
         "label": "Nghe phổi",
-        "x": 0.39,
-        "y": 0.46
+        "exam_region": "lungs",
+        "x": null,
+        "y": null
       },
       {
-        "id": "chest_inspect",
-        "label": "Nhìn lồng ngực khi thở",
-        "x": 0.5,
-        "y": 0.53
+        "id": "lips_mouth",
+        "label": "Môi",
+        "exam_region": "lips_limbs",
+        "x": null,
+        "y": null
       },
       {
-        "id": "breathing",
-        "label": "Đếm nhịp thở 1 phút",
-        "x": 0.5,
-        "y": 0.61
+        "id": "hands_fingers",
+        "label": "Đầu chi",
+        "exam_region": "lips_limbs",
+        "x": null,
+        "y": null
       },
       {
-        "id": "hydration",
+        "id": "abdomen_skin",
         "label": "Mắt, nếp véo da",
-        "x": 0.64,
-        "y": 0.59
+        "exam_region": "hydration",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "general",
+        "label": "Toàn trạng, tri giác",
+        "exam_region": "general",
+        "x": null,
+        "y": null
       },
       {
         "id": "vitals",
         "label": "Sinh hiệu",
-        "x": 0.21,
-        "y": 0.59
+        "exam_region": "vitals",
+        "x": null,
+        "y": null
       },
       {
-        "id": "limbs",
-        "label": "Đầu chi",
-        "exam_region": "lips_limbs",
-        "x": 0.79,
-        "y": 0.59
+        "id": "breathing",
+        "label": "Đếm nhịp thở 1 phút",
+        "exam_region": "breathing",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "heart",
+        "label": "Nghe tim",
+        "exam_region": "heart",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "ent",
+        "label": "Tai mũi họng",
+        "exam_region": "ent",
+        "x": null,
+        "y": null
       }
     ],
     "estimated_minutes": null,
