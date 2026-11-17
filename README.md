@@ -60,7 +60,11 @@ With `make` (see `Makefile` for all targets):
 make test        # backend tests
 make lint        # ruff + eslint
 make dev         # start API and web
+make check-llm   # every configured model (patient, evaluator, fallback, embedding) answers?
 ```
+If Auto-OSCE scoring or the cited debrief fails with `PROVIDER_ERROR`, run
+`cd apps/api && python ../../scripts/check_llm.py`: a `ClientError(404)` means a
+model id was retired, `429` means no quota (free-tier keys have none for Pro models).
 On Windows, double-click `run.bat` (or run `run` from the repo root): it opens
 one window for the API (http://127.0.0.1:8000, auto-reload) and one for the web
 (http://localhost:3000), installs web packages on first run, then opens the

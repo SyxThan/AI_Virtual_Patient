@@ -80,6 +80,12 @@ function NoticeIcon({ tone }: { tone: "error" | "info" }) {
   );
 }
 
+/** Stored error codes are technical (API-safe); students see a Vietnamese sentence instead. */
+const ERROR_TEXT = vi.debrief.errorCodes as Record<string, string>;
+function errorText(code: string): string {
+  return ERROR_TEXT[code] ?? ERROR_TEXT.unknown;
+}
+
 // Errors use the warning tone: red is reserved for red flags and destructive actions.
 function Notice({ tone, children }: { tone: "error" | "info"; children: React.ReactNode }) {
   const cls = tone === "error" ? "border-warning/30 bg-warning-soft" : "border-line bg-surface";
@@ -156,7 +162,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     body = (
       <Notice tone="error">
         <p className="text-base font-bold">{vi.debrief.failedTitle}</p>
-        {ev.error && <p className="mt-1 text-ink-muted">{ev.error}</p>}
+        {ev.error && <p className="mt-1 text-ink-muted">{errorText(ev.error)}</p>}
         <Button variant="secondary" onClick={onRetry} disabled={retrying} className="mt-4">
           {retrying ? vi.debrief.retrying : vi.debrief.retry}
         </Button>
@@ -192,7 +198,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
           </>
         ) : (
           <div className="lg:col-span-12">
-            <Notice tone="info">{db?.error ?? vi.debrief.debriefFailed}</Notice>
+            <Notice tone="info">{db?.error ? errorText(db.error) : vi.debrief.debriefFailed}</Notice>
           </div>
         )}
       </div>

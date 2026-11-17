@@ -307,6 +307,13 @@
     "retrying": "Đang gửi yêu cầu chấm lại...",
     "retryError": "Không gửi được yêu cầu chấm lại. Vui lòng thử lại.",
     "debriefFailed": "Chưa tạo được phản hồi sư phạm cho buổi khám này.",
+    "errorCodes": {
+      "PROVIDER_ERROR": "Không kết nối được mô hình AI. Hãy bấm thử lại; nếu vẫn lỗi, báo nhóm phát triển kiểm tra cấu hình mô hình.",
+      "INVALID_OUTPUT": "Mô hình AI trả về kết quả không đọc được. Hãy bấm thử lại.",
+      "NO_RUBRIC": "Ca bệnh này chưa có bảng kiểm nên chưa chấm được.",
+      "CONSENT_MISSING": "Buổi khám này chưa có đồng ý lưu dữ liệu nên không được chấm.",
+      "unknown": "Có lỗi khi xử lý. Hãy bấm thử lại; nếu vẫn lỗi, báo nhóm phát triển."
+    },
     "redFlag": "CẢNH BÁO DẤU HIỆU NGUY HIỂM: Bạn đã bỏ sót hoặc chưa đạt tiêu chí tối quan trọng (Giật mình chới với / Phân độ Tay chân miệng)",
     "score": {
       "title": "Điểm Auto-OSCE",

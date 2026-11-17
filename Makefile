@@ -19,7 +19,7 @@ help:
 > @echo "  db-check-rls   assert RLS on every table                (AVP-007)"
 > @echo "  load-cases     load cases into the database             (AVP-008)"
 > @echo "  gen-client     regenerate the TS client from OpenAPI    (AVP-035)"
-> @echo "  check-llm      diagnose the configured LLM provider"
+> @echo "  check-llm      check every configured model (patient, evaluator, fallback, embedding)"
 > @echo "  redteam        run the Patient red-team suite -> evals/results (AVP-011)"
 > @echo "  redteam-judge  LLM-judge a red-team result + audit CSV   (AVP-011)"
 > @echo "  eval-latency   measure turn latency -> evals/results    (AVP-026)"

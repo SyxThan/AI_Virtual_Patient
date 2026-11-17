@@ -1,47 +1,116 @@
 #!/usr/bin/env python
-"""Diagnose the configured LLM provider (reads .env). Prints the selected provider
-and the result of one tiny test call, with the full error if it fails.
-No secrets are printed (only whether the key is set)."""
+"""Check every configured model before a demo (reads .env): Patient, Evaluator,
+Evaluator fallback and embeddings. For each one: is the id in the key's model
+list, and does one tiny call answer? Prints OK/FAIL with the error type and HTTP
+status only. No secrets and no provider messages are printed (AVP-144).
+
+Run from apps/api so the API's .env is used:  cd apps/api && python ../../scripts/check_llm.py
+Exit code 0 when every configured model answers, 1 otherwise.
+
+Typical failures:
+  ClientError(404)  model id retired or not open to this key: pick one from the list printed
+  ClientError(429)  quota exhausted; a free-tier key has 0 quota for Pro models
+  ServerError(503)  model overloaded right now: retry later (the fallback covers this)
+"""
 
 from __future__ import annotations
 
-import traceback
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 
 from avp_api.config import get_settings
-from avp_api.providers.llm import get_llm_provider
+from avp_api.providers.llm import describe_provider_error
+
+
+@dataclass(frozen=True)
+class Check:
+    role: str
+    model: str
+    listed: bool | None  # None = the model list could not be fetched
+    error: str | None  # None = the test call answered
+
+    @property
+    def ok(self) -> bool:
+        return self.error is None
+
+
+def configured_models(s) -> list[tuple[str, str, str]]:
+    """(role, model id, kind) for every model the API would use. kind: llm | embed."""
+    out: list[tuple[str, str, str]] = []
+    if s.llm_model_patient:
+        out.append(("patient", s.llm_model_patient, "llm"))
+    evaluator = s.llm_model_evaluator or s.llm_model_patient
+    if evaluator:
+        out.append(("evaluator", evaluator, "llm"))
+    if s.llm_model_evaluator_fallback and s.llm_model_evaluator_fallback != evaluator:
+        out.append(("evaluator fallback", s.llm_model_evaluator_fallback, "llm"))
+    if s.embedding_model:
+        out.append(("embedding", s.embedding_model, "embed"))
+    return out
+
+
+def run_checks(
+    models: Iterable[tuple[str, str, str]],
+    available: set[str] | None,
+    call_llm: Callable[[str], object],
+    call_embed: Callable[[str], object],
+) -> list[Check]:
+    results = []
+    for role, model, kind in models:
+        listed = None if available is None else model in available
+        try:
+            (call_embed if kind == "embed" else call_llm)(model)
+            error = None
+        except Exception as exc:  # noqa: BLE001 - diagnostic: classify, never print the message
+            error = describe_provider_error(exc)
+        results.append(Check(role, model, listed, error))
+    return results
+
+
+def _gemini_calls(api_key: str):
+    from google import genai
+    from google.genai import types
+
+    from avp_api.providers.embeddings import EMBEDDING_DIM
+    from avp_api.providers.llm import GeminiProvider
+
+    client = genai.Client(api_key=api_key)
+
+    def list_models() -> set[str]:
+        return {m.name.removeprefix("models/") for m in client.models.list()}
+
+    def call_llm(model: str) -> object:
+        return GeminiProvider(api_key, model).generate("Trả lời đúng một từ: OK")
+
+    def call_embed(model: str) -> object:
+        cfg = types.EmbedContentConfig(output_dimensionality=EMBEDDING_DIM)
+        return client.models.embed_content(model=model, contents=["sốt"], config=cfg)
+
+    return list_models, call_llm, call_embed
 
 
 def main() -> int:
     s = get_settings()
-    print("LLM_PROVIDER      =", s.llm_provider)
-    print(
-        "LLM_API_KEY set   =", bool(s.llm_api_key), f"(len={len(s.llm_api_key or '')})"
-    )
-    print("LLM_MODEL_PATIENT =", repr(s.llm_model_patient))
-    provider = get_llm_provider()
-    print("selected provider =", type(provider).__name__)
-    if type(provider).__name__ == "FakeLLMProvider":
-        print(
-            "\n=> Using the FAKE provider (so no real Gemini call). To use Gemini, set"
-        )
-        print(
-            "   LLM_PROVIDER=gemini, LLM_API_KEY=<key>, LLM_MODEL_PATIENT=gemini-3.8-flash."
-        )
+    print("LLM_PROVIDER =", s.llm_provider, "| LLM_API_KEY set =", bool(s.llm_api_key))
+    if s.llm_provider != "gemini" or not s.llm_api_key:
+        print("Fake providers in use (no real model to check).")
         return 0
+    list_models, call_llm, call_embed = _gemini_calls(s.llm_api_key)
     try:
-        out = provider.generate(
-            prompt="Xin chào, bé nhà mình bị sao ạ?",
-            system_prompt="Bạn là người mẹ, trả lời ngắn gọn bằng tiếng Việt.",
-        )
-        print("\nOK — reply:", (out or "")[:160])
-        return 0
-    except Exception:  # noqa: BLE001 — diagnostic: surface any provider error
-        print("\nERROR calling the provider:\n")
-        traceback.print_exc()
-        print("\nCommon causes: wrong LLM_MODEL_PATIENT (e.g. 'gemini-3.8-flash');")
-        print("503 UNAVAILABLE = model overloaded, retry; API key not enabled for the")
-        print("Generative Language API; region/quota. The error above says which.")
-        return 1
+        available: set[str] | None = list_models()
+    except Exception as exc:  # noqa: BLE001
+        print("Could not list models:", describe_provider_error(exc))
+        available = None
+    results = run_checks(configured_models(s), available, call_llm, call_embed)
+    for r in results:
+        listed = "?" if r.listed is None else ("listed" if r.listed else "NOT LISTED")
+        status = "OK  " if r.ok else f"FAIL {r.error}"
+        print(f"  {r.role:<19} {r.model:<28} {listed:<11} {status}")
+    if not all(r.ok for r in results) and available:
+        print("\nModels this key can see (pick ids from here):")
+        for name in sorted(n for n in available if "gemini" in n):
+            print("  ", name)
+    return 0 if all(r.ok for r in results) else 1
 
 
 if __name__ == "__main__":
