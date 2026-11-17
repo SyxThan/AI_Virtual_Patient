@@ -8,11 +8,15 @@ import { fmt } from "@/lib/sessionAuth";
 
 /**
  * Confirmation before "Kết thúc buổi khám": says that no more questions can be
- * asked afterwards. Focus starts on the safe choice (keep examining).
+ * asked afterwards and what is still open (unexamined regions, unticked
+ * reminders in guided mode). Focus starts on the safe choice (keep examining).
  */
 export default function FinishDialog({
   open,
   turnCount,
+  unexamined,
+  regionTotal,
+  unticked,
   finishing,
   error,
   onConfirm,
@@ -20,6 +24,10 @@ export default function FinishDialog({
 }: {
   open: boolean;
   turnCount: number;
+  unexamined: number;
+  regionTotal: number;
+  /** Guided mode only; null when there is no reminder list. */
+  unticked: { n: number; total: number } | null;
   finishing: boolean;
   error: string | null;
   onConfirm: () => void;
@@ -36,7 +44,19 @@ export default function FinishDialog({
       description={
         <>
           <p>{f.body}</p>
-          <p className="tabular mt-3 font-semibold text-ink">{fmt(f.turns, { n: turnCount })}</p>
+          <ul className="tabular mt-3 space-y-1 font-semibold text-ink">
+            <li>{fmt(f.turns, { n: turnCount })}</li>
+            <li className={unexamined > 0 ? "text-warning" : ""}>
+              {unexamined > 0
+                ? fmt(vi.cockpit.finish.unexamined, { n: unexamined, total: regionTotal })
+                : fmt(vi.cockpit.finish.allExamined, { total: regionTotal })}
+            </li>
+            {unticked && unticked.total > 0 && (
+              <li className={unticked.n > 0 ? "text-warning" : ""}>
+                {fmt(vi.cockpit.finish.unticked, { n: unticked.n, total: unticked.total })}
+              </li>
+            )}
+          </ul>
         </>
       }
       initialFocusRef={cancelRef}
@@ -67,7 +87,7 @@ export default function FinishDialog({
           aria-busy={finishing}
           className={buttonClass({ variant: "danger" })}
         >
-          {finishing ? vi.session.finishing : f.confirm}
+          {finishing ? vi.session.finishing : vi.cockpit.finish.confirm}
         </button>
       </div>
     </Modal>

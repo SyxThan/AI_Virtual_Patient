@@ -65,6 +65,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-140** | **Slice 19** (`TASK-S19-01`) | Cảnh 3D phòng khám nhi (`mother_child.glb`): loader, collider theo model, mẹ nói/chớp mắt/nhìn người học, ban minh hoạ | **P0** | 🟡 PR mở |
 | **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | 🟡 PR mở |
 | **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
+| **AVP-143** | **Slice 19** (`TASK-S19-02`) | Trang khám dạng "buồng lái": vừa một màn hình, sân khấu 3D lớn, điểm khám trên cơ thể, thẻ kết quả, cụm giọng nói + phụ đề, cột phải có tab, phím tắt | **P0** | 🟡 PR mở |
 | **AVP-144** | **Slice 7** (sửa lỗi) | Sửa chấm Auto-OSCE: model chấm `gemini-1.5-pro` đã bị Google gỡ (404); thêm model dự phòng, log loại lỗi + mã HTTP, thông báo tiếng Việt, `check_llm.py` kiểm tra mọi model | **P0** | 🟡 PR mở |
 
 ---
@@ -91,7 +92,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | ✅ Hoàn tất (PR #39–#41) |
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
 | **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | 🟡 PR #46 ✅, #47, red-team |
-| **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | 🟡 PR mở (AVP-140) |
+| **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | 🟡 AVP-140 ✅ (PR #53), AVP-143 PR mở |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -482,6 +483,12 @@ Thay hình khối procedural của Slice 5 bằng cảnh `mother_child.glb` do t
 * **File liên quan:** `apps/web/src/components/avatar/*`, `apps/web/public/models/mother_child.glb`, `apps/web/public/draco/`, `assets/avatar/`.
 * **Tiêu chí hoàn thành:** `npm test` (contract helpers), `npm run lint`, `tsc`, `next build` qua; cảnh tải được model thật trên trình duyệt; vùng `documented=false` không bao giờ có ban.
 * **Còn mở:** `TODO(clinician)` texture ban thật thay cho hoa văn procedural; có cần cảnh cởi quần để khám mông không (contract §5); lớp ban quanh miệng hiện trên da mặt, cần bác sĩ xác nhận cách minh hoạ tổn thương niêm mạc miệng. Chưa đo fps bằng script trong `evals/` nên chưa có số liệu (Hard Rule 3).
+
+#### `TASK-S19-02` [P0]: Bố cục trang khám "buồng lái" (AVP-143)
+* **Mô tả:** `/session/[id]` thành khung ứng dụng cao đúng `100dvh`, không cuộn trang (ẩn header/footer chung qua `ChromeGate`). Thanh trên 56px; "Kết thúc buổi khám" tách khỏi "Hướng dẫn" và mở hộp xác nhận có số vùng chưa khám và số mục nhắc việc chưa đánh dấu. Sân khấu (`ClinicStage`) lấp đầy phần còn lại: góc nhìn chuyển 500ms, cuộn chuột/chụm hai ngón để phóng to, nút phóng to/thu nhỏ/đặt lại, gợi ý lần đầu tự ẩn. Ở "Khám bé", mỗi vùng có điểm khám bám theo cơ thể bé (`AvatarScene` chiếu điểm 3D ra màn hình mỗi khung hình, chỉ ghi `transform`); thẻ kết quả hiện cạnh điểm khám (tự đóng sau 8s hoặc khi bấm ra ngoài, có ghim). Cụm giọng nói ở đáy sân khấu (4 trạng thái, sóng âm theo âm lượng micro, khoá khi mẹ đang trả lời), phụ đề câu trả lời gần nhất (tắt được). Cột phải: tab "Trò chuyện"/"Phiếu khám", hành động khám thành một dòng sự kiện, nút "Tin mới", ô nhập ghim đáy, ngăn kéo "Nhắc việc". Cột kéo đổi độ rộng và thu gọn được (lưu localStorage). Phím tắt Space, 1–4, Q/W/E, F, /, Esc (liệt kê trong "Hướng dẫn"). Responsive 4 mức (≥1280, 1024–1279, 768–1023, <768 với tấm trượt 3 nấc).
+* **File liên quan:** `apps/web/src/app/session/[id]/page.tsx`, `apps/web/src/components/avatar/{ClinicStage,ExamResultCard,AvatarScene}.tsx`, `apps/web/src/components/workspace/*`, `apps/web/src/components/guide/GuidedChecklist.tsx`, `apps/web/src/components/shell/ChromeGate.tsx`.
+* **Không đổi:** API, logic hội thoại, chấm điểm, nội dung ca bệnh, câu chữ cảnh báo lâm sàng. Thêm vào `useVoiceSession` một hàm chỉ đọc `micLevel()` (vẽ sóng âm; không gửi đi đâu).
+* **Tiêu chí hoàn thành:** `tsc`, `eslint`, `npm test`, `next build` qua; ở 1920×1080 canvas ≥ 1100×700 và trang không có thanh cuộn; khám một vùng bằng phím 1–4 hiện thẻ kết quả cạnh vùng đó.
 
 ---
 

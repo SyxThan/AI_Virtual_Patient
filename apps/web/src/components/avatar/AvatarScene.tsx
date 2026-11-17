@@ -6,7 +6,16 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { buildProceduralRig } from "./AnatomyColliders";
 import { patientLipSync } from "./LipSyncController";
 import { loadClinicModel, onModelProgress } from "./ModelLoader";
-import { easeInOutCubic, type ExamRegionId, type RegionFindings, type ViewId } from "./avatarContract";
+import {
+  clamp,
+  easeInOutCubic,
+  isAnchorId,
+  placeBeside,
+  type AnchorId,
+  type ExamRegionId,
+  type RegionFindings,
+  type ViewId,
+} from "./avatarContract";
 import { CameraFlight, partView, presetView, regionView, type CameraView } from "./cameraViews";
 import { prepareClinicRig } from "./clinicRig";
 import type { SceneRig } from "./sceneRig";
@@ -21,6 +30,10 @@ export type SceneStatus =
 export type AvatarSceneApi = {
   setView: (view: ViewId) => void;
   focusRegion: (region: ExamRegionId) => void;
+  /** Exam framing on the whole child, the mother glancing at it ("observe"). */
+  focusChild: () => void;
+  /** Dolly in (+1) or out (-1) one step toward the orbit target. */
+  zoom: (direction: 1 | -1) => void;
 };
 
 export type AvatarSceneProps = {
@@ -35,18 +48,30 @@ export type AvatarSceneProps = {
   onHoverChange: (target: HoverTarget | null) => void;
   onStatus: (status: SceneStatus) => void;
   onSpeakingChange: (speaking: boolean) => void;
-  /** The learner scrolled over the canvas without Ctrl: the page scrolls instead of zooming. */
-  onWheelPassThrough: () => void;
+  /** First drag, wheel or pinch on the canvas (hides the first-run hint). */
+  onFirstInteraction: () => void;
   onReady: (api: AvatarSceneApi | null) => void;
+  /**
+   * Layer over the canvas whose `[data-anchor]` children follow 3D points:
+   * markers are centred on their point, `data-anchor-kind="card"` elements sit
+   * beside it (docked by CSS when the stage is narrower than CARD_MIN_STAGE).
+   * Only `transform` is written, so overlays never trigger layout of the page.
+   */
+  overlayRef: RefObject<HTMLElement | null>;
 };
 
 const CLICK_TOLERANCE_PX = 5; // more movement than this = an orbit drag, not a click
 const SPEAK_ON = 0.09;
 const SPEAK_OFF = 0.04;
 const LOOK_AT_CHILD_SECONDS = 3.5;
+const VIEW_FLIGHT_S = 0.5;
+const ZOOM_STEP = 0.8;
+/** Below this stage width the result card docks instead of following its marker. */
+export const CARD_MIN_STAGE = 640;
+const HEAD_BADGE_LIFT = 0.24; // metres above the head anchor
 
 /**
- * Three.js scene for the Clinical Workspace: the clinic room with the mother
+ * Three.js scene for the Clinical Workspace stage: the clinic room with the mother
  * holding the child (mother_child.glb, docs/specs/avatar-asset.md), or the
  * procedural fallback. Client-only: loaded through AvatarCanvas with
  * `dynamic(..., { ssr: false })`; touches window/document only inside effects.
@@ -82,7 +107,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
       return;
     }
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.NeutralToneMapping;
     renderer.shadowMap.enabled = true;
@@ -121,6 +146,10 @@ export default function AvatarScene(props: AvatarSceneProps) {
     controls.target.set(-0.35, 0.8, -0.25);
 
     const clock = { last: performance.now(), elapsed: 0 };
+    function regionOf(o: THREE.Object3D | null): ExamRegionId | null {
+      for (let n = o; n; n = n.parent) if (n.userData.regionId) return n.userData.regionId as ExamRegionId;
+      return null;
+    }
     const flight = new CameraFlight();
     controls.addEventListener("start", () => flight.cancel()); // the learner takes over
 
@@ -132,7 +161,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
 
     const current = (): CameraView => ({ position: camera.position.clone(), target: controls.target.clone() });
     const aspect = () => camera.aspect;
-    const flyTo = (to: CameraView, seconds = 1.1) => {
+    const flyTo = (to: CameraView, seconds = VIEW_FLIGHT_S) => {
       if (reducedMotion.matches) {
         flight.cancel();
         camera.position.copy(to.position);
@@ -141,18 +170,77 @@ export default function AvatarScene(props: AvatarSceneProps) {
       }
       flight.start(current(), to, seconds);
     };
+    const glanceAt = (point: THREE.Vector3) => {
+      // The mother glances down at her child while it is examined.
+      childLookPoint.copy(point);
+      lookAtChildUntil = clock.elapsed + LOOK_AT_CHILD_SECONDS;
+    };
     const api = {
       setView: (view: ViewId) => {
         if (rig) flyTo(presetView(view, rig, aspect()));
       },
       focusRegion: (region: ExamRegionId) => {
         if (!rig) return;
-        flyTo(regionView(region, rig, aspect()));
-        // The mother glances down at her child while it is examined.
-        rig.regionBox(region).getCenter(childLookPoint);
-        lookAtChildUntil = clock.elapsed + LOOK_AT_CHILD_SECONDS;
+        flyTo(regionView(region, rig, aspect()), 0.6);
+        glanceAt(rig.regionBox(region).getCenter(new THREE.Vector3()));
+      },
+      focusChild: () => {
+        if (!rig) return;
+        flyTo(presetView("exam", rig, aspect()));
+        glanceAt(rig.childBox.getCenter(new THREE.Vector3()));
+      },
+      zoom: (direction: 1 | -1) => {
+        const offset = camera.position.clone().sub(controls.target);
+        const len = clamp(
+          offset.length() * (direction > 0 ? ZOOM_STEP : 1 / ZOOM_STEP),
+          controls.minDistance,
+          controls.maxDistance,
+        );
+        flyTo(
+          { target: controls.target.clone(), position: controls.target.clone().addScaledVector(offset.normalize(), len) },
+          0.25,
+        );
       },
     } satisfies AvatarSceneApi;
+
+    // 3D points the HTML overlays follow. A region anchor sits on its
+    // collider's surface on the camera side, not at the box centre (for "both
+    // hands" the centre would float in the air between them).
+    const anchors = new Map<AnchorId, THREE.Vector3>();
+    const computeAnchors = (r: SceneRig) => {
+      anchors.clear();
+      r.root.updateMatrixWorld(true);
+      const front = new THREE.Vector3(0.3, 0.2, 1).normalize();
+      const v = new THREE.Vector3();
+      for (const collider of r.colliders) {
+        const region = regionOf(collider);
+        if (!region || anchors.has(region)) continue;
+        const box = r.regionBox(region);
+        const size = box.getSize(new THREE.Vector3()).length();
+        const aim = box.getCenter(new THREE.Vector3()).addScaledVector(front, size);
+        const best = new THREE.Vector3();
+        let bestD = Infinity;
+        // Every collider of this region (a region may be split across meshes).
+        for (const c of r.colliders) {
+          if (regionOf(c) !== region) continue;
+          c.traverse((o) => {
+            const mesh = o as THREE.Mesh;
+            const pos = mesh.isMesh ? mesh.geometry.getAttribute("position") : null;
+            if (!pos) return;
+            for (let i = 0; i < pos.count; i++) {
+              v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld);
+              const d = v.distanceToSquared(aim);
+              if (d < bestD) {
+                bestD = d;
+                best.copy(v);
+              }
+            }
+          });
+        }
+        anchors.set(region, bestD < Infinity ? best : box.getCenter(new THREE.Vector3()));
+      }
+      anchors.set("child", r.childBox.getCenter(new THREE.Vector3()));
+    };
 
     const attach = (next: SceneRig) => {
       if (disposed) {
@@ -162,6 +250,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
       rig = next;
       rigRef.current = next;
       scene.add(next.root);
+      computeAnchors(next);
       next.setFindings(p().findings);
       renderer.shadowMap.needsUpdate = true;
       // Establishing shot: the whole room, then glide in to the conversation framing.
@@ -169,7 +258,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
       camera.position.copy(overview.position);
       controls.target.copy(overview.target);
       controls.update();
-      flyTo(presetView("talk", next, aspect()), 1.8);
+      flyTo(presetView("talk", next, aspect()), 1.6);
       p().onStatus({ phase: "ready", source: next.source });
       p().onReady(api);
     };
@@ -197,10 +286,6 @@ export default function AvatarScene(props: AvatarSceneProps) {
       | { kind: "region"; region: ExamRegionId }
       | { kind: "part"; owner: THREE.Object3D; label: string };
 
-    const regionOf = (o: THREE.Object3D | null): ExamRegionId | null => {
-      for (let n = o; n; n = n.parent) if (n.userData.regionId) return n.userData.regionId as ExamRegionId;
-      return null;
-    };
 
     const pick = (ev: PointerEvent): Hit | null => {
       if (!rig) return null;
@@ -243,9 +328,16 @@ export default function AvatarScene(props: AvatarSceneProps) {
       }
     };
 
+    let interacted = false;
+    const firstInteraction = () => {
+      if (interacted) return;
+      interacted = true;
+      p().onFirstInteraction();
+    };
     let downAt: { x: number; y: number } | null = null;
     const onPointerDown = (ev: PointerEvent) => {
       downAt = { x: ev.clientX, y: ev.clientY };
+      firstInteraction();
     };
     const onPointerUp = (ev: PointerEvent) => {
       if (!downAt) return;
@@ -275,23 +367,28 @@ export default function AvatarScene(props: AvatarSceneProps) {
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerleave", onPointerLeave);
 
-    // Plain wheel scrolls the page (a workspace tile must not trap scrolling);
-    // Ctrl/⌘ + wheel or fullscreen zooms. Capture phase on the container runs
-    // before OrbitControls' own listener on the canvas.
-    const onWheel = (ev: WheelEvent) => {
-      if (ev.ctrlKey || ev.metaKey || document.fullscreenElement) return;
-      ev.stopPropagation();
-      p().onWheelPassThrough();
-    };
-    container.addEventListener("wheel", onWheel, { capture: true });
+    // The workspace page never scrolls, so the plain wheel (and a pinch, via
+    // OrbitControls) zooms the stage directly.
+    canvas.addEventListener("wheel", firstInteraction, { passive: true });
 
     // ---------------------------------------------------------------- sizing & visibility
+    const stage = { w: 0, h: 0 };
+    let framed = false;
     const resize = () => {
       const w = Math.max(1, container.clientWidth);
       const h = Math.max(1, container.clientHeight);
+      if (w === stage.w && h === stage.h) return;
+      stage.w = w;
+      stage.h = h;
       renderer.setSize(w, h);
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
+      // setSize clears the canvas: draw now, not on the next frame, so dragging
+      // the column divider or resizing the window never flashes an empty stage.
+      if (framed) {
+        placeOverlays();
+        renderer.render(scene, camera);
+      }
     };
     resize();
     const resizeObserver = new ResizeObserver(resize);
@@ -304,6 +401,44 @@ export default function AvatarScene(props: AvatarSceneProps) {
       clock.last = performance.now(); // no giant dt after a pause
     });
     visibility.observe(container);
+
+    // ---------------------------------------------------------------- overlays
+    const projected = new THREE.Vector3();
+    const headPoint = new THREE.Vector3();
+    function placeOverlays() {
+      const layer = p().overlayRef.current;
+      if (!layer || !rig) return;
+      const els = layer.querySelectorAll<HTMLElement>("[data-anchor]");
+      if (els.length === 0) return;
+      // Read every size first, then write: no layout thrash.
+      const sizes = Array.from(els, (el) => [el.offsetWidth, el.offsetHeight] as const);
+      rig.headPosition(headPoint);
+      headPoint.y += HEAD_BADGE_LIFT;
+      els.forEach((el, i) => {
+        const id = el.dataset.anchor;
+        const point = id === "head" ? headPoint : isAnchorId(id) ? anchors.get(id) : undefined;
+        if (!point) return;
+        projected.copy(point).project(camera);
+        const onStage = projected.z < 1 && Math.abs(projected.x) <= 1.02 && Math.abs(projected.y) <= 1.02;
+        const sx = (projected.x * 0.5 + 0.5) * stage.w;
+        const sy = (-projected.y * 0.5 + 0.5) * stage.h;
+        const [w, h] = sizes[i];
+        let transform = "";
+        if (el.dataset.anchorKind === "card") {
+          const floating = stage.w >= CARD_MIN_STAGE ? "true" : "false";
+          if (el.dataset.floating !== floating) el.dataset.floating = floating;
+          if (floating === "true") {
+            const pos = placeBeside(sx, sy, w, h, stage.w, stage.h);
+            transform = `translate3d(${Math.round(pos.x)}px, ${Math.round(pos.y)}px, 0)`;
+          }
+        } else {
+          transform = `translate3d(${Math.round(sx - w / 2)}px, ${Math.round(sy - h / 2)}px, 0)`;
+          const shown = onStage ? "true" : "false";
+          if (el.dataset.onStage !== shown) el.dataset.onStage = shown;
+        }
+        if (el.style.transform !== transform) el.style.transform = transform;
+      });
+    }
 
     // ---------------------------------------------------------------- loop
     const lookAt = new THREE.Vector3();
@@ -358,7 +493,9 @@ export default function AvatarScene(props: AvatarSceneProps) {
           }
         }
       }
+      placeOverlays();
       renderer.render(scene, camera);
+      framed = true;
     }
     renderer.setAnimationLoop(frame);
 
@@ -373,7 +510,7 @@ export default function AvatarScene(props: AvatarSceneProps) {
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerleave", onPointerLeave);
-      container.removeEventListener("wheel", onWheel, { capture: true });
+      canvas.removeEventListener("wheel", firstInteraction);
       controls.dispose();
       rig?.dispose();
       rigRef.current = null;
