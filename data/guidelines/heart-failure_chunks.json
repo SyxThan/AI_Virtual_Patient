@@ -1,0 +1,55 @@
+{
+  "corpus": "heart-failure-guidelines",
+  "corpus_version": 1,
+  "case_id": "case-06-heart-failure",
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-11, AVP-156, phương án suy tim; chủ dự án chọn suy tim thay cho COPD ngày 2026-11-18). Mỗi chunk là bản TÓM TẮT do tác giả viết lại (origin: author_added), không phải trích nguyên văn. Chưa có bác sĩ đối chiếu.",
+      "Nội dung đọc từ bản web của 1857/QĐ-BYT (caselaw.vn, bản .doc của ĐH Duy Tân), không phải bản gốc có chữ ký. TODO(clinician): so từng chunk với bản gốc 1857/QĐ-BYT ngày 05/07/2022 và thêm số trang vào `section`.",
+      "TODO(clinician): bản web không có phần kiểu hình lâm sàng suy tim cấp (ấm/lạnh, khô/ướt) nên chưa có chunk; bổ sung từ bản gốc nếu ca cần.",
+      "TODO(clinician): chunk 'III.4 Xử trí ban đầu suy tim cấp' có liều furosemid tĩnh mạch (1-2 lần liều uống; 20-40 mg nếu chưa dùng). Đây là tóm tắt nguồn, chưa đối chiếu bản gốc. Patient Agent không đọc corpus (cold path).",
+      "Not ingested: esc-hf-2021-2023 (2021 ESC Guidelines for acute and chronic heart failure + 2023 Focused Update, ESC/OUP): rights not confirmed by owner. Không có chunk nào của tài liệu này trong file.",
+      "rights_checked=true for MOH documents set on the project owner's instruction (2026-11-18, S20-11)."
+    ]
+  },
+  "documents": [
+    {
+      "source_key": "moh-qd-1857-2022",
+      "title": "Hướng dẫn chẩn đoán và điều trị suy tim cấp và mạn (Quyết định 1857/QĐ-BYT ngày 05/07/2022)",
+      "publisher": "Bộ Y tế",
+      "year": 2022,
+      "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
+      "rights_checked": true,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "I.1 Định nghĩa; I.2 Phân loại theo phân suất tống máu (Bảng 1)",
+          "text": "Tóm tắt: suy tim là hội chứng lâm sàng do biến đổi cấu trúc và/hoặc chức năng tim, làm tăng áp lực trong buồng tim và/hoặc giảm cung lượng tim khi gắng sức hoặc khi nghỉ. Theo phân suất tống máu thất trái: suy tim PSTM giảm khi EF ≤ 40%; PSTM giảm nhẹ khi EF 41-49%; PSTM bảo tồn khi EF ≥ 50% kèm bằng chứng khách quan về bất thường cấu trúc hoặc chức năng tim phù hợp rối loạn chức năng tâm trương và tăng peptide bài niệu."
+        },
+        {
+          "section": "Phân độ NYHA (Bảng 2) và giai đoạn",
+          "text": "Tóm tắt: NYHA I không hạn chế vận động; II hạn chế nhẹ, vận động thông thường gây mệt, hồi hộp hoặc khó thở; III hạn chế nhiều, vận động nhẹ đã có triệu chứng; IV có triệu chứng cả khi nghỉ. Giai đoạn A có nguy cơ, chưa tổn thương cấu trúc và chưa triệu chứng; B có tổn thương cấu trúc, chưa triệu chứng; C có tổn thương cấu trúc kèm triệu chứng hiện tại hoặc trước đây; D suy tim nặng kháng trị cần can thiệp đặc biệt."
+        },
+        {
+          "section": "Triệu chứng và dấu hiệu (Bảng 3)",
+          "text": "Tóm tắt: triệu chứng điển hình gồm khó thở, khó thở kịch phát về đêm, giảm khả năng gắng sức, mệt, phù mắt cá chân. Dấu hiệu đặc hiệu hơn: tĩnh mạch cổ nổi, phản hồi gan - tĩnh mạch cổ dương tính, tiếng ngựa phi (T3), diện đập mỏm tim rộng. Dấu hiệu kém đặc hiệu: ran ở phổi, phù ngoại biên, gan to, tràn dịch màng phổi, nhịp tim nhanh, nhịp thở Cheyne-Stokes, thiểu niệu, tăng cân trên 2 kg/tuần."
+        },
+        {
+          "section": "Peptide bài niệu (Bảng 4, Hình 6)",
+          "text": "Tóm tắt: suy tim mạn ít khả năng khi BNP < 35 pg/mL hoặc NT-proBNP < 125 pg/mL. Suy tim cấp: NT-proBNP gợi ý theo tuổi là trên 450 pg/mL (dưới 55 tuổi), trên 900 pg/mL (55-75 tuổi), trên 1.800 pg/mL (trên 75 tuổi)."
+        },
+        {
+          "section": "III.1 Suy tim cấp; III.2 Nguyên nhân và yếu tố thúc đẩy",
+          "text": "Tóm tắt: suy tim cấp là các triệu chứng và/hoặc dấu hiệu suy tim tiến triển nhanh, có thể mới xuất hiện hoặc là đợt mất bù của suy tim mạn. Nguyên nhân hay gặp: hội chứng vành cấp, tăng huyết áp cấp cứu, rối loạn nhịp nhanh hoặc chậm, nguyên nhân cơ học (hở van cấp, thủng thành tim), tắc động mạch phổi, nhiễm trùng, chèn ép tim. Yếu tố thúc đẩy: viêm cơ tim cấp, lóc tách động mạch chủ, COPD, suy thận cấp, thiếu máu, rối loạn chuyển hóa, thai kỳ, ăn mặn, không tuân thủ điều trị, thuốc và độc chất."
+        },
+        {
+          "section": "III.4 Xử trí ban đầu suy tim cấp",
+          "text": "Tóm tắt: thở oxy khi SpO2 < 90% hoặc PaO2 < 60 mmHg. Lợi tiểu quai tĩnh mạch: nếu đang uống lợi tiểu quai, liều furosemid tĩnh mạch khởi đầu bằng 1-2 lần liều uống hằng ngày; nếu chưa dùng, khởi đầu 20-40 mg tĩnh mạch. Chuyển hồi sức hoặc đơn vị chăm sóc tim mạch đặc biệt khi: cần hoặc có nguy cơ phải đặt nội khí quản; dấu hiệu giảm tưới máu; SpO2 < 90% dù đang thở oxy; co kéo cơ hô hấp hoặc nhịp thở > 25 lần/phút; tần số tim < 40 hoặc > 130 lần/phút; huyết áp tâm thu < 90 mmHg."
+        }
+      ]
+    }
+  ]
+}
