@@ -615,7 +615,7 @@ export interface components {
              */
             action: "examine_region" | "observe_child";
             /** Region */
-            region?: ("palm_hands" | "feet" | "mouth_throat" | "buttocks_knees") | null;
+            region?: string | null;
         };
         /** ExamActionResponse */
         ExamActionResponse: {
@@ -625,7 +625,7 @@ export interface components {
              */
             action: "examine_region" | "observe_child";
             /** Region */
-            region: ("palm_hands" | "feet" | "mouth_throat" | "buttocks_knees") | null;
+            region: string | null;
             /** Case Region */
             case_region: string | null;
             /** Documented */

@@ -5,10 +5,15 @@ Idempotent (docs/specs/database.md): hash each case; an unchanged file is a
 no-op; a changed file deactivates the old active version and inserts a new one
 (the partial unique index allows only one active version per case id). Files whose
 name starts with "_" are illustrative examples and are skipped.
+
+Dev-only extras (AVP-150): `--extra scripts/fixtures/case-90-test-2d.json` also
+loads the synthetic [TEST] 2D case for manual testing; `--deactivate case-90-test-2d`
+hides it again. Never load the fixture into the demo project.
 """
 
 from __future__ import annotations
 
+import argparse
 import datetime
 import hashlib
 import json
@@ -71,17 +76,48 @@ def load_one(db: Session, path: Path) -> str:
     return f"loaded v{max_version + 1}"
 
 
-def main() -> int:
+def deactivate(db: Session, case_id: str) -> str:
+    rows = db.execute(
+        select(models.Case).where(models.Case.id == case_id, models.Case.is_active.is_(True))
+    ).scalars()
+    n = 0
+    for row in rows:
+        row.is_active = False
+        n += 1
+    return f"deactivated {n} version(s)" if n else "no active version"
+
+
+def _args(argv: list[str]) -> argparse.Namespace:
+    ap = argparse.ArgumentParser(description="Load case JSON files into the cases table.")
+    ap.add_argument(
+        "--extra",
+        type=Path,
+        action="append",
+        default=[],
+        help="also load this file, e.g. the [TEST] fixture scripts/fixtures/case-90-test-2d.json "
+        "(dev only; never on the demo project)",
+    )
+    ap.add_argument(
+        "--deactivate", action="append", default=[], help="hide this case id from the library"
+    )
+    return ap.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _args(sys.argv[1:] if argv is None else argv)
     if not get_settings().database_url:
         print("DATABASE_URL is not set; configure .env (see .env.example)", file=sys.stderr)
         return 2
     paths = sorted(p for p in CASES_DIR.glob("*.json") if not p.name.startswith("_"))
-    if not paths:
+    paths += args.extra
+    if not paths and not args.deactivate:
         print("no case files to load")
         return 0
     with Session(get_engine()) as db:
         for path in paths:
             print(f"{path.name}: {load_one(db, path)}")
+        for case_id in args.deactivate:
+            print(f"{case_id}: {deactivate(db, case_id)}")
         db.commit()
     return 0
 

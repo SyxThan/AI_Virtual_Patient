@@ -19,13 +19,14 @@ SID = str(uuid.uuid4())
 class FakeSessionRepo:
     def __init__(self) -> None:
         self.state: dict = {"role": "student"}
+        self.case_id = "case-01-hfmd"
 
     def get(self, session_id: str) -> SessionRecord | None:
         if session_id != SID:
             return None
         return SessionRecord(
             id=SID,
-            case_id="case-01-hfmd",
+            case_id=self.case_id,
             case_version=1,
             mode="guided",
             status="active",
@@ -51,6 +52,7 @@ _REPO = FakeSessionRepo()
 
 def _reset() -> None:
     _REPO.state = {"role": "student"}
+    _REPO.case_id = "case-01-hfmd"
 
 
 def test_default_is_baseline() -> None:
@@ -96,3 +98,19 @@ def test_wrong_guest_token_denied() -> None:
     _reset()
     r = _client().get(f"/api/v1/sessions/{SID}/vitals", headers={"X-Guest-Token": "wrong"})
     assert r.status_code == 404
+
+
+def test_case_without_vitals_model_gets_not_applicable_not_hfmd_numbers() -> None:
+    """AVP-150 / Hard Rule 1: another case never borrows the HFMD vitals."""
+    _reset()
+    _REPO.case_id = "case-90-test-2d"
+    client = _client()
+    h = {"X-Guest-Token": GOOD}
+    r = client.get(f"/api/v1/sessions/{SID}/vitals", headers=h)
+    assert r.status_code == 409 and r.json()["error"]["code"] == "VITALS_NOT_APPLICABLE"
+    r = client.post(
+        f"/api/v1/sessions/{SID}/vitals/events", json={"event": "ORDER_ANTIPYRETIC"}, headers=h
+    )
+    assert r.status_code == 409
+    assert "vitals" not in _REPO.state  # nothing written
+    _reset()

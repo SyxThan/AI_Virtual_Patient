@@ -37,24 +37,28 @@
       {
         "id": "mouth_throat",
         "label": "Miệng - họng",
+        "exam_region": "mouth",
         "x": null,
         "y": null
       },
       {
         "id": "palm_hands",
         "label": "Lòng bàn tay",
+        "exam_region": "skin",
         "x": null,
         "y": null
       },
       {
         "id": "feet",
         "label": "Lòng bàn chân",
+        "exam_region": "skin",
         "x": null,
         "y": null
       },
       {
         "id": "buttocks_knees",
         "label": "Mông - đầu gối",
+        "exam_region": "skin",
         "x": null,
         "y": null
       }

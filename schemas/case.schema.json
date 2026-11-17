@@ -193,7 +193,14 @@
               },
               "label": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "pattern": "^[^\\[\\]]+$",
+                "description": "No square brackets: the transcript records an exam as '[Khám - <label>]'."
+              },
+              "exam_region": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The exam[].region whose findings this hotspot reveals (AVP-150). Defaults to id. Several hotspots may share one region."
               },
               "x": {
                 "type": [

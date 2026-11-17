@@ -51,6 +51,7 @@ class FakeSessionRepo:
 class FakeTurnRepo:
     def __init__(self) -> None:
         self.rows: list[TurnRecord] = []
+        self.meta: list[dict | None] = []
 
     def next_idx(self, session_id: str) -> int:
         return len(self.rows)
@@ -66,6 +67,7 @@ class FakeTurnRepo:
             created_at=datetime.now(UTC),
         )
         self.rows.append(rec)
+        self.meta.append(kw.get("guardrail"))
         return rec
 
     def list_for_session(self, session_id: str) -> list[TurnRecord]:
@@ -145,3 +147,60 @@ def test_exam_system_turns_are_not_fed_to_the_mother() -> None:
     ]
     prompt = patient_agent._render_prompt(transcript, "Cháu ăn uống thế nào?")
     assert FINDING["mouth"] not in prompt
+
+
+# --- per-case regions and the 2D stage (AVP-150 / TASK-S20-05) ---------------------
+
+CASE_2D = json.loads(
+    (REPO_ROOT / "scripts/fixtures/case-90-test-2d.json").read_text(encoding="utf-8")
+)
+FINDING_2D = {e["region"]: e["finding"] for e in CASE_2D["exam"]}
+
+
+def test_2d_hotspot_returns_the_case_finding_verbatim_and_records_turns() -> None:
+    client, turns = _client(CASE_2D)
+    body = _post(client, {"action": "examine_region", "region": "test_chest"}).json()
+    assert body["documented"] is True and body["case_region"] == "test_chest"
+    assert body["finding"] == FINDING_2D["test_chest"]
+    assert [t.speaker for t in turns.rows] == ["student", "system"]
+    assert turns.meta[0]["kind"] == "exam"  # same record the 3D stage writes
+    assert turns.meta[0]["ui_region"] == "test_chest"
+
+
+def test_2d_hotspots_can_share_one_exam_region() -> None:
+    for region in ("test_left_hand", "test_right_hand"):
+        client, _ = _client(CASE_2D)
+        body = _post(client, {"action": "examine_region", "region": region}).json()
+        assert body["case_region"] == "test_hands"
+        assert body["finding"] == FINDING_2D["test_hands"]
+
+
+def test_2d_hotspot_without_exam_entry_is_unknown() -> None:
+    client, turns = _client(CASE_2D)
+    body = _post(client, {"action": "examine_region", "region": "test_knee"}).json()
+    assert body["documented"] is False and body["finding"] is None
+    assert turns.rows[1].text == "Không có ghi nhận trong hồ sơ cho vùng này."
+
+
+def test_region_the_case_does_not_offer_is_rejected() -> None:
+    client, turns = _client(CASE_2D)
+    r = _post(client, {"action": "examine_region", "region": "mouth_throat"})  # an HFMD id
+    assert r.status_code == 422 and r.json()["error"]["code"] == "UNKNOWN_REGION"
+    assert turns.rows == []
+    client, _ = _client()
+    assert _post(client, {"action": "examine_region", "region": "test_chest"}).status_code == 422
+    assert _post(client, {"action": "examine_region", "region": "Bad Id!"}).status_code == 422
+
+
+def test_hfmd_version_without_catalog_keeps_the_legacy_mapping() -> None:
+    """Sessions pinned to an HFMD version loaded before AVP-146/150 still work."""
+    old = {k: v for k, v in CASE.items() if k != "catalog"}
+    client, _ = _client(old)
+    body = _post(client, {"action": "examine_region", "region": "feet"}).json()
+    assert body["case_region"] == "skin" and body["finding"] == FINDING["skin"]
+
+
+def test_hfmd_catalog_maps_hotspots_like_before() -> None:
+    from avp_api.services.exam_service import LEGACY_UI_TO_CASE_REGION, case_regions
+
+    assert {k: v[0] for k, v in case_regions(CASE).items()} == LEGACY_UI_TO_CASE_REGION

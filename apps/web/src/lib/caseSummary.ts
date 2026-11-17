@@ -62,11 +62,12 @@ export function useCaseSummary(caseId: string | null): CaseLoad & { retry: () =>
 
 /**
  * The case summary of an existing session (debrief, workspace): reads the
- * session's `case_id` (owner-checked by the API), then the case card. null while
- * loading or when either call fails; callers then fall back to neutral text.
+ * session's `case_id` (owner-checked by the API), then the case card.
+ * undefined while loading, null when either call failed (callers then fall back
+ * to neutral text), else the summary.
  */
-export function useSessionCase(sessionId: string): CaseSummary | null {
-  const [found, setFound] = useState<{ id: string; data: CaseSummary } | null>(null);
+export function useSessionCase(sessionId: string): CaseSummary | null | undefined {
+  const [found, setFound] = useState<{ id: string; data: CaseSummary | null } | null>(null);
   useEffect(() => {
     const ctrl = new AbortController();
     (async () => {
@@ -76,18 +77,16 @@ export function useSessionCase(sessionId: string): CaseSummary | null {
           headers: authHeaders(),
           signal: ctrl.signal,
         });
-        if (!res.ok) return;
-        const { case_id } = (await res.json()) as { case_id?: string };
-        if (!case_id) return;
-        const load = await fetchCaseSummary(case_id, ctrl.signal);
-        if (load.status === "ok") setFound({ id: sessionId, data: load.data });
-      } catch {
-        /* aborted or offline: keep the neutral fallback */
+        const { case_id } = res.ok ? ((await res.json()) as { case_id?: string }) : {};
+        const load = case_id ? await fetchCaseSummary(case_id, ctrl.signal) : null;
+        setFound({ id: sessionId, data: load?.status === "ok" ? load.data : null });
+      } catch (e) {
+        if ((e as Error).name !== "AbortError") setFound({ id: sessionId, data: null });
       }
     })();
     return () => ctrl.abort();
   }, [sessionId]);
-  return found?.id === sessionId ? found.data : null;
+  return found?.id === sessionId ? found.data : undefined;
 }
 
 const t = vi.caseSetup;

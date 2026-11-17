@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, StringConstraints, model_validator
 
-# Regions the UI can tap on the 3D avatar (colliders in components/avatar).
-UIExamRegion = Literal["palm_hands", "feet", "mouth_throat", "buttocks_knees"]
+# A hotspot id from the case's `catalog.exam_regions` (AVP-150): the 3D avatar's
+# colliders for HFMD (palm_hands, feet, mouth_throat, buttocks_knees) or a 2D
+# hotspot of another case. Which ids exist is checked against the case in
+# exam_service (422 UNKNOWN_REGION), not here.
+UIExamRegion = Annotated[str, StringConstraints(pattern=r"^[a-z0-9_]{1,64}$")]
 ActionType = Literal["examine_region", "observe_child"]
 
 

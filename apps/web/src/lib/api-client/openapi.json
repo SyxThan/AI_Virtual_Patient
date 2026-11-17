@@ -2397,12 +2397,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "palm_hands",
-                  "feet",
-                  "mouth_throat",
-                  "buttocks_knees"
-                ]
+                "pattern": "^[a-z0-9_]{1,64}$"
               },
               {
                 "type": "null"
@@ -2431,12 +2426,7 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "palm_hands",
-                  "feet",
-                  "mouth_throat",
-                  "buttocks_knees"
-                ]
+                "pattern": "^[a-z0-9_]{1,64}$"
               },
               {
                 "type": "null"
