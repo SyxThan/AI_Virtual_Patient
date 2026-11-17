@@ -10,11 +10,30 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
+from fastapi import HTTPException
+
 from avp_api.db.repositories.session_repo import SessionRepository
 from avp_api.schemas.vitals import ClinicalState, VitalsEvent, VitalsSnapshot
 from avp_api.services import guide_service, session_service
 
 INITIAL_STATE: ClinicalState = "GRADE_2A_BASELINE"
+
+# The state machine below is the HFMD scenario. Any other case has no vitals
+# model yet, so it gets "not applicable" instead of borrowed HFMD numbers
+# (Hard Rule 1; AVP-150).
+VITALS_CASE_IDS = frozenset({"case-01-hfmd"})
+
+
+def _ensure_applicable(case_id: str) -> None:
+    if case_id not in VITALS_CASE_IDS:
+        raise HTTPException(
+            status_code=409,
+            detail={
+                "code": "VITALS_NOT_APPLICABLE",
+                "message": "This case has no vitals model.",
+            },
+        )
+
 
 # state -> (temp_c, hr, rr, bp_sys, bp_dia, spo2)
 _MATRIX: dict[ClinicalState, tuple[float, int, int, int, int, int]] = {
@@ -93,7 +112,8 @@ def _current_state(state_json: dict) -> ClinicalState:
 def get_vitals(
     session_id: str, repo: SessionRepository, user_id: str | None, guest_token: str | None
 ) -> VitalsSnapshot:
-    session_service.get_session(session_id, repo, user_id, guest_token)  # ownership (404 on miss)
+    sess = session_service.get_session(session_id, repo, user_id, guest_token)  # 404 on miss
+    _ensure_applicable(sess.case_id)
     rec = repo.get(session_id)
     return snapshot_for(_current_state(rec.state if rec else {}))
 
@@ -106,6 +126,7 @@ def apply_event(
     guest_token: str | None,
 ) -> VitalsSnapshot:
     sess = session_service.get_session(session_id, repo, user_id, guest_token)  # 404 on miss
+    _ensure_applicable(sess.case_id)
     # Orders after the exam time limit are refused like turns (AVP-112 follow-up).
     guide_service.ensure_within_time_limit(sess.mode, sess.created_at)
     rec = repo.get(session_id)

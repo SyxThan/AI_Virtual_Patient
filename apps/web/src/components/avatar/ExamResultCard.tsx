@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import vi from "../../../messages/vi.json";
 import type { components } from "@/lib/api-client/schema";
+import { useExamRegions } from "@/components/workspace/examRegions";
 import type { ExamTarget } from "@/components/workspace/examTurns";
 import Badge from "@/components/ui/Badge";
 import { FOCUS_RING } from "@/components/ui/focus";
@@ -60,7 +61,7 @@ export default function ExamResultCard({
     return () => document.removeEventListener("pointerdown", onDown);
   }, [pinned, onClose]);
 
-  const regionLabel = vi.exam.regions[state.target];
+  const regionLabel = useExamRegions().labelOf(state.target);
   const result = state.source === "live" ? state.result : null;
 
   return (

@@ -35,13 +35,14 @@ Optional top-level `catalog` object: the data a case-library card and the exam s
 | `display_complaint` | string (required) | text on the card; must equal `presentation.chief_complaint` **verbatim** |
 | `cover` | string \| null | public web path of the cover image, e.g. `/cases/hfmd-cover.webp` |
 | `exam_mode` | `3d` \| `2d` (required) | `3d` = the mother-and-child scene; `2d` = illustration with hotspots |
-| `exam_regions[]` | `{id, label, x, y}` (required, may be empty) | exam hotspots; `x`/`y` are 0..1 positions on the 2D image, `null` for `3d` |
+| `exam_regions[]` | `{id, label, exam_region?, x, y}` (required, may be empty) | exam hotspots; `x`/`y` are 0..1 positions on the 2D image, `null` for `3d`; `exam_region` names the `exam[].region` the hotspot reveals (default: `id`) |
 | `estimated_minutes` | integer \| null | suggested duration; `null` until someone has measured it (Hard rule 3) |
 | `order` | integer (required) | sort hint, lower first |
 
 Rules:
 - **No diagnosis on cards.** Naming the disease gives away the OSCE answer. `display_complaint` and the region labels must not contain `diagnosis.primary` or `title.vi`; the diagnosis stays only in `diagnosis` (and `title`, which the API hides unless asked to reveal it).
-- `exam_regions[].id` is the UI region id the web sends in `POST /sessions/{id}/actions`; findings still come only from `exam[]` (matched by region in `exam_service.py`), never from the catalog.
+- `exam_regions[].id` is the UI region id the web sends in `POST /sessions/{id}/actions`; findings still come only from `exam[]` entries whose `region` equals the hotspot's `exam_region` (default `id`), never from the catalog (AVP-150). The API answers 422 `UNKNOWN_REGION` for an id the case does not list. A region with no matching `exam[]` entry is **unknown** (no finding text), never an invented "normal".
+- `exam_region` is not returned by `GET /cases` (it would hint at the answer key).
 - `catalog` is not clinical content, so editing it does not reset `review.status`; editing `presentation.chief_complaint` does, and `display_complaint` must follow it.
 - It lives in `cases.content` (JSONB), so no migration is needed.
 

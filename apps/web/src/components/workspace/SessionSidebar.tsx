@@ -2,6 +2,7 @@
 
 import { useId, useRef, type KeyboardEvent, type ReactNode } from "react";
 import vi from "../../../messages/vi.json";
+import { speakerText, useCaseVoice } from "@/components/workspace/caseVoice";
 import { FOCUS_RING } from "@/components/ui/focus";
 
 export type SidebarTab = "chat" | "record";
@@ -37,6 +38,7 @@ export default function SessionSidebar({
   /** e.g. the collapse button (desktop). */
   headerAction?: ReactNode;
 }) {
+  const voice = useCaseVoice();
   const base = useId();
   const tabRefs = useRef<Record<SidebarTab, HTMLButtonElement | null>>({ chat: null, record: null });
 
@@ -54,7 +56,7 @@ export default function SessionSidebar({
 
   return (
     <section
-      aria-label={vi.workspace.regions.chat}
+      aria-label={speakerText(vi.workspace.regions.chat, voice)}
       className="flex h-full min-h-0 flex-col overflow-hidden bg-surface [container-type:size]"
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-line px-2">

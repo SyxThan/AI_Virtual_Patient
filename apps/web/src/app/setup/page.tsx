@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import vi from "../../../messages/vi.json";
-import CaseProfile from "@/components/setup/CaseProfile";
+import CaseProfile, { CaseProfileState } from "@/components/setup/CaseProfile";
 import DeviceCheck from "@/components/setup/DeviceCheck";
 import { ChoiceRow, StepHeading } from "@/components/setup/SetupControls";
 import SetupTopBar from "@/components/setup/SetupTopBar";
@@ -19,10 +19,10 @@ import {
 } from "@/components/setup/setupPrefs";
 import { useClinicPreload, useMicCheck, useWebgl } from "@/components/setup/useDeviceCheck";
 import { FOCUS_RING } from "@/components/ui/focus";
-import { API_URL, authHeaders, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
+import { examModeOf, parseCaseParam, useCaseSummary } from "@/lib/caseSummary";
+import { API_URL, authHeaders, fmt, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
 import { navigateToStage } from "@/lib/stageTransition";
 
-const CASE_ID = "case-01-hfmd";
 const ux = vi.setupUx;
 
 function prefersReducedMotion(): boolean {
@@ -35,9 +35,26 @@ function prefersReducedMotion(): boolean {
  * area pinned to the panel's bottom (a fixed bar below 1024px). The start
  * button is always enabled: pressing it without consent points at step 4.
  * The API call is unchanged (`POST /api/v1/sessions`).
+ *
+ * AVP-149: the case comes from `?case=<id>` and its profile from
+ * `GET /api/v1/cases/{id}`. Without a usable case the profile column explains
+ * why and links to the /cases library; the start button then points there too.
  */
 export default function SetupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SetupScreen />
+    </Suspense>
+  );
+}
+
+function SetupScreen() {
   const router = useRouter();
+  const caseId = parseCaseParam(useSearchParams().get("case"));
+  const caseLoad = useCaseSummary(caseId);
+  const caseData = caseLoad.status === "ok" ? caseLoad.data : null;
+  // Only the 3D case needs WebGL and the clinic model (AVP-150); a 2D case skips both.
+  const is3d = caseData ? examModeOf(caseData) === "3d" : false;
   // Last role/mode, remembered in localStorage (consent is never remembered).
   const { role, mode } = useSyncExternalStore(subscribePrefs, getPrefsSnapshot, () => DEFAULT_PREFS);
   const [consent, setConsent] = useState(false);
@@ -52,7 +69,8 @@ export default function SetupPage() {
   const meterRef = useRef<HTMLDivElement>(null);
 
   const webgl = useWebgl();
-  const preload = useClinicPreload(webgl);
+  // Nothing to preload until a 3D case is known ("checking" keeps the hook idle).
+  const preload = useClinicPreload(is3d ? webgl : "checking");
   const mic = useMicCheck(meterRef);
   const finishMic = mic.finish;
 
@@ -62,6 +80,11 @@ export default function SetupPage() {
 
   const handleStart = useCallback(async () => {
     if (loading) return; // lock repeated presses while the session is created
+    if (!caseData) {
+      // No valid case: the profile column already explains it; send them to pick one.
+      if (caseLoad.status !== "loading") router.push("/cases");
+      return;
+    }
     if (!consent) {
       setConsentError(true);
       const step = consentStepRef.current;
@@ -75,7 +98,7 @@ export default function SetupPage() {
       consentBoxRef.current?.focus({ preventScroll: true });
       return;
     }
-    if (webgl === "unsupported") {
+    if (is3d && webgl === "unsupported") {
       setDeviceError(true);
       pointAt(deviceStepRef.current);
       return;
@@ -88,7 +111,7 @@ export default function SetupPage() {
       const res = await fetch(`${API_URL}/api/v1/sessions`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...authHeaders() },
-        body: JSON.stringify({ case_id: CASE_ID, mode, role, consent: true }),
+        body: JSON.stringify({ case_id: caseData.id, mode, role, consent: true }),
       });
       if (!res.ok) {
         // 503 = the API could not reach Supabase to check the sign-in; 401 = token rejected.
@@ -97,7 +120,9 @@ export default function SetupPage() {
             ? vi.setup.error.authUnavailable
             : res.status === 401
               ? vi.setup.error.authExpired
-              : vi.setup.error.generic,
+              : res.status === 404
+                ? vi.caseSetup.notFoundBody
+                : vi.setup.error.generic,
         );
         setLoading(false);
         return;
@@ -109,7 +134,7 @@ export default function SetupPage() {
       setError(vi.setup.error.generic);
       setLoading(false);
     }
-  }, [loading, consent, webgl, mode, role, finishMic, pointAt, router.push]);
+  }, [loading, caseData, caseLoad.status, consent, is3d, webgl, mode, role, finishMic, pointAt, router]);
 
   // Enter starts the session unless focus is on something Enter already drives.
   useEffect(() => {
@@ -123,12 +148,20 @@ export default function SetupPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [handleStart]);
 
-  const deviceDone = webgl === "ok" && preload.phase === "ready" && (mic.state === "ok" || mic.state === "skipped");
-  const summary = [vi.setup.role[role], vi.setup.mode[mode]].join(" · ");
+  const micDone = mic.state === "ok" || mic.state === "skipped";
+  const deviceDone = is3d ? webgl === "ok" && preload.phase === "ready" && micDone : micDone;
+  const minutes = caseData?.catalog?.estimated_minutes;
+  const summary = [
+    vi.setup.role[role],
+    vi.setup.mode[mode],
+    minutes != null ? fmt(vi.caseSetup.minutes, { n: minutes }) : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <div className="flex min-h-dvh flex-col lg:h-dvh lg:min-h-0 lg:overflow-hidden">
-      <SetupTopBar />
+      <SetupTopBar next={caseId ? `/setup?case=${encodeURIComponent(caseId)}` : "/setup"} />
 
       <main
         id="main"
@@ -136,7 +169,19 @@ export default function SetupPage() {
       >
         {/* ------------------------------------------------ HỒ SƠ CA (7/12) */}
         <div className="setup-enter-stage min-w-0 lg:col-span-7 lg:min-h-0 short:col-span-6 lg:overflow-y-auto lg:pr-2">
-          <CaseProfile />
+          {caseLoad.status === "ok" ? (
+            <CaseProfile data={caseLoad.data} />
+          ) : (
+            <CaseProfileState kind={caseLoad.status} onRetry={caseLoad.retry} />
+          )}
+          {caseData && (
+            <a
+              href="/cases"
+              className={`mt-3 inline-flex min-h-11 items-center rounded-control text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary-strong ${FOCUS_RING}`}
+            >
+              {vi.caseSetup.otherCase}
+            </a>
+          )}
         </div>
 
         {/* ------------------------------------------------ THIẾT LẬP (5/12) */}
@@ -195,6 +240,7 @@ export default function SetupPage() {
                 </StepHeading>
               </h3>
               <DeviceCheck
+                show3d={is3d}
                 webgl={webgl}
                 preload={preload}
                 mic={mic.state}
@@ -204,7 +250,7 @@ export default function SetupPage() {
                 onMicStop={mic.finish}
                 onMicSkip={mic.skip}
               />
-              {deviceError && webgl === "unsupported" && (
+              {deviceError && is3d && webgl === "unsupported" && (
                 <p className="mt-2 text-sm font-semibold text-danger">{ux.webglError}</p>
               )}
             </div>
@@ -303,7 +349,7 @@ export default function SetupPage() {
                   className="h-5 w-5 animate-spin rounded-full border-2 border-white/40 border-t-white motion-reduce:animate-none"
                 />
               )}
-              {loading ? ux.preparing : vi.setup.start}
+              {loading ? ux.preparing : caseData || caseLoad.status === "loading" ? vi.setup.start : vi.caseSetup.toLibrary}
             </button>
           </div>
         </section>

@@ -109,6 +109,12 @@ sequenceDiagram
 * **Định dạng lưu trữ:**
   * Bảng `source_documents`: Lưu metadata văn bản (Tên, Số quyết định, Cơ quan ban hành, Trạng thái kiểm tra bản quyền `rights_checked: true`).
   * Bảng `source_chunks`: Lưu từng đoạn văn bản ngắn (khoảng 300 - 500 ký tự y khoa), vector embedding `vector(1536)` hoặc `vector(768)` tương thích pgvector.
+* **Phạm vi theo ca (AVP-151, migration `0003`):**
+  * `source_documents.case_id` ghi tài liệu thuộc ca nào; `NULL` là tài liệu dùng chung cho mọi ca (ví dụ hướng dẫn tổng quát của Bộ Y tế). Đoạn văn (`source_chunks`) theo tài liệu của nó.
+  * Debriefing Agent truyền `case_id` của phiên vào `search_chunks`; chỉ nhận đoạn của tài liệu cùng ca hoặc tài liệu dùng chung, **không bao giờ** nhận đoạn của ca khác.
+  * Ca chưa có tài liệu: không có trích dẫn nào, mọi nhận xét hiện là "chưa kiểm chứng" (không mượn nguồn của ca khác).
+  * File corpus khai báo `case_id` ở cấp file hoặc từng tài liệu; `scripts/ingest_guidelines.py --case-id <id>` hoặc `--shared` ghi đè cho cả file. Không truyền đường dẫn thì nạp mọi file trong `data/guidelines/`.
+  * Patient Agent (hot path) và Evaluator **không** gọi RAG; điều này không đổi.
 * **Hợp đồng Trích dẫn (Citation Contract):**
   Mỗi khuyến nghị lâm sàng trong debriefing bắt buộc phải gắn mảng `citations`:
   ```json

@@ -103,16 +103,23 @@ def _needs_feedback(crit: dict, status: str) -> bool:
 
 
 def retrieve_sources(
-    focus: list[dict], rag: RagRepository, embedder: EmbeddingProvider
+    focus: list[dict],
+    rag: RagRepository,
+    embedder: EmbeddingProvider,
+    case_id: str | None,
 ) -> tuple[dict[str, RetrievedChunk], dict[str, list[str]]]:
-    """-> (alias -> chunk, criterion_id -> aliases ranked). Embedding/DB errors
-    degrade to "no sources" (every claim then shows as unverified)."""
+    """-> (alias -> chunk, criterion_id -> aliases ranked). Only the session
+    case's documents and shared ones are searched (AVP-151); a case with no
+    corpus gets no sources, so every claim shows as unverified (never a borrowed
+    citation). Embedding/DB errors also degrade to "no sources"."""
     if not focus:
         return {}, {}
     min_score = _MIN_SCORE.get(embedder.model_id, _DEFAULT_MIN_SCORE)
     try:
         vectors = embedder.embed([_query_for(c) for c in focus], kind="query")
-        hits = [rag.search_chunks(v, embedder.model_id, top_k=_TOP_K) for v in vectors]
+        hits = [
+            rag.search_chunks(v, embedder.model_id, top_k=_TOP_K, case_id=case_id) for v in vectors
+        ]
     except Exception:  # noqa: BLE001 - a debrief without sources beats no debrief
         logger.warning("debrief retrieval failed; continuing without sources", exc_info=True)
         return {}, {}
@@ -327,7 +334,8 @@ def generate_debrief(
         raise DebriefError("NO_RUBRIC")
     status = {v.criterion_id: v.status for v in evaluation.items}
     focus = [c for c in rubric_items if _needs_feedback(c, status.get(c["id"], "unmet"))]
-    sources, per_crit = retrieve_sources(focus, rag, embedder)
+    # The case content always carries its id; without it only shared docs are used.
+    sources, per_crit = retrieve_sources(focus, rag, embedder, case.get("id"))
 
     if isinstance(llm, FakeLLMProvider):
         proposal, model = _compose_fake(rubric_items, status, per_crit, case), FAKE_MODEL_ID

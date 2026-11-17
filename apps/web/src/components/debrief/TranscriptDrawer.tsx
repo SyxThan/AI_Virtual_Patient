@@ -9,7 +9,6 @@ import { fmt } from "@/lib/sessionAuth";
 
 const SPEAKER: Record<string, string> = {
   student: vi.debrief.transcript.student,
-  patient: vi.debrief.transcript.patient,
   system: vi.debrief.transcript.system,
 };
 
@@ -17,10 +16,12 @@ const SPEAKER: Record<string, string> = {
 export default function TranscriptDrawer({
   turns,
   focusIdx,
+  patientLabel,
   onClose,
 }: {
   turns: TurnRow[];
   focusIdx: number;
+  patientLabel: string;
   onClose: () => void;
 }) {
   const refs = useRef(new Map<number, HTMLLIElement>());
@@ -76,7 +77,7 @@ export default function TranscriptDrawer({
                 }`}
               >
                 <span className="mb-1 flex flex-wrap gap-x-3 text-xs font-semibold text-ink-muted">
-                  <span>{SPEAKER[t.speaker] ?? t.speaker}</span>
+                  <span>{t.speaker === "patient" ? patientLabel : (SPEAKER[t.speaker] ?? t.speaker)}</span>
                   <span className="tabular font-normal">{fmt(vi.debrief.rubric.turn, { idx: t.turn_idx })}</span>
                 </span>
                 {t.text}

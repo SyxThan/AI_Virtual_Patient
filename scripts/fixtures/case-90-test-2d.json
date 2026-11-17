@@ -1,0 +1,192 @@
+{
+  "schema_version": "1",
+  "id": "case-90-test-2d",
+  "title": {
+    "vi": "[TEST] Ca thử khám 2D",
+    "en": "[TEST] 2D exam test case"
+  },
+  "specialty": "[TEST] Kiểm thử",
+  "source": {
+    "document": "[TEST] Dữ liệu giả cho kiểm thử, không phải ca lâm sàng",
+    "year": 2026,
+    "section": "[TEST]",
+    "case_number": 1
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "[TEST] Synthetic fixture for AVP-150 (2D exam stage) and AVP-149 (Setup by case). Not clinical content, never load it into the demo project.",
+      "[TEST] Every text below is a placeholder; the vitals are placeholders required by the schema, not a clinical scenario."
+    ]
+  },
+  "catalog": {
+    "patient_group": "adult",
+    "display_complaint": "[TEST] Tôi đến để thử màn khám trên ảnh 2D.",
+    "cover": "/cases/test-2d.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "test_head",
+        "label": "Đầu (TEST)",
+        "exam_region": "test_head",
+        "x": 0.5,
+        "y": 0.13
+      },
+      {
+        "id": "test_chest",
+        "label": "Ngực (TEST)",
+        "exam_region": "test_chest",
+        "x": 0.5,
+        "y": 0.37
+      },
+      {
+        "id": "test_left_hand",
+        "label": "Bàn tay trái (TEST)",
+        "exam_region": "test_hands",
+        "x": 0.8,
+        "y": 0.535
+      },
+      {
+        "id": "test_right_hand",
+        "label": "Bàn tay phải (TEST)",
+        "exam_region": "test_hands",
+        "x": 0.2,
+        "y": 0.535
+      },
+      {
+        "id": "test_knee",
+        "label": "Đầu gối (chưa có dữ liệu) (TEST)",
+        "exam_region": "test_knee",
+        "x": 0.42,
+        "y": 0.75
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 99
+  },
+  "patient": {
+    "name": "[TEST] Người bệnh giả",
+    "age": {
+      "value": 30,
+      "unit": "years"
+    },
+    "sex": "female",
+    "occupation": "[TEST]",
+    "informant": {
+      "role": "self"
+    },
+    "persona": {
+      "personality": "[TEST] Bình thường",
+      "dialect": "neutral",
+      "emotional_state": "[TEST] Bình thường"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "[TEST] Tôi đến để thử màn khám trên ảnh 2D.",
+    "triage_note": "[TEST] Không có ghi chú lâm sàng.",
+    "severity_state": {
+      "label": "test",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 80,
+      "temp_c": 37,
+      "resp_rate": 16
+    }
+  },
+  "history": [
+    {
+      "id": "h-test-reason",
+      "topic": "reason",
+      "polarity": "positive",
+      "lay_response": "[TEST] Tôi chỉ đến để thử hệ thống.",
+      "clinical_note": "[TEST]",
+      "intents": [
+        "lý do đến khám"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-test-head",
+      "region": "test_head",
+      "action": "[TEST] Nhìn vùng đầu",
+      "finding": "[TEST] Kết quả giả cho vùng đầu.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-test-chest",
+      "region": "test_chest",
+      "action": "[TEST] Nghe vùng ngực",
+      "finding": "[TEST] Kết quả giả cho vùng ngực.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-test-hands",
+      "region": "test_hands",
+      "action": "[TEST] Nhìn hai bàn tay",
+      "finding": "[TEST] Kết quả giả cho hai bàn tay.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "[TEST] Không có chẩn đoán",
+    "severity_grade": "[TEST]",
+    "differentials": [],
+    "acceptable_alternatives": []
+  },
+  "management": [],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-test-exam",
+        "domain": "physical_exam",
+        "criterion": "[TEST] Khám đủ các vùng có điểm khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "[TEST] Không khám vùng nào",
+          "1": "[TEST] Khám một phần",
+          "2": "[TEST] Khám đủ"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "[TEST] Cho tôi khám"
+        ]
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "[TEST] Không có tài liệu",
+      "section": "[TEST]"
+    }
+  ],
+  "forbidden_terms": [],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "[TEST] Tôi không rõ."
+    ],
+    "not_ordered_lab": [
+      "[TEST] Chưa làm xét nghiệm đó."
+    ],
+    "out_of_scope": [
+      "[TEST] Câu này ngoài phạm vi ca thử."
+    ]
+  }
+}

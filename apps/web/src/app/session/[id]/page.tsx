@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import vi from "../../../../messages/vi.json";
 import {
-  EXAM_REGIONS,
   VIEWS,
+  isExamRegion,
   parseFindings,
   type ExamRegionId,
   type RegionFindings,
@@ -14,6 +14,7 @@ import {
 import ClinicStage, { type StageController } from "@/components/avatar/ClinicStage";
 import ExamResultCard, { type ExamActionResponse, type ExamCardState } from "@/components/avatar/ExamResultCard";
 import { patientLipSync } from "@/components/avatar/LipSyncController";
+import Exam2DStage, { type Stage2DController } from "@/components/exam2d/Exam2DStage";
 import GuidedChecklist, { useGuideTicks, type GuideItem } from "@/components/guide/GuidedChecklist";
 import OnboardingOverlay, { onboardingSeen } from "@/components/onboarding/OnboardingOverlay";
 import Button, { buttonClass } from "@/components/ui/Button";
@@ -29,6 +30,8 @@ import SessionTopBar from "@/components/workspace/SessionTopBar";
 import StageCaption from "@/components/workspace/StageCaption";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
 import VoiceDock from "@/components/workspace/VoiceDock";
+import { CaseVoiceContext, caseVoiceOf, speakerText } from "@/components/workspace/caseVoice";
+import { ExamRegionsContext, HFMD_REGIONS, regionsFromCase } from "@/components/workspace/examRegions";
 import { examTargetOf, lastPatientLine, latestFindings, type ExamTarget } from "@/components/workspace/examTurns";
 import {
   useVoiceSession,
@@ -36,6 +39,7 @@ import {
   type VoiceTranscript,
 } from "@/hooks/useVoiceSession";
 import type { components } from "@/lib/api-client/schema";
+import { examModeOf, useSessionCase } from "@/lib/caseSummary";
 import { API_URL, authHeaders, fmt, whenAuthReady } from "@/lib/sessionAuth";
 
 type ExamActionRequest = components["schemas"]["ExamActionRequest"];
@@ -81,8 +85,6 @@ function isTypingTarget(el: EventTarget | null): boolean {
   );
 }
 
-const regionLabel = (target: ExamTarget) => vi.exam.regions[target].toLowerCase();
-
 /** Exam findings kept for this tab (sessionStorage may be blocked: then none). */
 function readFindings(key: string): RegionFindings {
   try {
@@ -121,17 +123,28 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [replying, setReplying] = useState(false);
   const replyTimer = useRef<number | undefined>(undefined);
   const stageRef = useRef<StageController | null>(null);
+  const stage2dRef = useRef<Stage2DController | null>(null);
+  // AVP-150: the case decides the stage. 3D (mother and child) only when its
+  // catalog says so; any other case gets the 2D illustration with its hotspots.
+  const sessionCase = useSessionCase(id);
+  const regions = useMemo(
+    () => (sessionCase && examModeOf(sessionCase) === "3d" ? HFMD_REGIONS : regionsFromCase(sessionCase ?? null)),
+    [sessionCase],
+  );
+  const caseVoice = useMemo(() => caseVoiceOf(sessionCase), [sessionCase]);
+  const is3d = regions.mode === "3d";
+  const regionLabel = (target: ExamTarget) => regions.labelOf(target).toLowerCase();
   const { ticks, toggle: toggleTick } = useGuideTicks(id);
   // Regions examined in this session -> `documented` (drives the avatar's region
   // status and illustrative lesion layer). Per-viewer convenience only: kept in
   // sessionStorage so a reload keeps it; the transcript stays the source of truth.
-  const [examFindings, setExamFindings] = useState<RegionFindings>({});
+  const [examFindings, setExamFindings] = useState<Record<string, boolean>>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const findingsKey = `avp.exam-findings.${id}`;
   const recordFinding = useCallback(
-    (region: ExamRegionId, documented: boolean) => {
+    (region: string, documented: boolean) => {
       setExamFindings((cur) => {
         const next = { ...cur, [region]: documented };
         try {
@@ -378,7 +391,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  const examineRegion = (region: ExamRegionId) => handleExam({ action: "examine_region", region }, region);
+  const examineRegion = (region: string) => handleExam({ action: "examine_region", region }, region);
   const observeChild = () => handleExam({ action: "observe_child" }, "observe_child");
 
   const closeCard = useCallback(() => {
@@ -389,7 +402,8 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   /** Fly the camera to a region (or the whole child) without examining it. */
   const goTo = useCallback((target: ExamTarget) => {
     if (target === "observe_child") stageRef.current?.focusChild();
-    else stageRef.current?.focusRegion(target);
+    else if (isExamRegion(target)) stageRef.current?.focusRegion(target);
+    else stage2dRef.current?.focusRegion(target); // 2D: focus the hotspot
   }, []);
 
   /** Reopen a past exam from the transcript or the exam record. */
@@ -422,10 +436,11 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const shortcuts = useRef<{
     enabled: boolean;
     canTalk: boolean;
-    examine: (region: ExamRegionId) => void;
+    ids: readonly string[];
+    examine: (region: string) => void;
     talk: (down: boolean) => void;
     escape: () => boolean;
-  }>({ enabled: false, canTalk: false, examine: () => {}, talk: () => {}, escape: () => false });
+  }>({ enabled: false, canTalk: false, ids: [], examine: () => {}, talk: () => {}, escape: () => false });
   const spaceHeld = useRef(false);
   useEffect(() => {
     const onDown = (e: KeyboardEvent) => {
@@ -448,9 +463,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       if (e.repeat) return;
       const key = e.key.toLowerCase();
       const n = Number(e.key);
-      if (Number.isInteger(n) && n >= 1 && n <= EXAM_REGIONS.length) {
+      if (Number.isInteger(n) && n >= 1 && n <= k.ids.length) {
         e.preventDefault();
-        k.examine(EXAM_REGIONS[n - 1]);
+        k.examine(k.ids[n - 1]);
       } else if (key === "q" || key === "w" || key === "e") {
         e.preventDefault();
         stageRef.current?.setView(VIEWS["qwe".indexOf(key)]);
@@ -483,7 +498,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
     };
   }, []);
 
-  const recorded = useMemo(() => latestFindings(turns), [turns]);
+  const recorded = useMemo(() => latestFindings(turns, regions.labelToTarget), [turns, regions]);
   const lastReply = useMemo(() => lastPatientLine(turns), [turns]);
 
   // Latest values for the window key handlers (refreshed after every render).
@@ -500,9 +515,10 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         voice.status !== "processing" &&
         voice.status !== "connecting" &&
         voice.status !== "reconnecting",
+      ids: regions.ids,
       examine: (region) => {
         if (examLoading || lock) return;
-        stageRef.current?.focusRegion(region);
+        if (isExamRegion(region)) stageRef.current?.focusRegion(region);
         stageRef.current?.noteInteraction();
         void examineRegion(region);
       },
@@ -549,7 +565,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
                   </Button>
                 )}
                 <Link
-                  href="/setup"
+                  href="/cases"
                   className={buttonClass({ variant: load === "error" ? "secondary" : "primary" })}
                 >
                   {vi.workspace.backToSetup}
@@ -572,16 +588,34 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         ? vi.workspace.errors.finished
         : null;
 
-  const examined = new Set<ExamRegionId>(EXAM_REGIONS.filter((r) => r in recorded || r in examFindings));
+  const examined = new Set<string>(regions.ids.filter((r) => r in recorded || r in examFindings));
   const sending = pending?.state === "sending";
   const guideItems = !exam && guide?.checklist_enabled ? guide.items : [];
   const ticked = guideItems.filter((i) => ticks.has(i.criterion_id)).length;
+  const voiceDock = (
+    <VoiceDock
+      status={voice.status}
+      micState={voice.micState}
+      gaveUp={voice.gaveUp}
+      error={voice.error}
+      notice={voice.notice}
+      replying={replying}
+      disabled={sending}
+      lockedReason={lockedReason}
+      micLevel={voice.micLevel}
+      onStart={() => void voice.start()}
+      onStop={voice.stop}
+      onRetry={voice.retryConnection}
+      onTypeInstead={focusInput}
+    />
+  );
   const cardNode = card && (
     <ExamResultCard state={card} pinned={cardPinned} onPin={setCardPinned} onClose={closeCard} />
   );
 
   return (
-    <>
+    <CaseVoiceContext.Provider value={caseVoice}>
+    <ExamRegionsContext.Provider value={regions}>
       <CockpitFrame
         topBar={
           <SessionTopBar
@@ -618,43 +652,46 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           )
         }
         stage={
+          sessionCase === undefined ? (
+            // The case decides 3D or 2D: hold an empty stage for that one request.
+            <div
+              aria-busy="true"
+              className="h-[45dvh] animate-pulse rounded-tile bg-sand-soft motion-reduce:animate-none md:h-full"
+            />
+          ) : !is3d ? (
+            <Exam2DStage
+              controllerRef={stage2dRef}
+              examined={examined}
+              busy={examLoading || !!lock}
+              onExamineRegion={examineRegion}
+              onSpeakingChange={onSpeakingChange}
+              card={cardNode}
+              caption={<StageCaption text={lastReply?.text ?? null} />}
+              voice={voiceDock}
+            />
+          ) : (
           <ClinicStage
             controllerRef={stageRef}
-            findings={examFindings}
-            examined={examined}
+            findings={examFindings as RegionFindings}
+            examined={examined as ReadonlySet<ExamRegionId>}
             busy={examLoading || !!lock}
             onExamineRegion={examineRegion}
             onObserve={observeChild}
             onSpeakingChange={onSpeakingChange}
             card={cardNode}
-            cardAnchor={card ? (card.target === "observe_child" ? "child" : card.target) : null}
+            cardAnchor={card ? (card.target === "observe_child" ? "child" : isExamRegion(card.target) ? card.target : null) : null}
             caption={<StageCaption text={lastReply?.text ?? null} />}
-            voice={
-              <VoiceDock
-                status={voice.status}
-                micState={voice.micState}
-                gaveUp={voice.gaveUp}
-                error={voice.error}
-                notice={voice.notice}
-                replying={replying}
-                disabled={sending}
-                lockedReason={lockedReason}
-                micLevel={voice.micLevel}
-                onStart={() => void voice.start()}
-                onStop={voice.stop}
-                onRetry={voice.retryConnection}
-                onTypeInstead={focusInput}
-              />
-            }
+            voice={voiceDock}
           />
+          )
         }
         renderSidebar={(collapseButton) => (
           <SessionSidebar
             tab={tab}
             onTab={setTab}
-            chatCount={turns.filter((t) => t.speaker !== "system" && !examTargetOf(t.text)).length}
+            chatCount={turns.filter((t) => t.speaker !== "system" && !examTargetOf(t.text, regions.labelToTarget)).length}
             examDone={examined.size}
-            examTotal={EXAM_REGIONS.length}
+            examTotal={regions.ids.length}
             headerAction={collapseButton}
             chat={
               <TranscriptBox
@@ -694,7 +731,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
       {/* One polite announcement per new reply and per exam result (the log itself stays quiet). */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {lastReply ? fmt(vi.cockpit.announce.reply, { text: lastReply.text }) : ""}
+        {lastReply ? speakerText(vi.cockpit.announce.reply, caseVoice, { text: lastReply.text }) : ""}
       </div>
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {examAnnounce}
@@ -703,8 +740,8 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       <FinishDialog
         open={finishOpen}
         turnCount={turns.length}
-        unexamined={EXAM_REGIONS.length - examined.size}
-        regionTotal={EXAM_REGIONS.length}
+        unexamined={regions.ids.length - examined.size}
+        regionTotal={regions.ids.length}
         unticked={guideItems.length > 0 ? { n: guideItems.length - ticked, total: guideItems.length } : null}
         finishing={finishing}
         error={finishError}
@@ -712,6 +749,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         onCancel={() => setFinishOpen(false)}
       />
       <OnboardingOverlay open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
-    </>
+    </ExamRegionsContext.Provider>
+    </CaseVoiceContext.Provider>
   );
 }

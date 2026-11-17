@@ -20,10 +20,13 @@ from avp_api.db.repositories.turn_repo import TurnRepository
 from avp_api.schemas.action import ExamActionRequest, ExamActionResponse
 from avp_api.services import guide_service, session_service
 
-# THE single UI-region -> case-region mapping. ASSUMPTION pending human/clinician
-# confirmation (see PR): the HFMD case has one "skin" entry covering hands, feet,
+# Hotspot -> exam[].region now comes from each case's catalog.exam_regions
+# (`exam_region`, default: the hotspot id), AVP-150. This table only serves HFMD
+# case versions loaded before that field existed (sessions pin their version).
+# ASSUMPTION pending clinician confirmation: one "skin" entry covers hands, feet,
 # buttocks and knees, and one "mouth" entry; the avatar has 4 tap targets.
-UI_TO_CASE_REGION: dict[str, str] = {
+LEGACY_CASE_IDS = frozenset({"case-01-hfmd"})
+LEGACY_UI_TO_CASE_REGION: dict[str, str] = {
     "mouth_throat": "mouth",
     "palm_hands": "skin",
     "feet": "skin",
@@ -32,7 +35,8 @@ UI_TO_CASE_REGION: dict[str, str] = {
 # "Observe the child lying still" is an observation, not a body tap.
 OBSERVE_CASE_REGION = "general"
 
-# Transcript labels for the student's action (transcript data, Vietnamese).
+# Transcript labels for the student's action (transcript data, Vietnamese); a
+# catalog label wins over these.
 _ACTION_LABELS: dict[str, str] = {
     "mouth_throat": "miệng - họng",
     "palm_hands": "lòng bàn tay",
@@ -41,6 +45,29 @@ _ACTION_LABELS: dict[str, str] = {
     "observe_child": "quan sát trẻ nằm yên",
 }
 _UNKNOWN_TRANSCRIPT = "Không có ghi nhận trong hồ sơ cho vùng này."
+
+
+def case_regions(case: dict) -> dict[str, tuple[str, str]]:
+    """hotspot id -> (exam[].region, transcript label) for this case version.
+    Catalog first; a case version without a catalog falls back to the legacy
+    HFMD table so sessions pinned to it keep working."""
+    legacy = case.get("id") in LEGACY_CASE_IDS
+    catalog = case.get("catalog")
+    raw = catalog.get("exam_regions") if isinstance(catalog, dict) else None
+    if not isinstance(raw, list) or not raw:
+        if not legacy:
+            return {}  # a non-HFMD case without hotspots offers no exam regions
+        return {k: (v, _ACTION_LABELS[k]) for k, v in LEGACY_UI_TO_CASE_REGION.items()}
+    out: dict[str, tuple[str, str]] = {}
+    for r in raw:
+        if not isinstance(r, dict) or not r.get("id"):
+            continue
+        rid = r["id"]
+        fallback = LEGACY_UI_TO_CASE_REGION.get(rid) if legacy else None
+        region = r.get("exam_region") or fallback or rid
+        label = (r.get("label") or _ACTION_LABELS.get(rid) or rid).lower()
+        out[rid] = (region, label)
+    return out
 
 
 def _elapsed_ms(started_at: datetime) -> int:
@@ -72,10 +99,15 @@ def perform_action(
 
     if req.action == "observe_child":
         case_region: str | None = OBSERVE_CASE_REGION
-        label_key = "observe_child"
+        label = _ACTION_LABELS["observe_child"]
     else:
-        case_region = UI_TO_CASE_REGION.get(req.region or "")
-        label_key = req.region or ""
+        regions = case_regions(case)
+        if req.region not in regions:
+            raise HTTPException(
+                status_code=422,
+                detail={"code": "UNKNOWN_REGION", "message": "This case has no such exam region."},
+            )
+        case_region, label = regions[req.region]
 
     entries = [e for e in case.get("exam", []) if case_region and e.get("region") == case_region]
     documented = bool(entries)
@@ -83,7 +115,6 @@ def perform_action(
     case_action = entries[0].get("action") if documented else None
     red_flag = any(e.get("red_flag") for e in entries)
 
-    label = _ACTION_LABELS.get(label_key, label_key)
     student_text = f"[Khám - {label}] {case_action}" if case_action else f"[Khám - {label}]"
     system_text = finding if documented else _UNKNOWN_TRANSCRIPT
 

@@ -39,8 +39,13 @@ def _corpus_repo() -> InMemoryRagRepository:
     return repo
 
 
-def _search(repo: InMemoryRagRepository, query: str, k: int = 3):
-    return repo.search_chunks(EMB.embed([query], kind="query")[0], EMB.model_id, top_k=k)
+HFMD = "case-01-hfmd"
+
+
+def _search(repo: InMemoryRagRepository, query: str, k: int = 3, case_id: str | None = HFMD):
+    return repo.search_chunks(
+        EMB.embed([query], kind="query")[0], EMB.model_id, top_k=k, case_id=case_id
+    )
 
 
 def test_fake_embedding_is_deterministic_unit_length_768() -> None:
@@ -117,7 +122,7 @@ def test_t_rag_01_startle_grade_2a_query_hits_grading_chunk_with_metadata() -> N
 def test_vectors_from_another_model_are_never_compared() -> None:
     repo = _corpus_repo()
     q = EMB.embed(["giật mình độ 2a"], kind="query")[0]
-    assert repo.search_chunks(q, "some-other-model", top_k=3) == []
+    assert repo.search_chunks(q, "some-other-model", top_k=3, case_id=HFMD) == []
 
 
 def test_t_rag_02_verifier_drops_fabricated_source_ids() -> None:
@@ -200,3 +205,64 @@ def test_off_corpus_retrieval_gives_no_citation() -> None:
     )
     assert len(out.items) == 1
     assert out.items[0].verified is False and out.items[0].citations == []
+
+
+# --- case scope (AVP-151 / TASK-S20-06) -------------------------------------------
+
+
+def _doc(key: str, case_id: str | None, text: str) -> DocumentIn:
+    return DocumentIn(
+        source_key=key,
+        title=f"[TEST] {key}",
+        publisher="[TEST]",
+        year=2026,
+        license_note="synthetic test data",
+        rights_checked=True,
+        chunks=[ChunkIn(section=f"{key}-s{i}", text=f"{text} {i}") for i in range(3)],
+        case_id=case_id,
+    )
+
+
+def _two_case_repo() -> InMemoryRagRepository:
+    repo = InMemoryRagRepository()
+    docs = [
+        _doc("doc-a", "case-test-a", "sốt cao giật mình phát ban"),
+        _doc("doc-b", "case-test-b", "sốt cao giật mình phát ban"),  # same text on purpose
+        _doc("doc-shared", None, "sốt cao giật mình hướng dẫn chung"),
+    ]
+    assert set(ingest_corpus(repo, EMB, docs).values()) == {"inserted"}
+    return repo
+
+
+@pytest.mark.parametrize("query", ["sốt cao giật mình phát ban 1", "hướng dẫn chung", "x"])
+def test_case_a_query_never_returns_case_b_chunks(query: str) -> None:
+    hits = _search(_two_case_repo(), query, k=50, case_id="case-test-a")
+    keys = {h.source_key for h in hits}
+    assert keys == {"doc-a", "doc-shared"}  # all of A + shared, nothing of B
+    assert all(h.case_id in ("case-test-a", None) for h in hits)
+
+
+def test_unknown_or_missing_case_gets_shared_documents_only() -> None:
+    repo = _two_case_repo()
+    for case_id in ("case-without-corpus", None):
+        keys = {h.source_key for h in _search(repo, "sốt cao", k=50, case_id=case_id)}
+        assert keys == {"doc-shared"}
+
+
+def test_hfmd_corpus_is_scoped_to_hfmd() -> None:
+    assert {d.case_id for d in load_corpus()} == {HFMD}
+    repo = _corpus_repo()
+    assert _search(repo, "giật mình độ 2a", k=50, case_id="case-other") == []
+    assert _search(repo, "giật mình độ 2a", k=1)[0].source_key == "moh-qd-1003-2012"
+
+
+def test_load_corpus_scope_override() -> None:
+    assert {d.case_id for d in load_corpus(case_id=None)} == {None}
+    assert {d.case_id for d in load_corpus(case_id="case-x")} == {"case-x"}
+
+
+def test_debrief_for_case_without_corpus_cites_nothing() -> None:
+    other = {**CASE, "id": "case-test-no-corpus"}
+    statuses = {c["id"]: "unmet" for c in CASE["rubric"]["items"]}
+    out = generate_debrief(other, _evaluation(statuses), [], _corpus_repo(), EMB, FakeLLMProvider())
+    assert all(not i.citations for i in out.items)

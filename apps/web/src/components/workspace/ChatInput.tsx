@@ -2,6 +2,7 @@
 
 import { useId, useState, type Ref } from "react";
 import vi from "../../../messages/vi.json";
+import { speakerText, useCaseVoice } from "@/components/workspace/caseVoice";
 import Button from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
 
@@ -23,6 +24,7 @@ export default function ChatInput({
   lockedReason?: string | null;
   inputRef?: Ref<HTMLInputElement>;
 }) {
+  const voice = useCaseVoice();
   const [text, setText] = useState("");
   const id = useId();
   const locked = !!lockedReason;
@@ -43,7 +45,7 @@ export default function ChatInput({
       }}
     >
       <label htmlFor={id} className="sr-only">
-        {vi.workspace.inputLabel}
+        {speakerText(vi.workspace.inputLabel, voice)}
       </label>
       <div className="flex items-center gap-2">
         <input
@@ -51,7 +53,7 @@ export default function ChatInput({
           ref={inputRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={locked ? (lockedReason ?? "") : vi.session.inputPlaceholder}
+          placeholder={locked ? (lockedReason ?? "") : speakerText(vi.session.inputPlaceholder, voice)}
           disabled={locked}
           maxLength={MAX_TURN_CHARS}
           autoComplete="off"

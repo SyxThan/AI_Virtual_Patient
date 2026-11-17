@@ -3,7 +3,8 @@
 import vi from "../../../messages/vi.json";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { fmt } from "@/lib/sessionAuth";
-import { EXAM_TARGETS, type ExamTarget } from "./examTurns";
+import { useExamRegions } from "./examRegions";
+import type { ExamTarget } from "./examTurns";
 
 /**
  * "Phiếu khám": every exam target with what was recorded for it, verbatim from
@@ -20,13 +21,14 @@ export default function ExamRecord({
   onOpen: (target: ExamTarget, finding: string | null) => void;
   onGoTo: (target: ExamTarget) => void;
 }) {
+  const { targets, labelOf } = useExamRegions();
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
       <ul className="flex flex-col gap-2">
-        {EXAM_TARGETS.map((target) => {
+        {targets.map((target) => {
           const examined = target in findings;
           const finding = findings[target] ?? null;
-          const label = vi.exam.regions[target];
+          const label = labelOf(target);
           return (
             <li key={target} className={`rounded-card p-3 ring-1 ${examined ? "bg-surface ring-line" : "bg-canvas ring-line/60"}`}>
               <div className="flex items-center justify-between gap-3">

@@ -11,7 +11,7 @@ export default function StartCta() {
   const off = () => emitEcg({ kind: "hover", on: false });
   return (
     <Link
-      href="/setup"
+      href="/cases"
       onPointerEnter={on}
       onPointerLeave={off}
       onFocus={on}

@@ -42,7 +42,8 @@ export default function SessionCard({ session, onDeleted }: Props) {
     <Card as="li" className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 space-y-1">
-          <p className="font-bold text-ink">{session.case_title ?? session.case_id}</p>
+          {/* Named like the /cases library: the complaint, never the diagnosis (AVP-149). */}
+          <p className="font-bold text-ink">&ldquo;{session.case_label ?? vi.caseSetup.defaultCase}&rdquo;</p>
           <p className="text-sm text-ink-muted">
             <time dateTime={session.started_at}>
               {fmt(vi.history.startedAt, { date: formatDate(session.started_at) })}

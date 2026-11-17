@@ -358,6 +358,11 @@ paths:
               schema: { $ref: "#/components/schemas/VitalsSnapshot" }
         "403": { $ref: "#/components/responses/Error" }
         "404": { $ref: "#/components/responses/Error" }
+        "409":
+          description: VITALS_NOT_APPLICABLE, the session's case has no vitals model (AVP-150; also for POST /vitals/events).
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
 
   /me:
     get:
@@ -570,6 +575,8 @@ components:
         id: { type: string, format: uuid }
         case_id: { type: string }
         case_title: { type: [string, "null"] }
+        # AVP-149: catalog.display_complaint; names the case without the diagnosis.
+        case_label: { type: [string, "null"] }
         mode: { type: string, enum: [guided, exam] }
         status:
           type: string
@@ -748,7 +755,9 @@ components:
           enum: [examine, palpate, auscultate, measure_vitals, order_medication]
         target_region:
           type: string
-          description: Anatomy region id (e.g. palm_hands, feet, mouth_throat, buttocks_knees).
+          description: >-
+            Hotspot id from the case's catalog.exam_regions (AVP-150), e.g. palm_hands, feet,
+            mouth_throat, buttocks_knees for HFMD. An id the case does not list is 422 UNKNOWN_REGION.
         parameters:
           type: object
           additionalProperties: true

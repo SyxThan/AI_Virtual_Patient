@@ -1,7 +1,7 @@
 // Run: npm test (node --test with native TypeScript type stripping).
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { examTargetOf, foldTranscript, lastPatientLine, latestFindings } from "./examTurns.ts";
+import { examTargetOf, foldTranscript, labelTable, lastPatientLine, latestFindings } from "./examTurns.ts";
 
 const t = (turn_idx: number, speaker: string, text: string) => ({ turn_idx, speaker, text });
 
@@ -51,5 +51,25 @@ describe("foldTranscript", () => {
     assert.equal(f.mouth_throat, undefined);
     assert.equal(lastPatientLine(more)?.text, "Dạ hai ngày.");
     assert.equal(lastPatientLine([]), null);
+  });
+});
+
+describe("2D case regions (AVP-150)", () => {
+  const labels = labelTable([
+    { id: "test_chest", label: "Ngực (TEST)" },
+    { id: "test_left_hand", label: "Bàn tay trái (TEST)" },
+  ]);
+  it("maps the backend's lowercased catalog label back to the hotspot id", () => {
+    assert.equal(examTargetOf("[Khám - ngực (test)] Nghe vùng ngực", labels), "test_chest");
+    assert.equal(examTargetOf("[Khám - bàn tay trái (test)]", labels), "test_left_hand");
+  });
+  it("does not read another case's labels", () => {
+    assert.equal(examTargetOf("[Khám - lòng bàn tay]", labels), null);
+    assert.equal(examTargetOf("[Khám - ngực (test)]"), null); // HFMD table by default
+  });
+  it("folds and reports findings per hotspot", () => {
+    const turns = [t(0, "student", "[Khám - ngực (test)]"), t(1, "system", "Kết quả giả.")];
+    assert.deepEqual(latestFindings(turns, labels), { test_chest: "Kết quả giả." });
+    assert.equal(foldTranscript(turns, labels)[0].kind, "exam");
   });
 });

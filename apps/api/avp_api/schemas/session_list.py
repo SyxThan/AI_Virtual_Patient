@@ -16,7 +16,11 @@ EvaluationStatus = Literal["none", "pending", "done", "failed"]
 class SessionSummary(BaseModel):
     id: str
     case_id: str
+    # Names the disease; kept for compatibility. The web shows case_label instead.
     case_title: str | None = None
+    # The case's presenting complaint (catalog.display_complaint): names the case
+    # without revealing the diagnosis, like the /cases library (AVP-149).
+    case_label: str | None = None
     mode: str
     status: str
     started_at: datetime

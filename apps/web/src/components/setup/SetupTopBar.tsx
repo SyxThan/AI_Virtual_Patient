@@ -11,7 +11,7 @@ import { FOCUS_RING } from "@/components/ui/focus";
  * brand on the left, the account chip on the right. Replaces the old
  * "Tài khoản" tile.
  */
-export default function SetupTopBar() {
+export default function SetupTopBar({ next = "/setup" }: { next?: string }) {
   const { status, email } = useAuth();
 
   return (
@@ -40,7 +40,7 @@ export default function SetupTopBar() {
             <span className="font-semibold text-ink">{vi.setupUx.account.guest}</span>
             {status === "signedOut" && (
               <Link
-                href="/login?next=/setup"
+                href={`/login?next=${encodeURIComponent(next)}`}
                 className={`inline-flex min-h-11 items-center rounded-full px-2.5 font-semibold sm:px-3 text-primary underline-offset-4 hover:bg-primary-soft hover:underline ${FOCUS_RING}`}
               >
                 <span className="sm:hidden">{vi.nav.signIn}</span>

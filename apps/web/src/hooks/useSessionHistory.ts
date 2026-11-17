@@ -11,6 +11,8 @@ export type SessionSummary = {
   id: string;
   case_id: string;
   case_title?: string | null;
+  /** Presenting complaint (AVP-149): names the case without its diagnosis. */
+  case_label?: string | null;
   mode: string;
   status: string;
   started_at: string;

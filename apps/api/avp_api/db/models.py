@@ -241,6 +241,10 @@ class SourceDocument(Base):
     source_key: Mapped[str | None] = mapped_column(Text, unique=True)
     review_status: Mapped[str] = mapped_column(Text, nullable=False, server_default=text("'draft'"))
     content_hash: Mapped[str | None] = mapped_column(Text)
+    # 0003 (AVP-151): the case this document belongs to; NULL = shared by every
+    # case. No FK: cases has a composite (id, version) key and a document follows
+    # the case id across versions.
+    case_id: Mapped[str | None] = mapped_column(Text, index=True)
     __table_args__ = (
         CheckConstraint(
             "review_status in ('draft', 'clinician_reviewed')",
