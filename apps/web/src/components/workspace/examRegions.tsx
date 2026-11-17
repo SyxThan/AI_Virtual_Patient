@@ -3,13 +3,14 @@
 import { createContext, useContext } from "react";
 import vi from "../../../messages/vi.json";
 import { EXAM_REGIONS } from "@/components/avatar/avatarContract";
-import type { CaseSummary } from "@/lib/caseSummary";
+import { HFMD_CASE_ID } from "@/components/avatar/caseScene";
+import { examModeOf, type CaseSummary } from "@/lib/caseSummary";
 import { LABEL_TO_TARGET, labelTable, type ExamTarget } from "./examTurns";
 
 /**
  * The exam regions of the session's case (AVP-150). The 3D HFMD scene has its
- * four colliders plus "observe the child"; a 2D case has the hotspots of its
- * `catalog.exam_regions`. Workspace parts (exam record, result card, transcript)
+ * four colliders plus "observe the child"; another 3D case (AVP-160) and a 2D
+ * case have the hotspots of their `catalog.exam_regions`. Workspace parts (exam record, result card, transcript)
  * read labels from here instead of assuming the HFMD regions.
  */
 export type ExamRegionSet = {
@@ -56,6 +57,33 @@ export function regionsFromCase(c: CaseSummary | null): ExamRegionSet {
     ),
     image: cover && cover.startsWith("/") && !cover.startsWith("//") ? cover : null,
   };
+}
+
+/**
+ * Region set of a 3D case other than HFMD (avp-case-scene/1, AVP-160): every
+ * `catalog.exam_regions` entry, in catalog order (colliders first, then exam-bar
+ * only entries such as vitals), labelled from the catalog. Which ones get a 3D
+ * marker is decided by the scene (a collider with that id); no "observe".
+ */
+export function regionsFrom3dCase(c: CaseSummary): ExamRegionSet {
+  const regions = c.catalog?.exam_regions ?? [];
+  const labels = Object.fromEntries(regions.map((r) => [r.id, r.label]));
+  const ids = regions.map((r) => r.id);
+  return {
+    mode: "3d",
+    ids,
+    targets: ids,
+    labelOf: (t) => labels[t] ?? t,
+    labelToTarget: labelTable(regions),
+    points: [],
+    image: null,
+  };
+}
+
+/** Exam regions of a session's case: HFMD keeps its Slice 16 set, other 3D cases use the catalog. */
+export function regionsOfCase(c: CaseSummary | null | undefined): ExamRegionSet {
+  if (c && examModeOf(c) === "3d") return c.id === HFMD_CASE_ID ? HFMD_REGIONS : regionsFrom3dCase(c);
+  return regionsFromCase(c ?? null);
 }
 
 export const ExamRegionsContext = createContext<ExamRegionSet>(HFMD_REGIONS);

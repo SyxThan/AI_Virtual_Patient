@@ -13,6 +13,7 @@ Guidance for implementing the Three.js 3D avatar (Mother holding child) and inte
 - **Model:** `apps/web/public/models/mother_child.glb` (Draco; decoder self-hosted in `public/draco/`). The asset contract is `docs/specs/avatar-asset.md`; code relies ONLY on what it lists. Blender source + build/validate scripts: `assets/avatar/`.
 - **Coordinate Space:** metres, origin between the mother's feet on the floor, +Y up, characters face +Z. Room walls at −Z and −X: camera views always look from the front-right (`cameraViews.ts`), OrbitControls azimuth/polar limits keep it out of the walls.
 - **Fallback:** a file that breaks the contract or fails to load falls back to the procedural rig (`AnatomyColliders.ts`) with the same 4 colliders; no WebGL shows a notice and the exam buttons still work.
+- **Other 3D cases (AVP-160, `avp-case-scene/1`):** `public/models/<caseId>.glb` + `<caseId>.scene.json` (camera, breathing, overlays; no clinical text). `ClinicStage source={{kind:"case",caseId}}` loads them (`caseSceneLoader.ts`), `caseRig.ts` builds the rig (speaker by `extras.role`, `faceForward` head look, colliders + `viewDir`, `landmark_*`, breathing morph), `caseSkin.ts` patches `patient_skin` (atlasCell + boxes mask, 5 overlay types). Regions/labels come from the case catalog (`regionsFrom3dCase`); entries without a collider are exam-bar only. No procedural fallback: failure = notice + exam bar. HFMD (`case-01-hfmd`) never takes this path. Pure helpers in `caseScene.ts` (tested). Contract: second half of `docs/specs/avatar-asset.md`.
 
 ## Directory Structure
 ```
@@ -27,7 +28,11 @@ apps/web/src/components/avatar/
   lesionSkin.ts           # child_skin shader patch: region hover + ILLUSTRATIVE lesion reveal
   cameraViews.ts          # Framings computed from model boxes + eased camera flight
   sceneRig.ts             # SceneRig interface shared by model and fallback
-  AnatomyColliders.ts     # Procedural fallback rig
+  AnatomyColliders.ts     # Procedural fallback rig (HFMD only)
+  caseScene.ts            # avp-case-scene/1 pure helpers: scene.json parse, extras, layout, breathing, look (tested)
+  caseSceneLoader.ts      # scene.json fetch/cache + useCaseScene (no three import)
+  caseRig.ts              # avp-case-scene/1 model -> SceneRig
+  caseSkin.ts             # patient_skin shader patch: region mask, hover, illustrative overlays
   LipSyncController.ts    # Audio amplitude -> mouth level (drives jawOpen)
 ```
 

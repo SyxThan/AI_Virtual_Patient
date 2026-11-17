@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { MODEL_URL } from "@/components/avatar/avatarContract";
+import type { StageSource } from "@/components/avatar/caseScene";
+import { modelUrlOf } from "@/components/avatar/caseSceneLoader";
 import { onModelProgress } from "@/components/avatar/modelBytes";
 
 /* ------------------------------------------------------------------ WebGL */
@@ -34,27 +37,33 @@ export function useWebgl(): WebglState {
 
 export type PreloadState = { phase: "waiting" | "loading" | "ready" | "failed"; fraction: number };
 
-let preloadPromise: Promise<void> | null = null;
+const preloads = new Map<string, Promise<void>>();
 
 /**
- * Warms exactly what the Clinical Workspace loads, through the same modules so
- * the session page finds it cached after client-side navigation:
- * the .glb bytes (modelBytes.ts promise), the three.js scene chunk, and the
- * Draco decoder (ModelLoader keeps one decoder and its workers for the page's
- * lifetime; parsing once here compiles the wasm). Nothing clinical is involved.
+ * Warms exactly what the Clinical Workspace loads for this case, through the
+ * same modules so the session page finds it cached after client-side
+ * navigation: the case's .glb bytes (mother_child.glb for HFMD, else the model
+ * its `/models/<caseId>.scene.json` names; modelBytes.ts promise), the three.js
+ * scene chunk, and the Draco decoder (ModelLoader keeps one decoder and its
+ * workers for the page's lifetime; parsing once here compiles the wasm).
+ * Nothing clinical is involved.
  */
-function preloadClinic(): Promise<void> {
-  preloadPromise ??= Promise.all([
-    import("@/components/avatar/ModelLoader").then((m) => m.loadClinicModel()),
-    import("@/components/avatar/AvatarScene"),
-  ]).then(
-    () => undefined,
-    (err: unknown) => {
-      preloadPromise = null; // let the workspace (or a reload) try again
-      throw err;
-    },
-  );
-  return preloadPromise;
+function preloadClinic(url: string): Promise<void> {
+  let p = preloads.get(url);
+  if (!p) {
+    p = Promise.all([
+      import("@/components/avatar/ModelLoader").then((m) => m.loadClinicModel(url)),
+      import("@/components/avatar/AvatarScene"),
+    ]).then(
+      () => undefined,
+      (err: unknown) => {
+        preloads.delete(url); // let the workspace (or a reload) try again
+        throw err;
+      },
+    );
+    preloads.set(url, p);
+  }
+  return p;
 }
 
 type IdleWindow = Window & {
@@ -62,23 +71,41 @@ type IdleWindow = Window & {
   cancelIdleCallback?: (id: number) => void;
 };
 
-/** Starts the preload when the browser is idle after load; reports real download progress. */
-export function useClinicPreload(webgl: WebglState): PreloadState {
+const HFMD_STAGE: StageSource = { kind: "hfmd" };
+
+/**
+ * Starts the preload of the case's 3D stage (`source`, HFMD by default) when
+ * the browser is idle after load; reports real download progress.
+ */
+export function useClinicPreload(webgl: WebglState, source: StageSource = HFMD_STAGE): PreloadState {
   const [state, setState] = useState<PreloadState>({ phase: "waiting", fraction: 0 });
+  const sourceKey = source.kind === "hfmd" ? "" : source.caseId;
 
   useEffect(() => {
     if (webgl !== "ok") return;
     let alive = true;
-    const unsubscribe = onModelProgress((fraction) => {
-      if (alive) setState((s) => (s.phase === "ready" || s.phase === "failed" ? s : { phase: "loading", fraction }));
-    });
+    let unsubscribe = () => {};
+    const stage: StageSource = sourceKey ? { kind: "case", caseId: sourceKey } : HFMD_STAGE;
+    const subscribe = (url: string) => {
+      unsubscribe = onModelProgress((fraction) => {
+        if (alive) setState((s) => (s.phase === "ready" || s.phase === "failed" ? s : { phase: "loading", fraction }));
+      }, url);
+    };
+    // HFMD knows its model now; a case learns it from its scene file first.
+    if (!sourceKey) subscribe(MODEL_URL);
     const run = () => {
       if (!alive) return;
       setState((s) => (s.phase === "waiting" ? { ...s, phase: "loading" } : s));
-      preloadClinic().then(
-        () => alive && setState({ phase: "ready", fraction: 1 }),
-        () => alive && setState({ phase: "failed", fraction: 0 }),
-      );
+      modelUrlOf(stage)
+        .then((url) => {
+          if (!alive) return;
+          if (sourceKey) subscribe(url);
+          return preloadClinic(url);
+        })
+        .then(
+          () => alive && setState({ phase: "ready", fraction: 1 }),
+          () => alive && setState({ phase: "failed", fraction: 0 }),
+        );
     };
     const w = window as IdleWindow;
     let idleId: number | undefined;
@@ -96,7 +123,7 @@ export function useClinicPreload(webgl: WebglState): PreloadState {
       if (idleId !== undefined) w.cancelIdleCallback?.(idleId);
       if (timer) clearTimeout(timer);
     };
-  }, [webgl]);
+  }, [webgl, sourceKey]);
 
   return state;
 }

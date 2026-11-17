@@ -4,13 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import vi from "../../../../messages/vi.json";
-import {
-  VIEWS,
-  isExamRegion,
-  parseFindings,
-  type ExamRegionId,
-  type RegionFindings,
-} from "@/components/avatar/avatarContract";
+import { VIEWS, type RegionFindings } from "@/components/avatar/avatarContract";
+import { parseRegionFindings, stageSourceOf } from "@/components/avatar/caseScene";
 import ClinicStage, { type StageController } from "@/components/avatar/ClinicStage";
 import ExamResultCard, { type ExamActionResponse, type ExamCardState } from "@/components/avatar/ExamResultCard";
 import { patientLipSync } from "@/components/avatar/LipSyncController";
@@ -31,7 +26,7 @@ import StageCaption from "@/components/workspace/StageCaption";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
 import VoiceDock from "@/components/workspace/VoiceDock";
 import { CaseVoiceContext, caseVoiceOf, speakerText } from "@/components/workspace/caseVoice";
-import { ExamRegionsContext, HFMD_REGIONS, regionsFromCase } from "@/components/workspace/examRegions";
+import { ExamRegionsContext, regionsOfCase } from "@/components/workspace/examRegions";
 import { examTargetOf, lastPatientLine, latestFindings, type ExamTarget } from "@/components/workspace/examTurns";
 import {
   useVoiceSession,
@@ -39,7 +34,7 @@ import {
   type VoiceTranscript,
 } from "@/hooks/useVoiceSession";
 import type { components } from "@/lib/api-client/schema";
-import { examModeOf, useSessionCase } from "@/lib/caseSummary";
+import { useSessionCase } from "@/lib/caseSummary";
 import { API_URL, authHeaders, fmt, whenAuthReady } from "@/lib/sessionAuth";
 
 type ExamActionRequest = components["schemas"]["ExamActionRequest"];
@@ -86,9 +81,9 @@ function isTypingTarget(el: EventTarget | null): boolean {
 }
 
 /** Exam findings kept for this tab (sessionStorage may be blocked: then none). */
-function readFindings(key: string): RegionFindings {
+function readFindings(key: string): Record<string, boolean> {
   try {
-    return parseFindings(window.sessionStorage.getItem(key));
+    return parseRegionFindings(window.sessionStorage.getItem(key));
   } catch {
     return {};
   }
@@ -124,13 +119,12 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const replyTimer = useRef<number | undefined>(undefined);
   const stageRef = useRef<StageController | null>(null);
   const stage2dRef = useRef<Stage2DController | null>(null);
-  // AVP-150: the case decides the stage. 3D (mother and child) only when its
-  // catalog says so; any other case gets the 2D illustration with its hotspots.
+  // AVP-150: the case decides the stage. 3D only when its catalog says so (HFMD:
+  // mother and child, Slice 16; another case: its avp-case-scene/1 model, AVP-160);
+  // any other case gets the 2D illustration with its hotspots.
   const sessionCase = useSessionCase(id);
-  const regions = useMemo(
-    () => (sessionCase && examModeOf(sessionCase) === "3d" ? HFMD_REGIONS : regionsFromCase(sessionCase ?? null)),
-    [sessionCase],
-  );
+  const regions = useMemo(() => regionsOfCase(sessionCase), [sessionCase]);
+  const stageSource = useMemo(() => stageSourceOf(sessionCase?.id ?? ""), [sessionCase]);
   const caseVoice = useMemo(() => caseVoiceOf(sessionCase), [sessionCase]);
   const is3d = regions.mode === "3d";
   const regionLabel = (target: ExamTarget) => regions.labelOf(target).toLowerCase();
@@ -402,9 +396,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   /** Fly the camera to a region (or the whole child) without examining it. */
   const goTo = useCallback((target: ExamTarget) => {
     if (target === "observe_child") stageRef.current?.focusChild();
-    else if (isExamRegion(target)) stageRef.current?.focusRegion(target);
+    else if (is3d) stageRef.current?.focusRegion(target); // no-op for a hotspot without a collider
     else stage2dRef.current?.focusRegion(target); // 2D: focus the hotspot
-  }, []);
+  }, [is3d]);
 
   /** Reopen a past exam from the transcript or the exam record. */
   const openRecorded = useCallback(
@@ -518,7 +512,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
       ids: regions.ids,
       examine: (region) => {
         if (examLoading || lock) return;
-        if (isExamRegion(region)) stageRef.current?.focusRegion(region);
+        if (is3d) stageRef.current?.focusRegion(region);
         stageRef.current?.noteInteraction();
         void examineRegion(region);
       },
@@ -671,15 +665,16 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
             />
           ) : (
           <ClinicStage
+            source={stageSource}
             controllerRef={stageRef}
             findings={examFindings as RegionFindings}
-            examined={examined as ReadonlySet<ExamRegionId>}
+            examined={examined}
             busy={examLoading || !!lock}
             onExamineRegion={examineRegion}
             onObserve={observeChild}
             onSpeakingChange={onSpeakingChange}
             card={cardNode}
-            cardAnchor={card ? (card.target === "observe_child" ? "child" : isExamRegion(card.target) ? card.target : null) : null}
+            cardAnchor={card ? (card.target === "observe_child" ? "child" : card.target) : null}
             caption={<StageCaption text={lastReply?.text ?? null} />}
             voice={voiceDock}
           />

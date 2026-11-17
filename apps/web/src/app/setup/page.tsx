@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import vi from "../../../messages/vi.json";
 import CaseProfile, { CaseProfileState } from "@/components/setup/CaseProfile";
 import DeviceCheck from "@/components/setup/DeviceCheck";
@@ -19,6 +19,7 @@ import {
 } from "@/components/setup/setupPrefs";
 import { useClinicPreload, useMicCheck, useWebgl } from "@/components/setup/useDeviceCheck";
 import { FOCUS_RING } from "@/components/ui/focus";
+import { stageSourceOf } from "@/components/avatar/caseScene";
 import { examModeOf, parseCaseParam, useCaseSummary } from "@/lib/caseSummary";
 import { API_URL, authHeaders, fmt, rememberGuestSession, whenAuthReady } from "@/lib/sessionAuth";
 import { navigateToStage } from "@/lib/stageTransition";
@@ -53,8 +54,9 @@ function SetupScreen() {
   const caseId = parseCaseParam(useSearchParams().get("case"));
   const caseLoad = useCaseSummary(caseId);
   const caseData = caseLoad.status === "ok" ? caseLoad.data : null;
-  // Only the 3D case needs WebGL and the clinic model (AVP-150); a 2D case skips both.
+  // Only a 3D case needs WebGL and its clinic model (AVP-150/160); a 2D case skips both.
   const is3d = caseData ? examModeOf(caseData) === "3d" : false;
+  const stageSource = useMemo(() => stageSourceOf(caseData?.id ?? ""), [caseData]);
   // Last role/mode, remembered in localStorage (consent is never remembered).
   const { role, mode } = useSyncExternalStore(subscribePrefs, getPrefsSnapshot, () => DEFAULT_PREFS);
   const [consent, setConsent] = useState(false);
@@ -70,7 +72,7 @@ function SetupScreen() {
 
   const webgl = useWebgl();
   // Nothing to preload until a 3D case is known ("checking" keeps the hook idle).
-  const preload = useClinicPreload(is3d ? webgl : "checking");
+  const preload = useClinicPreload(is3d ? webgl : "checking", stageSource);
   const mic = useMicCheck(meterRef);
   const finishMic = mic.finish;
 

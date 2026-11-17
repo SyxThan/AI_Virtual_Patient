@@ -123,3 +123,58 @@ Bản Blender desktop có thể bật Draco ngay trong exporter, nhưng vẫn ph
 
 - Không tải được `mother_child.glb` (lỗi mạng hoặc file không đạt contract): `ModelLoader` quay về **model procedural** hiện tại, đảm bảo đủ 4 collider cùng tên.
 - Không có WebGL: hiện màn dự phòng với danh sách 4 vùng khám, và vẫn khám được bằng click vào danh sách.
+
+---
+
+# Contract `avp-case-scene/1`: mô hình 3D cho các ca khác HFMD (AVP-160)
+
+Phần trên (Slice 16) chỉ áp dụng cho ca `case-01-hfmd` với `mother_child.glb`; ca này giữ nguyên 4 vùng, `observe_child` và model procedural dự phòng.
+Mọi ca khác có `catalog.exam_mode = "3d"` dùng contract dưới đây. Bản đầy đủ cho người dựng model nằm trong `docs/specs/avatar-asset.md` của từng gói asset; code web chỉ dựa vào những mục sau.
+
+## A. File trong `apps/web/public/models/`
+
+| File | Nội dung |
+|---|---|
+| `<caseId>.glb` | glTF 2.0 binary, Draco, cùng hệ toạ độ và phòng với Slice 16 |
+| `<caseId>.scene.json` | Cấu hình cảnh. **Không** chứa finding, nhãn vùng, phương pháp khám hay chữ lâm sàng |
+
+```json
+{ "contract": "avp-case-scene/1", "caseId": "case-02-dengue", "model": "/models/case-02-dengue.glb",
+  "speakerLabel": "Mẹ", "draft": true,
+  "camera": { "home": {"pos":[x,y,z],"target":[x,y,z]}, "exam": {"pos":[...],"target":[...]} },
+  "breathing": { "morph": "breathIn", "rate": 52, "amplitude": 1.0 },
+  "regions": [ { "id": "<collider regionId>", "overlays": [ { "type": "petechiae", "p1": 190, "p2": 0.16, "color": "#8e1b2c", "strength": 1 } ] } ] }
+```
+
+- `contract` và `caseId` phải khớp ca đang mở; `model` phải là đường dẫn cục bộ `/models/*.glb`. Sai thì sân khấu chỉ còn thanh nút khám.
+- `breathing` chỉ có khi gói có (ví dụ viêm phổi); code chỉ đọc `morph`, `rate` (0 < rate ≤ 120 lần/phút), `amplitude` (0..1). Trường khác (như `note`) không bao giờ hiển thị.
+- `regions[].overlays`: copy nguyên văn từ `demo/case.json` của gói. Kiểu: `petechiae`, `vesicles`, `focus`, `edge`, `tint` (bảng tham số ở §6 của gói). `focus`/`edge` cần `landmark` có trong model, thiếu thì bỏ qua.
+- `speakerLabel` dùng cho nhãn "<speakerLabel> đang nói"; trống thì lấy vai người trả lời của ca.
+
+## B. Catalog của ca (GET /cases/{id})
+
+- `exam_mode: "3d"`.
+- `exam_regions[]`: trước hết một mục cho mỗi collider (`id` = `regionId` của collider, `label`, `exam_region` → `exam[].region` của ca, `x`/`y` null), sau đó các mục **không** có collider (ví dụ `general`, `vitals`): chỉ là nút trên thanh khám.
+- Nhãn hiển thị lấy từ catalog. Collider có `regionId` không nằm trong catalog thì bị bỏ qua (không click được).
+
+## C. Model (`gltf.scene.userData` và node extras)
+
+- Scene extras: `contract`, `caseId`, `regions` (thứ tự vùng, tối đa 8), `skinMaterial` (mặc định `patient_skin`).
+- Người nói: node có `extras.role = "speaker"` và `extras.faceForward`; bone `head` (và `spine` nếu có) nằm dưới node đó. Đầu xoay tối đa 35° quanh `faceForward`, dùng được cho người ngồi lẫn người nằm.
+- Morph `jawOpen`, `eyeBlink_L`, `eyeBlink_R` ghi cho **mọi** mesh có morph đó. Morph thở lấy tên từ `breathing.morph`.
+- Collider `collider_<id>` với extras `regionId`, `atlasCell` (0–5, `-1` = trên quần áo), `boxes` (AABB thế giới), `viewDir` (hướng camera khi bay tới vùng). Vùng trên quần áo hover thì hiện collider mờ màu vàng.
+- Empty `landmark_<tên>` với `extras.landmark`: vị trí cho lớp `focus`/`edge`.
+- Bộ phận có `extras.label` hiện tooltip; `extras.info` là ghi chú tác giả, **không** hiển thị.
+
+## D. An toàn (Hard Rule 1)
+
+- Finding chỉ đến từ `POST /sessions/{id}/actions` (nguyên văn `exam[]` của ca). Web không đọc finding từ scene.json hay gói asset.
+- Lớp minh hoạ (overlay) chỉ hiện ở vùng **đã khám và có finding được ghi nhận** (`documented = true`); vùng không có ghi nhận không vẽ gì. Nhãn luôn hiện: "Dấu hiệu trên mô hình chỉ là hình minh hoạ, chờ bác sĩ duyệt".
+
+## E. Dự phòng
+
+- Thiếu `scene.json`, thiếu GLB, sai contract/caseId, hoặc thiếu người nói/bone `head`/morph `jawOpen`/vật liệu da/collider hợp lệ: không có model procedural, sân khấu hiện thông báo và thanh nút khám (mọi vùng của catalog vẫn khám được).
+- Không có WebGL: như Slice 16, chỉ còn thanh nút khám.
+- Trang Setup kiểm WebGL và tải trước đúng model của ca (đọc `scene.json` để biết `model`).
+
+Code: `components/avatar/caseScene.ts` (helper thuần, có test), `caseSceneLoader.ts`, `caseRig.ts`, `caseSkin.ts`.

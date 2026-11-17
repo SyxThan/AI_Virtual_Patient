@@ -90,11 +90,12 @@ export function clamp(v: number, lo: number, hi: number): number {
 }
 
 /**
- * Exam findings shown on the avatar: region -> `documented` from the backend.
+ * Exam findings shown on the avatar: region id -> `documented` from the backend
+ * (HFMD: the 4 regions below; an avp-case-scene/1 case: its catalog ids).
  * Only `true` (the case documents a finding there) reveals the illustrative
  * lesion layer; `false` (unknown) never paints anything (Hard Rule 1).
  */
-export type RegionFindings = Partial<Record<ExamRegionId, boolean>>;
+export type RegionFindings = Partial<Record<string, boolean>>;
 
 /** Lesion-layer targets per atlas cell (0 or 1) for a findings map. */
 export function lesionTargets(findings: RegionFindings): [number, number, number, number] {

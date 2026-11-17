@@ -8,6 +8,7 @@ import {
   UNLABELLED_PARTS,
   blinkAt,
   headAngles,
+  isExamRegion,
   jawFromLevel,
   lesionTargets,
   nextBlinkDelay,
@@ -110,7 +111,7 @@ export function prepareClinicRig(gltf: GLTF): SceneRig {
   }
 
   root.updateMatrixWorld(true);
-  const regionBoxes = new Map<ExamRegionId, THREE.Box3>();
+  const regionBoxes = new Map<string, THREE.Box3>();
   const childBox = new THREE.Box3();
   for (const id of EXAM_REGIONS) {
     const box = new THREE.Box3();
@@ -204,6 +205,7 @@ export function prepareClinicRig(gltf: GLTF): SceneRig {
   return {
     source: "model",
     root,
+    regionIds: EXAM_REGIONS,
     colliders,
     pickables,
     labelOwner: (obj) => {
@@ -219,7 +221,7 @@ export function prepareClinicRig(gltf: GLTF): SceneRig {
     sceneBox,
     headPosition: (out) => head.getWorldPosition(out),
     setRegionHover: (id) => {
-      uniforms.uHover.value = id ? REGION_CELL[id] : -1;
+      uniforms.uHover.value = id && isExamRegion(id) ? REGION_CELL[id] : -1;
     },
     setPartHover: (owner) => {
       if (owner === glowing) return;

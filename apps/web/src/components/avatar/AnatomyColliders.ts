@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { jawScaleFor } from "./LipSyncController";
-import type { ExamRegionId } from "./avatarContract";
+import { EXAM_REGIONS, type ExamRegionId } from "./avatarContract";
 import type { FrameInput, SceneRig } from "./sceneRig";
 
 /**
@@ -103,7 +103,7 @@ export function buildProceduralRig(): SceneRig {
   root.add(child);
   root.updateMatrixWorld(true);
 
-  const regionBox = (id: ExamRegionId) => {
+  const regionBox = (id: string) => {
     const box = new THREE.Box3();
     colliders.filter((c) => c.userData.regionId === id).forEach((c) => box.expandByObject(c));
     return box;
@@ -112,7 +112,7 @@ export function buildProceduralRig(): SceneRig {
   const sceneBox = new THREE.Box3().setFromObject(root);
   const headPos = new THREE.Vector3(0, 1.66, 0);
 
-  const setRegionHover = (id: ExamRegionId | null) => {
+  const setRegionHover = (id: string | null) => {
     for (const c of colliders) {
       (c.material as THREE.MeshBasicMaterial).opacity = id && c.userData.regionId === id ? HOVER_OPACITY : 0;
     }
@@ -121,6 +121,7 @@ export function buildProceduralRig(): SceneRig {
   return {
     source: "procedural",
     root,
+    regionIds: EXAM_REGIONS,
     colliders,
     pickables: [],
     labelOwner: () => null,

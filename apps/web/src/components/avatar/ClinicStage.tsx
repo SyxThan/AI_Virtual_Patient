@@ -1,25 +1,30 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useImperativeHandle, useRef, useState, type ReactNode, type Ref } from "react";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import vi from "../../../messages/vi.json";
-import { EXAM_REGIONS, VIEWS, type AnchorId, type ExamRegionId, type RegionFindings, type ViewId } from "./avatarContract";
-import type { AvatarSceneApi, AvatarSceneProps, HoverTarget, SceneStatus } from "./AvatarScene";
+import { VIEWS, type RegionFindings, type ViewId } from "./avatarContract";
+import type { AvatarSceneApi, AvatarSceneProps, AvatarSceneSource, HoverTarget, SceneStatus } from "./AvatarScene";
+import type { StageSource } from "./caseScene";
+import { useCaseScene } from "./caseSceneLoader";
 import { prefetchModelBytes } from "./modelBytes";
 import { STAGE_TRANSITION_NAME } from "@/lib/stageTransition";
 import { FOCUS_RING } from "@/components/ui/focus";
+import { useCaseVoice } from "@/components/workspace/caseVoice";
+import { useExamRegions } from "@/components/workspace/examRegions";
 import { fmt } from "@/lib/sessionAuth";
 
 // Three.js needs window/WebGL: never render it on the server (avatar-3d skill).
 const AvatarScene = dynamic<AvatarSceneProps>(() => import("./AvatarScene"), { ssr: false });
 
 const NO_FINDINGS: RegionFindings = {};
+const HFMD_SOURCE: StageSource = { kind: "hfmd" };
 const HINT_SEEN_KEY = "avp_stage_hint_seen_v1";
 
 /** What the page (keyboard shortcuts, exam record, transcript) can do to the stage. */
 export type StageController = {
   setView: (view: ViewId) => void;
-  focusRegion: (region: ExamRegionId) => void;
+  focusRegion: (region: string) => void;
   focusChild: () => void;
   zoom: (direction: 1 | -1) => void;
   reset: () => void;
@@ -45,8 +50,14 @@ function hintSeen(): boolean {
  * on a marker (exam view), or the exam bar, which is also the keyboard and
  * screen-reader path (markers are pointer shortcuts and stay out of the tab
  * order). Without WebGL only the exam bar remains, which is enough.
+ *
+ * `source` picks the scene: HFMD (Slice 16, default) or an avp-case-scene/1
+ * case, whose regions and labels come from the case catalog (ExamRegionsContext)
+ * and whose scene from `/models/<caseId>.scene.json`. If that file or its model
+ * fails, the stage shows a notice and the exam bar (every region still works).
  */
 export default function ClinicStage({
+  source = HFMD_SOURCE,
   controllerRef,
   findings = NO_FINDINGS,
   examined,
@@ -59,18 +70,19 @@ export default function ClinicStage({
   caption,
   voice,
 }: {
+  source?: StageSource;
   controllerRef: Ref<StageController | null>;
   /** Region -> `documented` (lesion layer). */
   findings?: RegionFindings;
   /** Regions with a recorded exam (marker and chip state). */
-  examined: ReadonlySet<ExamRegionId>;
+  examined: ReadonlySet<string>;
   busy?: boolean;
-  onExamineRegion: (region: ExamRegionId) => void;
+  onExamineRegion: (region: string) => void;
   onObserve: () => void;
   onSpeakingChange?: (speaking: boolean) => void;
-  /** Exam result card; positioned beside `cardAnchor` by the scene. */
+  /** Exam result card; positioned beside `cardAnchor` by the scene (docked when it has no 3D point). */
   card?: ReactNode;
-  cardAnchor?: AnchorId | null;
+  cardAnchor?: string | null;
   caption?: ReactNode;
   voice?: ReactNode;
 }) {
@@ -82,15 +94,27 @@ export default function ClinicStage({
   const [status, setStatus] = useState<SceneStatus>({ phase: "loading", progress: 0 });
   const [view, setView] = useState<ViewId>("talk");
   const [hover, setHover] = useState<HoverTarget | null>(null);
-  const [barHover, setBarHover] = useState<ExamRegionId | null>(null);
+  const [barHover, setBarHover] = useState<string | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
+  const regions = useExamRegions();
+  const caseVoice = useCaseVoice();
+  const isCase = source.kind === "case";
+  const caseScene = useCaseScene(isCase ? source.caseId : null);
+  const caseConfig = isCase && caseScene.status === "ok" ? caseScene.config : null;
+  const sceneSource = useMemo<AvatarSceneSource | undefined>(
+    () => (caseConfig ? { kind: "case", config: caseConfig, regions: regions.ids } : undefined),
+    [caseConfig, regions.ids],
+  );
+  const modelUrl = isCase ? caseConfig?.model : undefined;
+
   // Start the model download now, in parallel with the three.js chunk.
   useEffect(() => {
-    prefetchModelBytes().catch(() => undefined); // the scene falls back on its own
-  }, []);
+    if (isCase && !modelUrl) return; // the case scene file names the model
+    prefetchModelBytes(modelUrl).catch(() => undefined); // the scene falls back on its own
+  }, [isCase, modelUrl]);
 
   useEffect(() => {
     const onChange = () => setFullscreen(document.fullscreenElement === rootRef.current);
@@ -100,6 +124,20 @@ export default function ClinicStage({
 
   const ready = status.phase === "ready";
   const unsupported = status.phase === "unsupported";
+  // avp-case-scene/1 case whose scene file or model is unusable: exam bar only.
+  const failed = status.phase === "failed" || (isCase && caseScene.status === "failed");
+  const waitingScene = isCase && caseScene.status === "loading";
+  const loadProgress = status.phase === "loading" ? status.progress : 0;
+  // Markers only where the scene has a collider; HFMD keeps its 4 regions.
+  const markerIds = isCase
+    ? status.phase === "ready"
+      ? status.regions.filter((id) => regions.ids.includes(id))
+      : []
+    : regions.ids;
+  const canObserve = regions.targets.includes("observe_child");
+  const speakingText = isCase
+    ? fmt(vi.avatar.speakingWho, { Who: caseConfig?.speakerLabel || caseVoice.Who })
+    : vi.avatar.speaking;
 
   // First-run hint: once the scene is ready, until the first interaction.
   useEffect(() => {
@@ -174,7 +212,7 @@ export default function ClinicStage({
     [onSpeakingChange],
   );
 
-  const examine = (region: ExamRegionId) => {
+  const examine = (region: string) => {
     if (busy) return;
     setView("exam");
     apiRef.current?.focusRegion(region);
@@ -193,7 +231,7 @@ export default function ClinicStage({
   const markersOn = ready && view === "exam";
   const tooltipText = hover
     ? hover.kind === "region"
-      ? `${vi.exam.regions[hover.region]}${busy ? "" : `: ${vi.avatar.clickToExamine.toLowerCase()}`}`
+      ? `${regions.labelOf(hover.region)}${busy ? "" : `: ${vi.avatar.clickToExamine.toLowerCase()}`}`
       : hover.label
     : "";
 
@@ -210,9 +248,11 @@ export default function ClinicStage({
         data-stage-transition
         style={{ viewTransitionName: STAGE_TRANSITION_NAME }}
         className="relative h-[45dvh] shrink-0 overflow-hidden rounded-tile bg-gradient-to-b from-sand-soft to-canvas ring-1 ring-line/70 md:h-full md:rounded-none md:ring-0 [:fullscreen_&]:h-full">
-        <p className="sr-only">{vi.avatar.sceneLabel}</p>
-        {!unsupported && (
+        <p className="sr-only">{isCase ? vi.avatar.sceneLabelCase : vi.avatar.sceneLabel}</p>
+        {!unsupported && !failed && !waitingScene && (
           <AvatarScene
+            key={isCase ? source.caseId : "hfmd"}
+            source={sceneSource}
             onExamineRegion={busy ? undefined : examine}
             findings={findings}
             hoverRegion={barHover}
@@ -228,7 +268,7 @@ export default function ClinicStage({
 
         {/* Things that follow 3D points. Only `transform` is written per frame. */}
         <div ref={overlayRef} className="pointer-events-none absolute inset-0 z-10">
-          {EXAM_REGIONS.map((r) => {
+          {markerIds.map((r) => {
             const done = examined.has(r);
             const lit = litRegion === r;
             return (
@@ -265,7 +305,7 @@ export default function ClinicStage({
                     lit ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                   }`}
                 >
-                  {fmt(vi.cockpit.markerTitle, { region: vi.exam.regions[r] })}
+                  {fmt(vi.cockpit.markerTitle, { region: regions.labelOf(r) })}
                 </span>
               </button>
             );
@@ -280,7 +320,7 @@ export default function ClinicStage({
             }`}
           >
             <SpeakingBars />
-            {vi.avatar.speaking}
+            {speakingText}
           </span>
 
           {card && cardAnchor && (
@@ -326,7 +366,7 @@ export default function ClinicStage({
                     view === v ? "bg-primary text-white" : "text-ink-muted hover:text-ink"
                   }`}
                 >
-                  {vi.avatar.views[v]}
+                  {isCase && v === "exam" ? vi.avatar.views.examCase : vi.avatar.views[v]}
                 </button>
               ))}
             </div>
@@ -359,24 +399,26 @@ export default function ClinicStage({
           </div>
         )}
 
-        {status.phase === "loading" && (
+        {(status.phase === "loading" || waitingScene) && !failed && (
           <div role="status" className="absolute inset-0 grid place-items-center p-6 text-center">
             <div className="w-full max-w-64">
               <p className="text-sm text-ink-muted">
-                {vi.avatar.loadingProgress.replace("{pct}", String(Math.round(status.progress * 100)))}
+                {vi.avatar.loadingProgress.replace("{pct}", String(Math.round(loadProgress * 100)))}
               </p>
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
                 <div
                   className="h-full rounded-full bg-primary transition-[width] duration-300"
-                  style={{ width: `${Math.max(6, status.progress * 100)}%` }}
+                  style={{ width: `${Math.max(6, loadProgress * 100)}%` }}
                 />
               </div>
             </div>
           </div>
         )}
-        {unsupported && (
+        {(unsupported || failed) && (
           <div className="absolute inset-0 grid place-items-center p-6 text-center">
-            <p className="max-w-xs text-sm leading-relaxed text-ink-muted">{vi.avatar.unsupported}</p>
+            <p className="max-w-xs text-sm leading-relaxed text-ink-muted">
+              {unsupported ? vi.avatar.unsupported : vi.avatar.sceneFailed}
+            </p>
           </div>
         )}
       </div>
@@ -389,7 +431,7 @@ export default function ClinicStage({
           <p className="pointer-events-auto flex min-w-0 flex-wrap items-center gap-x-1.5 text-xs leading-snug text-ink-muted">
             <span className="font-semibold text-ink">{vi.avatar.illustrative}</span>
             <span aria-hidden="true">·</span>
-            <span className="text-warning">{vi.avatar.lesionNote}</span>
+            <span className="text-warning">{isCase ? vi.avatar.signNote : vi.avatar.lesionNote}</span>
             {ready && status.source === "procedural" && (
               <>
                 <span aria-hidden="true">·</span>
@@ -425,7 +467,7 @@ export default function ClinicStage({
           aria-label={vi.cockpit.examBar}
           className="pointer-events-auto -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1 md:flex-wrap md:justify-center md:overflow-visible"
         >
-          {EXAM_REGIONS.map((r, i) => {
+          {regions.ids.map((r, i) => {
             const done = examined.has(r);
             return (
               <button
@@ -433,7 +475,7 @@ export default function ClinicStage({
                 type="button"
                 data-opens-exam=""
                 disabled={busy}
-                aria-keyshortcuts={String(i + 1)}
+                aria-keyshortcuts={i < 9 ? String(i + 1) : undefined}
                 aria-describedby={undefined}
                 onClick={() => examine(r)}
                 onPointerEnter={() => setBarHover(r)}
@@ -447,17 +489,18 @@ export default function ClinicStage({
                 } ${barHover === r ? "ring-2 ring-primary" : ""}`}
               >
                 {done ? <CheckIcon /> : <span className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />}
-                {vi.exam.regions[r]}
+                {regions.labelOf(r)}
                 <span className="sr-only">: {done ? vi.avatar.examined : vi.avatar.notExamined}</span>
                 <kbd
                   aria-hidden="true"
                   className="hidden rounded border border-current/25 px-1 text-[0.7rem] font-semibold opacity-60 min-[1600px]:inline"
                 >
-                  {i + 1}
+                  {i < 9 ? i + 1 : ""}
                 </kbd>
               </button>
             );
           })}
+          {canObserve && (
           <button
             type="button"
             data-opens-exam=""
@@ -476,6 +519,7 @@ export default function ClinicStage({
             </svg>
             {vi.exam.observe}
           </button>
+          )}
         </div>
 
         {voice}
