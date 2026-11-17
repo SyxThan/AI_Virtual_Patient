@@ -26,11 +26,30 @@ The 53-case source puts history, exam findings and red flags into one "response"
 5. Rubric `critical: true` items cap the total score if scored 0 (whether it caps is decided with the clinician in AVP-016; see evaluation.md).
 6. Numbers appear in `labs[].value` only if the source has them; otherwise `value: null` and put the text in `result_text`.
 
+## Catalog block (Slice 20, AVP-146)
+Optional top-level `catalog` object: the data a case-library card and the exam stage need. It carries no clinical content of its own. Older drafts without it still validate; a case shown in `/cases` must have it.
+
+| Field | Type | Meaning |
+|---|---|---|
+| `patient_group` | `child` \| `adult` \| `elderly` (required) | filter chip on `/cases` |
+| `display_complaint` | string (required) | text on the card; must equal `presentation.chief_complaint` **verbatim** |
+| `cover` | string \| null | public web path of the cover image, e.g. `/cases/hfmd-cover.webp` |
+| `exam_mode` | `3d` \| `2d` (required) | `3d` = the mother-and-child scene; `2d` = illustration with hotspots |
+| `exam_regions[]` | `{id, label, x, y}` (required, may be empty) | exam hotspots; `x`/`y` are 0..1 positions on the 2D image, `null` for `3d` |
+| `estimated_minutes` | integer \| null | suggested duration; `null` until someone has measured it (Hard rule 3) |
+| `order` | integer (required) | sort hint, lower first |
+
+Rules:
+- **No diagnosis on cards.** Naming the disease gives away the OSCE answer. `display_complaint` and the region labels must not contain `diagnosis.primary` or `title.vi`; the diagnosis stays only in `diagnosis` (and `title`, which the API hides unless asked to reveal it).
+- `exam_regions[].id` is the UI region id the web sends in `POST /sessions/{id}/actions`; findings still come only from `exam[]` (matched by region in `exam_service.py`), never from the catalog.
+- `catalog` is not clinical content, so editing it does not reset `review.status`; editing `presentation.chief_complaint` does, and `display_complaint` must follow it.
+- It lives in `cases.content` (JSONB), so no migration is needed.
+
 ## Storage
 The JSON files in `data/cases/` are the source of truth. `make load-cases` copies them into the `cases` table as numbered versions (docs/specs/database.md); a session pins the version it started with, so editing a case never changes a finished session's evaluation.
 
 ## Validation (task AVP-035)
-`make validate-cases` checks: JSON Schema, unique ids within a case, every rubric `domain` is covered at least once, `overuse_orders[].applies_to_grades` includes the case's `severity_grade` only when intended, and prints a list of `author_added` entries still unreviewed.
+`make validate-cases` checks: JSON Schema, unique ids within a case, every rubric `domain` is covered at least once, `overuse_orders[].applies_to_grades` includes the case's `severity_grade` only when intended, and prints a list of `author_added` entries still unreviewed. When `catalog` exists it also checks that `display_complaint` equals `presentation.chief_complaint` verbatim and that no card text contains `diagnosis.primary` or `title.vi` (case-insensitive).
 
 ## Converting the 53 source cases (Layer 2, AVP-106)
 - Script extracts the structural parts (labs, overuse orders, diagnosis row, citations) deterministically from the docx.

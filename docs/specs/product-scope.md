@@ -4,13 +4,15 @@
 Xây dựng nền tảng Bệnh nhân Ảo y tế (AI Virtual Patient) tương tác đa phương thức (voice-to-voice + avatar 3D + khám lâm sàng raycasting) và tự động lượng giá năng lực lâm sàng (Auto-OSCE + RAG trích dẫn Hướng dẫn Bộ Y tế) phục vụ đào tạo Y Dược.
 
 ### 1.1. Phạm vi ca bệnh (Clinical Scope)
-* **Số lượng:** Đúng **01 ca lâm sàng duy nhất**: **Nhi khoa - Bệnh Tay chân miệng (Hand, Foot, and Mouth Disease - HFMD)**.
-* **Hình tượng nhân vật:** Người mẹ bế con nhỏ (bệnh nhân nhi).
-* **Nguồn tài liệu y khoa:** Hướng dẫn chẩn đoán và điều trị Bệnh Tay chân miệng (Quyết định số 1003/QĐ-BYT của Bộ Y tế và phác đồ Bệnh viện Bệnh Nhiệt đới TP.HCM). Toàn bộ dữ liệu ca bệnh được lưu tại `data/cases/hfmd_pediatric_01.json` và đánh dấu `[CẦN BÁC SĨ DUYỆT]`.
+* **Số lượng:** Một **thư viện ca bệnh**. Product Owner duyệt mở rộng từ 01 ca lên thư viện ca ngày 17/11/2026 (Slice 20 trong `docs/tasks.md`). Đợt đầu thêm 5 ca, người bệnh gồm trẻ em, người lớn và người cao tuổi. Người học vẫn là sinh viên Y và bác sĩ trẻ.
+* **Ca chính:** **Nhi khoa - Bệnh Tay chân miệng (Hand, Foot, and Mouth Disease - HFMD)** vẫn là ca chính, có cảnh 3D người mẹ bế con nhỏ. Ca nào chưa có model 3D thì khám trên ảnh minh hoạ 2D có các điểm vùng khám.
+* **Nguồn tài liệu y khoa của ca HFMD:** Hướng dẫn chẩn đoán và điều trị Bệnh Tay chân miệng (Quyết định số 1003/QĐ-BYT của Bộ Y tế và phác đồ Bệnh viện Bệnh Nhiệt đới TP.HCM). Dữ liệu ca nằm ở `data/cases/case-01-hfmd.json`, đánh dấu `[CẦN BÁC SĨ DUYỆT]`.
+* **Ca mới là bản nháp:** mỗi ca là một file trong `data/cases/` theo `docs/specs/case-schema.md`. Nội dung lâm sàng của ca mới là `origin: author_added`, `review.status: draft` cho đến khi bác sĩ duyệt, và trên giao diện luôn có huy hiệu "Nháp, chưa bác sĩ duyệt". Không tự bịa sinh hiệu, xét nghiệm hay liều thuốc; thiếu nguồn thì để `TODO(clinician)`. Không ghi số ca "đã duyệt" khi các ca còn là bản nháp.
+* **Thẻ ca không lộ chẩn đoán:** thẻ trong thư viện chỉ ghi lý do đến khám, trích đúng từ ca (`catalog.display_complaint`), không ghi tên bệnh.
 
 ### 1.2. Ba màn hình chính (3 Screens Architecture)
 1. **Setup Screen (`/setup`):**
-   * Lựa chọn ca bệnh (HFMD Nhi khoa).
+   * Hồ sơ ca bệnh đã chọn ở thư viện `/cases` (`/setup?case=<id>`, Slice 20); ca chính là HFMD Nhi khoa.
    * Lựa chọn vai trò người học (Sinh viên Y đa khoa, Bác sĩ nội trú, Bác sĩ thực hành).
    * Lựa chọn chế độ: Luyện tập (có gợi ý/feedback tức thì) hoặc Thi thử (OSCE Exam mode, ẩn gợi ý).
    * Tiếp nhận chấp thuận người dùng (Informed consent notice) và khởi tạo phiên thực hành (`sessionId`).

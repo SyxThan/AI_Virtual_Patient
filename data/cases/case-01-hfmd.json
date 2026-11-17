@@ -28,6 +28,40 @@
       "TODO(clinician): management[] carries no drug/dose detail on purpose — confirm the treatment protocol per MOH guidance before any demo."
     ]
   },
+  "catalog": {
+    "patient_group": "child",
+    "display_complaint": "Con em sốt cao ba ngày rồi không hạ, bỏ ăn, quấy khóc, ngủ cứ giật mình.",
+    "cover": "/cases/hfmd-cover.webp",
+    "exam_mode": "3d",
+    "exam_regions": [
+      {
+        "id": "mouth_throat",
+        "label": "Miệng - họng",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "palm_hands",
+        "label": "Lòng bàn tay",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "feet",
+        "label": "Lòng bàn chân",
+        "x": null,
+        "y": null
+      },
+      {
+        "id": "buttocks_knees",
+        "label": "Mông - đầu gối",
+        "x": null,
+        "y": null
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 1
+  },
   "patient": {
     "name": "Bé Trần Hoàng B.",
     "age": {
