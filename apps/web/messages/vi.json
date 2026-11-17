@@ -744,6 +744,40 @@
     "enterKey": "Enter",
     "enterHint": "để bắt đầu"
   },
+  "caseSetup": {
+    "loading": "Đang tải hồ sơ ca…",
+    "missingTitle": "Bạn chưa chọn ca bệnh",
+    "missingBody": "Mỗi buổi luyện tập bắt đầu từ một ca trong thư viện. Chọn một ca để xem hồ sơ và thiết lập buổi khám.",
+    "notFoundTitle": "Không tìm thấy ca này",
+    "notFoundBody": "Ca bệnh trong đường dẫn không tồn tại hoặc chưa được mở. Hãy chọn một ca khác trong thư viện.",
+    "errorTitle": "Chưa tải được hồ sơ ca",
+    "errorBody": "Không kết nối được máy chủ. Kiểm tra mạng rồi thử lại, hoặc chọn ca khác.",
+    "retry": "Thử lại",
+    "toLibrary": "Chọn ca trong thư viện",
+    "otherCase": "Chọn ca khác",
+    "complaintLabel": "Lý do đến khám",
+    "coverAlt": "Ảnh minh hoạ người bệnh của ca này.",
+    "noCover": "Ca này chưa có ảnh minh hoạ",
+    "exam2dNote": "Ca này khám trên ảnh minh hoạ, không cần mô hình 3D.",
+    "minutes": "~{n} phút",
+    "ageUnits": { "days": "{n} ngày tuổi", "weeks": "{n} tuần tuổi", "months": "{n} tháng", "years": "{n} tuổi" },
+    "sex": { "male": "nam", "female": "nữ" },
+    "informant": {
+      "self": "người bệnh tự kể",
+      "mother": "mẹ đưa đến khám",
+      "father": "bố đưa đến khám",
+      "other": "người nhà đưa đến khám"
+    },
+    "defaultCase": "Ca mặc định"
+  },
+  "exam2d": {
+    "stageLabel": "Ảnh minh hoạ người bệnh với các điểm khám",
+    "hint": "Bấm một điểm (hoặc phím số) để khám vùng đó.",
+    "pointLabel": "Khám {region}",
+    "examined": "đã khám",
+    "noImage": "Ca này chưa có ảnh minh hoạ. Dùng danh sách vùng khám bên dưới.",
+    "listLabel": "Vùng khám"
+  },
   "debriefUx": {
     "backToHistory": "Về lịch sử luyện tập",
     "backToHome": "Về trang chủ",

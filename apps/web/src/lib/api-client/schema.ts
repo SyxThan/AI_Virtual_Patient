@@ -849,6 +849,8 @@ export interface components {
             case_id: string;
             /** Case Title */
             case_title?: string | null;
+            /** Case Label */
+            case_label?: string | null;
             /** Mode */
             mode: string;
             /** Status */

@@ -21,7 +21,7 @@ export default function NotFound() {
             <Link href="/" className={buttonClass({ variant: "primary", className: "w-full" })}>
               {vi.errors.home}
             </Link>
-            <Link href="/setup" className={buttonClass({ variant: "secondary", className: "w-full" })}>
+            <Link href="/cases" className={buttonClass({ variant: "secondary", className: "w-full" })}>
               {vi.errors.start}
             </Link>
           </div>

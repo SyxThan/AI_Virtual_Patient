@@ -549,7 +549,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
                   </Button>
                 )}
                 <Link
-                  href="/setup"
+                  href="/cases"
                   className={buttonClass({ variant: load === "error" ? "secondary" : "primary" })}
                 >
                   {vi.workspace.backToSetup}

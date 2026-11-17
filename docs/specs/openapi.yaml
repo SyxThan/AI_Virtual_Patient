@@ -570,6 +570,8 @@ components:
         id: { type: string, format: uuid }
         case_id: { type: string }
         case_title: { type: [string, "null"] }
+        # AVP-149: catalog.display_complaint; names the case without the diagnosis.
+        case_label: { type: [string, "null"] }
         mode: { type: string, enum: [guided, exam] }
         status:
           type: string

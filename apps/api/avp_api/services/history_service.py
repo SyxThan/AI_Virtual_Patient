@@ -80,6 +80,7 @@ def _summary(row: SessionSummaryRow) -> SessionSummary:
         id=row.id,
         case_id=row.case_id,
         case_title=row.case_title,
+        case_label=row.case_label,
         mode=row.mode,
         status=row.status,
         started_at=row.started_at,

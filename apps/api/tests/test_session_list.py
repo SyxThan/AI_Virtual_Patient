@@ -159,6 +159,8 @@ def test_user_sees_only_own_sessions_and_no_transcript() -> None:
     assert ra["next_cursor"] is None
     item = ra["items"][0]
     assert item["case_title"] == CASE["title"]["vi"]
+    # AVP-149: the history names the case by its complaint, not its diagnosis.
+    assert item["case_label"] == CASE["catalog"]["display_complaint"]
     assert item["evaluation_status"] == "none" and item["total_score"] is None
     for forbidden in ("transcript", "turns", "state", "guest_token", "user_id"):
         assert forbidden not in item

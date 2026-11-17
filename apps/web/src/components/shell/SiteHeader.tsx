@@ -137,7 +137,7 @@ export default function SiteHeader() {
 
         {/* Desktop */}
         <div className="hidden items-center gap-1 text-sm sm:flex">
-          <Link href="/setup" className={linkCls}>
+          <Link href="/cases" className={linkCls}>
             {vi.nav.start}
           </Link>
           <Link href="/transparency" className={linkCls}>
@@ -226,7 +226,7 @@ export default function SiteHeader() {
           >
             <ul className="flex flex-col gap-1 text-base">
               <li>
-                <Link href="/setup" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
+                <Link href="/cases" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
                   {vi.nav.start}
                 </Link>
               </li>

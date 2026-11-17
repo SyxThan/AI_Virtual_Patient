@@ -19,7 +19,7 @@ export function authErrorMessage(err: unknown): string {
 }
 
 /** Only same-origin relative paths are allowed as a post-login destination. */
-export function safeNext(next: string | null | undefined, fallback = "/setup"): string {
+export function safeNext(next: string | null | undefined, fallback = "/cases"): string {
   if (!next || !next.startsWith("/") || next.startsWith("//") || next.includes("\\")) return fallback;
   return next;
 }

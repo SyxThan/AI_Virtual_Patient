@@ -116,7 +116,7 @@ export default function LoginForm() {
         <p role="status" className={ALERT}>
           {vi.auth.unavailable}
         </p>
-        <Link href="/setup" className={buttonClass({ variant: "primary", className: "w-full sm:w-fit" })}>
+        <Link href="/cases" className={buttonClass({ variant: "primary", className: "w-full sm:w-fit" })}>
           {vi.auth.guest}
         </Link>
       </div>
@@ -235,7 +235,7 @@ export default function LoginForm() {
       )}
 
       <div className="flex flex-col gap-3 border-t border-line pt-6">
-        <Link href="/setup" className={buttonClass({ variant: "secondary", className: "w-full" })}>
+        <Link href="/cases" className={buttonClass({ variant: "secondary", className: "w-full" })}>
           {vi.auth.guest}
         </Link>
         <p className="text-sm text-ink-muted">{vi.auth.guestHint}</p>

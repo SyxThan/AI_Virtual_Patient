@@ -48,7 +48,7 @@ export default function HistoryPage() {
           <Link href="/login" className={buttonClass({ variant: "primary" })}>
             {vi.history.signIn}
           </Link>
-          <Link href="/setup" className={buttonClass({ variant: "secondary" })}>
+          <Link href="/cases" className={buttonClass({ variant: "secondary" })}>
             {vi.history.guestPractice}
           </Link>
         </div>
@@ -71,7 +71,7 @@ export default function HistoryPage() {
       <Tile tone="mint" className="max-w-2xl">
         <p className="font-display text-2xl font-bold tracking-tight">{vi.history.emptyTitle}</p>
         <p className={`mt-2 ${TILE_MUTED.mint}`}>{vi.history.emptyBody}</p>
-        <Link href="/setup" className={buttonClass({ variant: "primary", size: "lg", className: "mt-6" })}>
+        <Link href="/cases" className={buttonClass({ variant: "primary", size: "lg", className: "mt-6" })}>
           {vi.history.startFirst}
         </Link>
       </Tile>
@@ -125,7 +125,7 @@ export default function HistoryPage() {
       description={vi.history.subtitle}
       actions={
         hasItems ? (
-          <Link href="/setup" className={buttonClass({ variant: "primary" })}>
+          <Link href="/cases" className={buttonClass({ variant: "primary" })}>
             {vi.history.newSession}
           </Link>
         ) : undefined

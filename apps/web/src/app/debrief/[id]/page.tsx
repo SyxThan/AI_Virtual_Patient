@@ -14,6 +14,7 @@ import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
 import Button, { buttonClass } from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
+import { caseLabel, patientLine, useSessionCase } from "@/lib/caseSummary";
 import Tile from "@/components/ui/Tile";
 import { useAuth } from "@/components/auth/AuthProvider";
 import DeleteSessionButton from "@/components/privacy/DeleteSessionButton";
@@ -105,6 +106,8 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
   const router = useRouter();
   const auth = useAuth();
   const { evaluation, debrief, turns, timedOut, retry, refresh } = useDebriefData(id);
+  // AVP-149: name the practised case the way the library does (complaint, not diagnosis).
+  const sessionCase = useSessionCase(id);
   const [focusTurn, setFocusTurn] = useState<number | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState(false);
@@ -209,6 +212,9 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
     <PageShell
       width="wide"
       title={vi.debrief.title}
+      description={
+        sessionCase ? `“${caseLabel(sessionCase)}” · ${patientLine(sessionCase)}` : undefined
+      }
       actions={<ExportPdfButton sessionId={id} disabled={!(evDone && dbDone)} />}
     >
       <div className="space-y-4">
@@ -217,7 +223,7 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
         <Tile as="footer" tone="surface" compact>
           <h2 className="font-display text-xl font-bold tracking-tight">{vi.debriefUx.actionsTitle}</h2>
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <Link href="/setup" className={buttonClass({ variant: "secondary" })}>
+            <Link href="/cases" className={buttonClass({ variant: "secondary" })}>
               {vi.debrief.actions.newCase}
             </Link>
             {/* A finished session redirects away from /session/{id}, so review the transcript here. */}

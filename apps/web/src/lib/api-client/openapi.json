@@ -2985,6 +2985,17 @@
             ],
             "title": "Case Title"
           },
+          "case_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Case Label"
+          },
           "mode": {
             "type": "string",
             "title": "Mode"

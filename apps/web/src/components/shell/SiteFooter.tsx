@@ -21,7 +21,7 @@ export default function SiteFooter() {
         <nav aria-label={vi.nav.footerLinks}>
           <ul className="flex flex-col gap-1">
             <li>
-              <Link href="/setup" className={LINK}>
+              <Link href="/cases" className={LINK}>
                 {vi.nav.start}
               </Link>
             </li>

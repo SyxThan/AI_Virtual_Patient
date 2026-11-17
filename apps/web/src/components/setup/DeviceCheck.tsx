@@ -14,6 +14,7 @@ const SOFT_BTN = `inline-flex min-h-11 items-center gap-2 rounded-control border
  * Step 3. Two rows of fixed height so state changes never move the layout:
  * the 3D model (WebGL probe + preload with a thin bar driven by real download
  * progress) and the microphone (tested only when the learner asks).
+ * A 2D case (AVP-150) needs no 3D model, so `show3d=false` drops that row.
  */
 export default function DeviceCheck({
   webgl,
@@ -24,7 +25,9 @@ export default function DeviceCheck({
   onMicTest,
   onMicStop,
   onMicSkip,
+  show3d = true,
 }: {
+  show3d?: boolean;
   webgl: WebglState;
   preload: PreloadState;
   mic: MicState;
@@ -66,7 +69,7 @@ export default function DeviceCheck({
   return (
     <div className="flex flex-col gap-2">
       {/* ---------------------------------------------------------- 3D model */}
-      <div id="device-model" className="rounded-control bg-canvas px-3.5 py-2">
+      <div id="device-model" className={`rounded-control bg-canvas px-3.5 py-2 ${show3d ? "" : "hidden"}`}>
         <div className="flex items-center gap-3">
           <StatusDot tone={modelOk ? "ok" : modelBad ? "bad" : "busy"} />
           <span className="text-sm font-semibold text-ink">{d.model}</span>

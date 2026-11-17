@@ -31,6 +31,9 @@ class SessionSummaryRow:
     id: str
     case_id: str
     case_title: str | None
+    # Non-revealing name (catalog.display_complaint), AVP-149. Falls back to the
+    # case's active version when the pinned version predates the catalog block.
+    case_label: str | None
     mode: str
     status: str
     started_at: datetime.datetime
@@ -69,6 +72,11 @@ class HistoryRepository(Protocol):
     def criterion_counts(self, user_id: str) -> list[CriterionCountRow]: ...
 
 
+def _label(content: Mapping) -> str | None:
+    catalog = content.get("catalog")
+    return catalog.get("display_complaint") if isinstance(catalog, dict) else None
+
+
 def _uuid_or_none(value: str) -> uuid.UUID | None:
     try:
         return uuid.UUID(value)
@@ -79,10 +87,15 @@ def _uuid_or_none(value: str) -> uuid.UUID | None:
 _LIST_SQL = text(
     """
     select s.id, s.case_id, c.content -> 'title' ->> 'vi' as case_title,
+           coalesce(
+               c.content -> 'catalog' ->> 'display_complaint',
+               cur.content -> 'catalog' ->> 'display_complaint'
+           ) as case_label,
            s.mode, s.status, s.started_at, s.ended_at,
            e.status as evaluation_status, e.total_score, e.critical_missed
     from sessions s
     left join cases c on c.id = s.case_id and c.version = s.case_version
+    left join cases cur on cur.id = s.case_id and cur.is_active
     left join lateral (
         select ev.status, ev.total_score, ev.critical_missed
         from evaluations ev
@@ -166,6 +179,7 @@ class SqlHistoryRepository:
                 id=str(r["id"]),
                 case_id=r["case_id"],
                 case_title=r["case_title"],
+                case_label=r["case_label"],
                 mode=r["mode"],
                 status=r["status"],
                 started_at=r["started_at"],
@@ -224,6 +238,13 @@ class InMemoryHistoryRepository:
         self.evaluations = evaluations
         self.cases = cases or {}
 
+    def _any_label(self, case_id: str) -> str | None:
+        """Label from any loaded version of the case (stands in for the active one)."""
+        for (cid, _version), content in sorted(self.cases.items(), reverse=True):
+            if cid == case_id and _label(content):
+                return _label(content)
+        return None
+
     def _latest(self, session_id: str) -> EvaluationRecord | None:
         mine = [e for e in self.evaluations if e.session_id == session_id]
         return max(mine, key=lambda e: e.created_at) if mine else None
@@ -242,12 +263,14 @@ class InMemoryHistoryRepository:
         out = []
         for s in rows[:limit]:
             ev = self._latest(s.id)
-            title = (self.cases.get((s.case_id, s.case_version)) or {}).get("title") or {}
+            content = self.cases.get((s.case_id, s.case_version)) or {}
+            title = content.get("title") or {}
             out.append(
                 SessionSummaryRow(
                     id=s.id,
                     case_id=s.case_id,
                     case_title=title.get("vi") if isinstance(title, dict) else None,
+                    case_label=_label(content) or self._any_label(s.case_id),
                     mode=s.mode,
                     status=s.status,
                     started_at=s.started_at,
