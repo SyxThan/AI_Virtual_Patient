@@ -54,6 +54,10 @@ class Settings(BaseSettings):
     # Second Evaluator/Debrief model, used only when the first is overloaded or out
     # of quota after its own retries (AVP-144). Unset = no fallback.
     llm_model_evaluator_fallback: str | None = None
+    # Per-request deadline for Gemini calls (the SDK has none by default, so an
+    # overloaded model could hold a scoring job forever). A timeout counts as
+    # transient: the Evaluator then uses its fallback model (AVP-144).
+    llm_timeout_s: float = 60.0
     # RAG embeddings (Slice 8, AVP-018). Changing the model means re-ingesting the
     # corpus: chunks are stored with the model id and only same-model chunks match.
     embedding_model: str | None = None

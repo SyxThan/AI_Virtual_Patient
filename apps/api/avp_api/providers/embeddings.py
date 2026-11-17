@@ -85,15 +85,20 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
 
     _BATCH = 50
 
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(self, api_key: str, model: str, timeout_s: float = 60.0) -> None:
         self._api_key = api_key
+        self._timeout_s = timeout_s
         self.model_id = model
 
     def embed(self, texts: list[str], kind: EmbedKind = "document") -> list[list[float]]:
         from google import genai
         from google.genai import types
 
-        client = genai.Client(api_key=self._api_key)
+        from avp_api.providers.llm import gemini_http_options
+
+        client = genai.Client(
+            api_key=self._api_key, http_options=gemini_http_options(self._timeout_s)
+        )
         config = types.EmbedContentConfig(
             output_dimensionality=self.dimension,
             task_type="RETRIEVAL_QUERY" if kind == "query" else "RETRIEVAL_DOCUMENT",
@@ -116,5 +121,5 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
 def get_embedding_provider() -> EmbeddingProvider:
     s = get_settings()
     if s.llm_provider == "gemini" and s.llm_api_key and s.embedding_model:
-        return GeminiEmbeddingProvider(s.llm_api_key, s.embedding_model)
+        return GeminiEmbeddingProvider(s.llm_api_key, s.embedding_model, s.llm_timeout_s)
     return FakeEmbeddingProvider()

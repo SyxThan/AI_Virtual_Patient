@@ -32,8 +32,17 @@ def describe_provider_error(exc: BaseException) -> str:
 
 
 def is_transient_provider_error(exc: BaseException) -> bool:
-    """Overload, rate limit or server error: another model may still answer."""
+    """Overload, rate limit, server error or timeout: another model may still answer."""
+    if isinstance(exc, TimeoutError) or "Timeout" in type(exc).__name__:
+        return True  # e.g. httpx.ReadTimeout from the SDK's request deadline
     return getattr(exc, "code", None) in _TRANSIENT_CODES
+
+
+def gemini_http_options(timeout_s: float):
+    """SDK request options with a deadline (milliseconds), shared by LLM and embeddings."""
+    from google.genai import types
+
+    return types.HttpOptions(timeout=int(timeout_s * 1000))
 
 
 class LLMProvider(ABC):
@@ -98,9 +107,10 @@ class GeminiProvider(LLMProvider):
     """Google Gemini via the google-genai SDK (optional extra `llm`). Lazy-imported
     so the SDK is required only when this provider is actually selected."""
 
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(self, api_key: str, model: str, timeout_s: float = 60.0) -> None:
         self._api_key = api_key
         self._model = model
+        self._timeout_s = timeout_s
         self.model_id = model
 
     def generate(
@@ -110,7 +120,9 @@ class GeminiProvider(LLMProvider):
         from google.genai import errors as genai_errors
         from google.genai import types
 
-        client = genai.Client(api_key=self._api_key)
+        client = genai.Client(
+            api_key=self._api_key, http_options=gemini_http_options(self._timeout_s)
+        )
         config = types.GenerateContentConfig(
             system_instruction=system_prompt, temperature=temperature
         )
@@ -136,7 +148,7 @@ class GeminiProvider(LLMProvider):
 def get_llm_provider() -> LLMProvider:
     s = get_settings()
     if s.llm_provider == "gemini" and s.llm_api_key and s.llm_model_patient:
-        return GeminiProvider(s.llm_api_key, s.llm_model_patient)
+        return GeminiProvider(s.llm_api_key, s.llm_model_patient, s.llm_timeout_s)
     return FakeLLMProvider()
 
 
@@ -182,9 +194,10 @@ def get_evaluator_provider() -> LLMProvider:
     s = get_settings()
     model = s.llm_model_evaluator or s.llm_model_patient
     if s.llm_provider == "gemini" and s.llm_api_key and model:
-        primary = GeminiProvider(s.llm_api_key, model)
+        primary = GeminiProvider(s.llm_api_key, model, s.llm_timeout_s)
         fallback = s.llm_model_evaluator_fallback
         if fallback and fallback != model:
-            return FallbackLLMProvider(primary, GeminiProvider(s.llm_api_key, fallback))
+            fb = GeminiProvider(s.llm_api_key, fallback, s.llm_timeout_s)
+            return FallbackLLMProvider(primary, fb)
         return primary
     return FakeLLMProvider()

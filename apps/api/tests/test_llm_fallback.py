@@ -90,6 +90,15 @@ def test_transient_classification(code: int, transient: bool) -> None:
     assert is_transient_provider_error(ClientError(code)) is transient
 
 
+def test_timeouts_count_as_transient() -> None:
+    class ReadTimeout(Exception):  # shape of httpx.ReadTimeout (no status code)
+        pass
+
+    assert is_transient_provider_error(ReadTimeout())
+    assert is_transient_provider_error(TimeoutError())
+    assert not is_transient_provider_error(ValueError("bad output"))
+
+
 # --- fallback provider -----------------------------------------------------------------
 
 
@@ -126,6 +135,7 @@ def test_factory_wraps_only_when_a_distinct_fallback_is_set(monkeypatch) -> None
             llm_model_patient="m-patient",
             llm_model_evaluator="m-eval",
             llm_model_evaluator_fallback=fallback,
+            llm_timeout_s=30.0,
         )
 
     monkeypatch.setattr(llm_mod, "get_settings", lambda: settings("m-lite"))
