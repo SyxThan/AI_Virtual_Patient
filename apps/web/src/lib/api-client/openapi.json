@@ -26,6 +26,81 @@
         }
       }
     },
+    "/api/v1/cases": {
+      "get": {
+        "tags": [
+          "cases"
+        ],
+        "summary": "List Cases",
+        "operationId": "list_cases_api_v1_cases_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cases/{case_id}": {
+      "get": {
+        "tags": [
+          "cases"
+        ],
+        "summary": "Get Case",
+        "operationId": "get_case_api_v1_cases__case_id__get",
+        "parameters": [
+          {
+            "name": "case_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Case Id"
+            }
+          },
+          {
+            "name": "reveal",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include title and diagnosis (they name the disease).",
+              "default": false,
+              "title": "Reveal"
+            },
+            "description": "Include title and diagnosis (they name the disease)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaseSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/sessions/{session_id}/guide": {
       "get": {
         "tags": [
@@ -1546,6 +1621,224 @@
   },
   "components": {
     "schemas": {
+      "CaseCatalog": {
+        "properties": {
+          "patient_group": {
+            "type": "string",
+            "enum": [
+              "child",
+              "adult",
+              "elderly"
+            ],
+            "title": "Patient Group"
+          },
+          "display_complaint": {
+            "type": "string",
+            "title": "Display Complaint"
+          },
+          "cover": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cover"
+          },
+          "exam_mode": {
+            "type": "string",
+            "enum": [
+              "3d",
+              "2d"
+            ],
+            "title": "Exam Mode"
+          },
+          "exam_regions": {
+            "items": {
+              "$ref": "#/components/schemas/CaseExamRegion"
+            },
+            "type": "array",
+            "title": "Exam Regions"
+          },
+          "estimated_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Minutes"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "patient_group",
+          "display_complaint",
+          "exam_mode",
+          "order"
+        ],
+        "title": "CaseCatalog"
+      },
+      "CaseExamRegion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "X"
+          },
+          "y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "CaseExamRegion"
+      },
+      "CaseListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CaseSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "title": "CaseListResponse"
+      },
+      "CasePatient": {
+        "properties": {
+          "age_value": {
+            "type": "integer",
+            "title": "Age Value"
+          },
+          "age_unit": {
+            "type": "string",
+            "title": "Age Unit"
+          },
+          "sex": {
+            "type": "string",
+            "title": "Sex"
+          },
+          "informant_role": {
+            "type": "string",
+            "title": "Informant Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "age_value",
+          "age_unit",
+          "sex",
+          "informant_role"
+        ],
+        "title": "CasePatient"
+      },
+      "CaseSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "specialty": {
+            "type": "string",
+            "title": "Specialty"
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "clinician_reviewed"
+            ],
+            "title": "Review Status"
+          },
+          "patient": {
+            "$ref": "#/components/schemas/CasePatient"
+          },
+          "catalog": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaseCatalog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "diagnosis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Diagnosis"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "version",
+          "specialty",
+          "review_status",
+          "patient"
+        ],
+        "title": "CaseSummary"
+      },
       "CitationItem": {
         "properties": {
           "source_id": {

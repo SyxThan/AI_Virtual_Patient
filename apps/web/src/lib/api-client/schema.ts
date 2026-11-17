@@ -21,6 +21,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Cases */
+        get: operations["list_cases_api_v1_cases_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cases/{case_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Case */
+        get: operations["get_case_api_v1_cases__case_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sessions/{session_id}/guide": {
         parameters: {
             query?: never;
@@ -314,6 +348,76 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** CaseCatalog */
+        CaseCatalog: {
+            /**
+             * Patient Group
+             * @enum {string}
+             */
+            patient_group: "child" | "adult" | "elderly";
+            /** Display Complaint */
+            display_complaint: string;
+            /** Cover */
+            cover?: string | null;
+            /**
+             * Exam Mode
+             * @enum {string}
+             */
+            exam_mode: "3d" | "2d";
+            /** Exam Regions */
+            exam_regions?: components["schemas"]["CaseExamRegion"][];
+            /** Estimated Minutes */
+            estimated_minutes?: number | null;
+            /** Order */
+            order: number;
+        };
+        /** CaseExamRegion */
+        CaseExamRegion: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** X */
+            x?: number | null;
+            /** Y */
+            y?: number | null;
+        };
+        /** CaseListResponse */
+        CaseListResponse: {
+            /** Items */
+            items: components["schemas"]["CaseSummary"][];
+        };
+        /** CasePatient */
+        CasePatient: {
+            /** Age Value */
+            age_value: number;
+            /** Age Unit */
+            age_unit: string;
+            /** Sex */
+            sex: string;
+            /** Informant Role */
+            informant_role: string;
+        };
+        /** CaseSummary */
+        CaseSummary: {
+            /** Id */
+            id: string;
+            /** Version */
+            version: number;
+            /** Specialty */
+            specialty: string;
+            /**
+             * Review Status
+             * @enum {string}
+             */
+            review_status: "draft" | "clinician_reviewed";
+            patient: components["schemas"]["CasePatient"];
+            catalog?: components["schemas"]["CaseCatalog"] | null;
+            /** Title */
+            title?: string | null;
+            /** Diagnosis */
+            diagnosis?: string | null;
+        };
         /** CitationItem */
         CitationItem: {
             /** Source Id */
@@ -872,6 +976,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    list_cases_api_v1_cases_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseListResponse"];
+                };
+            };
+        };
+    };
+    get_case_api_v1_cases__case_id__get: {
+        parameters: {
+            query?: {
+                /** @description Include title and diagnosis (they name the disease). */
+                reveal?: boolean;
+            };
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

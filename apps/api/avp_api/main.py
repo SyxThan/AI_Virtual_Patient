@@ -15,6 +15,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from avp_api.config import get_settings
 from avp_api.routers import (
     actions,
+    cases,
     debriefs,
     evaluations,
     guide,
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
         )
 
     app.include_router(health.router, prefix=settings.api_prefix)
+    app.include_router(cases.router, prefix=settings.api_prefix)
     app.include_router(guide.router, prefix=settings.api_prefix)
     app.include_router(sessions.router, prefix=settings.api_prefix)
     app.include_router(turns.router, prefix=settings.api_prefix)
