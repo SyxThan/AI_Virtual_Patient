@@ -11,6 +11,9 @@ type PageShellProps = {
 
 const WIDTHS = { narrow: "max-w-2xl", default: "max-w-5xl", wide: "max-w-7xl" } as const;
 
+/** Page title treatment shared by every route (display face, tight leading). */
+export const PAGE_TITLE = "font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl";
+
 /**
  * The page's `<main>` with the shared gutter (16px on phones) and an optional
  * heading row. Every route renders exactly one PageShell (the skip link targets it).
@@ -21,7 +24,7 @@ export default function PageShell({ title, description, actions, width = "defaul
       {(title || actions) && (
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0">
-            {title && <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1>}
+            {title && <h1 className={PAGE_TITLE}>{title}</h1>}
             {description && <p className="mt-2 max-w-prose text-ink-muted">{description}</p>}
           </div>
           {actions && <div className="flex flex-wrap gap-2">{actions}</div>}

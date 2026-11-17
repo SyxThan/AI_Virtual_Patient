@@ -50,8 +50,8 @@ function List({ items }: { items: string[] }) {
 export default function PedagogicalDebriefPanel({ summary }: { summary: Summary }) {
   const t = vi.debrief.summary;
   return (
-    <Tile as="section" tone="surface" aria-labelledby="summary-title" className="border border-line">
-      <h2 id="summary-title" className="text-xl font-bold tracking-tight">
+    <Tile as="section" tone="surface" aria-labelledby="summary-title">
+      <h2 id="summary-title" className="font-display text-2xl font-bold tracking-tight">
         {t.title}
       </h2>
       <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-2">

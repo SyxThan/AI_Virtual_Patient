@@ -25,9 +25,9 @@ export default function ProgressSection({ progress }: { progress: Progress | nul
   return (
     <section aria-labelledby="progress-title" className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-4">
-        <Tile tone="surface" className="min-w-0 border border-line lg:col-span-3">
+        <Tile tone="surface" className="min-w-0 lg:col-span-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <h2 id="progress-title" className="text-xl font-bold tracking-tight">
+            <h2 id="progress-title" className="font-display text-2xl font-bold tracking-tight">
               {vi.history.progress.title}
             </h2>
             <Badge tone="warning">{vi.history.progress.label}</Badge>
@@ -46,11 +46,11 @@ export default function ProgressSection({ progress }: { progress: Progress | nul
         <Tile tone="mint" compact className="flex flex-col gap-6">
           <div>
             <p className={`text-sm font-medium ${TILE_MUTED.mint}`}>{vi.history.scoredCount}</p>
-            <p className="tabular mt-1 text-4xl font-extrabold tracking-tight">{scored.length}</p>
+            <p className="font-display tabular mt-1 text-5xl font-bold tracking-tight">{scored.length}</p>
           </div>
           <div>
             <p className={`text-sm font-medium ${TILE_MUTED.mint}`}>{vi.history.latestScore}</p>
-            <p className="tabular mt-1 text-4xl font-extrabold tracking-tight">
+            <p className="font-display tabular mt-1 text-5xl font-bold tracking-tight">
               {latest ? fmt(vi.history.score, { score: formatScore(latest.total_score as number) }) : "—"}
             </p>
           </div>

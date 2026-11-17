@@ -1,17 +1,21 @@
 @import "tailwindcss";
 
 /*
- * AVP design tokens (Slice 15, docs/specs/ui-design.md).
+ * AVP design tokens, "Bento Clinical v2" (docs/specs/ui-design.md).
  * Clinical palette: mineral canvas, deep teal ink, one teal primary, calm tile tints.
- * Every text/background pair used by the UI primitives is >= 4.5:1 (WCAG AA).
- * Red is reserved for red flags and destructive actions.
+ * v2 adds a display face (Bricolage Grotesque), a deep-teal hero gradient, a mint
+ * glow used only as decoration, and a soft lit canvas. Every text/background pair
+ * used by the UI primitives is >= 4.5:1 (WCAG AA). Red is reserved for red flags
+ * and destructive actions.
  */
 @theme {
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
 
   --color-canvas: #eef3f2;
   --color-surface: #ffffff;
   --color-ink: #10231f;
+  --color-ink-deep: #071a18;
   --color-ink-muted: #4a5e59;
   --color-ink-inverse-muted: #b8ccc7;
   --color-line: #d5e0dd;
@@ -20,6 +24,10 @@
   --color-primary: #0a6e69;
   --color-primary-strong: #07524e;
   --color-primary-soft: #d5efeb;
+  /* Decorative only (glow, waveform, gauge): never used for text on light surfaces. */
+  --color-glow: #5eead4;
+  /* Patient-monitor yellow: the ECG trace and vitals values on dark stages only. */
+  --color-monitor: #f2c14e;
 
   --color-info: #1f5fbf;
   --color-info-soft: #e2ecfa;
@@ -38,17 +46,223 @@
   --radius-tile: 1.75rem;
   --radius-card: 1rem;
   --radius-control: 0.75rem;
+
+  /* One lift for raised surfaces (surface tiles, menus); tinted tiles stay flat. */
+  --shadow-lift: 0 1px 2px rgba(16, 35, 31, 0.05), 0 18px 40px -24px rgba(16, 35, 31, 0.28);
+  --shadow-stage: 0 24px 60px -24px rgba(7, 26, 24, 0.7);
+
+  --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-wave: wave 1.3s ease-in-out infinite;
+  --animate-breathe: breathe 3.2s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes wave {
+    0%,
+    100% {
+      transform: scaleY(0.35);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
 }
 
 :root {
   color-scheme: light;
+
+  /* Motion tokens (AVP-142). Durations and easings are declared once and reused. */
+  --dur-fast: 150ms;
+  --dur-base: 350ms;
+  --dur-slow: 700ms;
+  --dur-draw: 1600ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/*
+ * Motion rules. Initial hidden states live behind `.js`, a class an inline head
+ * script adds before first paint: without JavaScript every element shows in its
+ * final state. Only transform, opacity, stroke-dashoffset and clip-path animate.
+ */
+
+/*
+ * Loops pause while their scope is off screen or the tab is hidden (useActive).
+ * Only loops: one-shot entrances must finish even if scrolled past mid-way.
+ */
+[data-paused="true"] :is([class*="animate-wave"], [class*="animate-breathe"], .art-ripple, .ecg-band, .ecg-head-x, .ecg-head-y, .ecg-halo) {
+  animation-play-state: paused !important;
+}
+
+/* Hero title: each line slides up from behind its own mask. */
+.hero-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.hero-line > span {
+  display: block;
+  /* On phones a line can wrap: balance it instead of leaving one word alone. */
+  text-wrap: balance;
+}
+.js .hero-line > span {
+  animation: line-up var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(120ms + var(--i, 0) * 90ms);
+}
+.js .hero-after {
+  animation: fade-in var(--dur-base) var(--ease-out) both;
+  /* 150ms after the last title line has finished sliding in. */
+  animation-delay: calc(120ms + (var(--lines, 4) - 1) * 90ms + var(--dur-slow) + 150ms);
+}
+
+/* Scroll reveal: a section fades in once with its children 70ms apart (RevealObserver). */
+.js [data-reveal] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+.js [data-reveal][data-shown] > * {
+  opacity: 1;
+  transform: none;
+}
+[data-reveal] > :nth-child(2) { transition-delay: 70ms; }
+[data-reveal] > :nth-child(3) { transition-delay: 140ms; }
+[data-reveal] > :nth-child(4) { transition-delay: 210ms; }
+[data-reveal] > :nth-child(5) { transition-delay: 280ms; }
+[data-reveal] > :nth-child(6) { transition-delay: 350ms; }
+
+/* Underlined links: the underline redraws from left to right on hover. */
+.link-draw {
+  position: relative;
+  text-decoration: none;
+}
+.link-draw::after {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  right: 0.25rem;
+  bottom: 0.55rem;
+  height: 1.5px;
+  background: currentColor;
+  transform-origin: left;
+}
+.link-draw:hover::after {
+  animation: underline-draw var(--dur-base) var(--ease-out);
+}
+
+/* The sample conversation waits for hydration instead of flashing its full text. */
+.js [data-ready="false"] .chat-line {
+  opacity: 0;
+}
+
+/* Red-flag label: pops in (0.9 to 1) with one small shake. */
+@keyframes flag-pop {
+  0% { transform: scale(0.9); }
+  45% { transform: scale(1.04); }
+  60% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+  90% { transform: translateX(-1px); }
+  100% { transform: none; }
+}
+
+/*
+ * Feature illustrations (FeatureArt). `data-play` is set when the card enters the
+ * viewport (and again on hover, to replay). Before that, with JS, draw-type parts
+ * wait in their start state; without JS they show finished.
+ */
+.js [data-art]:not([data-play]) .art-draw { stroke-dashoffset: 1; }
+.js [data-art]:not([data-play]) .art-pop,
+.js [data-art]:not([data-play]) .art-sweep { opacity: 0; }
+[data-art][data-play] .art-draw {
+  stroke-dasharray: 1;
+  animation: art-draw 600ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+[data-art][data-play] .art-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: art-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+[data-art][data-play] .art-sweep {
+  transform-box: fill-box;
+  transform-origin: left;
+  animation: art-sweep 900ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+.art-ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: art-ripple 2.4s var(--ease-out) infinite;
+  animation-delay: var(--d, 0ms);
+}
+
+@keyframes art-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes art-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  70% { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes art-sweep {
+  from { opacity: 1; transform: scaleX(0); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+@keyframes art-ripple {
+  0% { opacity: 0.75; transform: scale(0.6); }
+  70%, 100% { opacity: 0; transform: scale(2.6); }
+}
+
+@keyframes line-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 body {
-  background: var(--color-canvas);
+  /* A lit canvas: two soft glows (mint, sky) at the top, mineral grey-green below. */
+  background-color: var(--color-canvas);
+  background-image:
+    radial-gradient(56rem 28rem at 12% -6%, rgba(94, 234, 212, 0.28), transparent 62%),
+    radial-gradient(44rem 26rem at 96% -4%, rgba(31, 95, 191, 0.12), transparent 60%);
+  background-repeat: no-repeat;
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Display type: optical size follows font-size (Bricolage has an opsz axis). */
+.font-display {
+  font-optical-sizing: auto;
 }
 
 /* Vitals, timers and scores line up digit by digit. */
@@ -56,13 +270,46 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Dark "stage" tiles: deep teal gradient with one mint glow in the top-right corner. */
+.tile-ink {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(42rem 22rem at 100% 0%, rgba(94, 234, 212, 0.22), transparent 60%),
+    linear-gradient(160deg, #123a36 0%, var(--color-ink) 48%, var(--color-ink-deep) 100%);
+}
+
+.tile-primary {
+  background-color: var(--color-primary);
+  background-image: linear-gradient(160deg, #0d7f79 0%, var(--color-primary) 55%, var(--color-primary-strong) 100%);
+}
+
+/* Hairline grid for the hero stage (decorative). */
+.stage-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(60% 70% at 70% 40%, #000 30%, transparent 100%);
+}
+
+/*
+ * Reduced motion: no loops, no scroll-driven or entrance motion; every element
+ * jumps to its final state. Only opacity cross-fades of 150ms remain.
+ */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: opacity !important;
+    transition-duration: var(--dur-fast) !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+  .js [data-reveal] > * {
+    opacity: 1;
+    transform: none;
   }
 }

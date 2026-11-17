@@ -128,7 +128,7 @@ export default function ProfilePage() {
     <PageShell width="narrow" title={vi.profile.title}>
       <div className="space-y-6">
         <Card aria-labelledby="profile-account-heading" className="space-y-5">
-          <h2 id="profile-account-heading" className="text-xl font-bold tracking-tight text-ink">
+          <h2 id="profile-account-heading" className="font-display text-2xl font-bold tracking-tight text-ink">
             {vi.profile.accountHeading}
           </h2>
           {loadError ? (

@@ -407,9 +407,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   return (
     <main id="main" className="mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6">
       {/* Top bar: who the patient is, the mode, the clock, and the way out */}
-      <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-tile bg-surface px-5 py-4 sm:px-6">
+      <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 rounded-tile bg-surface px-5 py-4 shadow-lift ring-1 ring-line/70 sm:px-6">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
-          <h1 className="text-lg font-bold tracking-tight text-ink sm:text-xl">
+          <h1 className="font-display text-xl font-bold tracking-tight text-ink sm:text-2xl">
             {vi.session.patientName}
           </h1>
           <Badge tone={exam ? "info" : "primary"}>
@@ -484,8 +484,22 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
 
         <section
           aria-label={vi.workspace.regions.chat}
-          className="flex h-[75vh] min-h-[26rem] min-w-0 flex-col overflow-hidden rounded-tile bg-surface lg:sticky lg:top-4 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:h-[calc(100vh-10rem)]"
+          className="flex h-[75vh] min-h-[26rem] min-w-0 flex-col overflow-hidden rounded-tile bg-surface shadow-lift ring-1 ring-line/70 lg:sticky lg:top-4 lg:col-span-7 lg:col-start-6 lg:row-span-2 lg:row-start-1 lg:h-[calc(100vh-10rem)]"
         >
+          <div className="flex items-center gap-3 border-b border-line px-4 py-3 sm:px-6">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sand-soft text-sand-ink" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
+                <circle cx="10" cy="7" r="3.2" />
+                <path d="M3.5 20c.6-5.4 3.4-8.4 6.5-8.4s5.9 3 6.5 8.4z" />
+                <circle cx="16.5" cy="12.5" r="2.2" />
+                <path d="M12.8 20c.3-3.1 1.8-5 3.7-5s3.4 1.9 3.7 5z" />
+              </svg>
+            </span>
+            <div className="min-w-0">
+              <p className="font-display text-base font-bold leading-tight text-ink">{vi.session.mother}</p>
+              <p className="text-xs text-ink-muted">{vi.landing.stage.status}</p>
+            </div>
+          </div>
           <TranscriptBox
             turns={turns}
             pending={pending}

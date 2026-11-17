@@ -394,6 +394,8 @@
     "profile": "Hồ sơ",
     "signOut": "Đăng xuất",
     "menuLabel": "Mở menu tài khoản",
+    "team": "Sản phẩm dự thi P-Innovation của nhóm TRINITY, Học viện Công nghệ Bưu chính Viễn thông (PTIT).",
+    "footerLinks": "Liên kết",
     "footer": "Công cụ luyện tập hỏi bệnh. Phản hồi Auto-OSCE chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên."
   },
   "auth": {
@@ -479,6 +481,11 @@
   "landing": {
     "howLink": "Xem cách hoạt động",
     "featuresTitle": "Bạn làm gì trong một buổi luyện tập",
+    "art": {
+      "mouth": "Miệng",
+      "palm": "Lòng bàn tay",
+      "sole": "Lòng bàn chân"
+    },
     "features": {
       "voice": {
         "title": "Hỏi bệnh bằng giọng nói",
@@ -532,7 +539,36 @@
     "draftBody": "Ca bệnh, sinh hiệu và bảng kiểm hiện là bản nháp do nhóm phát triển biên soạn, chưa được bác sĩ thẩm định. Không dùng để ra quyết định lâm sàng.",
     "practiceTitle": "Chỉ là phản hồi luyện tập",
     "practiceBody": "Điểm Auto-OSCE và nhận xét chỉ mang tính học tập, không phải kết quả đánh giá chính thức và không thay thế giảng viên.",
-    "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn"
+    "privacyLink": "Cách chúng tôi xử lý dữ liệu của bạn",
+    "stage": {
+      "label": "Một lượt hỏi bệnh",
+      "speakerMother": "Người mẹ",
+      "speakerYou": "Bạn",
+      "status": "trả lời theo hồ sơ ca bệnh",
+      "student1": "Chào chị, bé sốt từ khi nào ạ?",
+      "mother1": "Dạ cháu sốt ba ngày rồi, cho uống thuốc hạ sốt thì bớt một chút rồi lại sốt lên.",
+      "student2": "Đêm qua bé có giật mình lúc ngủ không chị?",
+      "mother2": "Cháu nằm yên mà tự nhiên giật nảy cả người, lúc ngủ cũng hay giật mình.",
+      "flagLabel": "Dấu hiệu cảnh báo",
+      "flag": "Giật mình chới với",
+      "speaking": "Người mẹ đang nói",
+      "pause": "Tạm dừng hội thoại mẫu",
+      "play": "Phát tiếp hội thoại mẫu",
+      "mic": "Giữ để nói",
+      "caption": "Người mẹ chỉ nói những gì có trong hồ sơ ca bệnh. Điều gì không có, mẹ sẽ nói là không biết."
+    },
+    "titleLines": ["Luyện hỏi bệnh", "với bệnh nhân ảo,", "nhận phản hồi theo", "bảng kiểm OSCE"],
+    "monitor": {
+      "label": "Sinh hiệu lúc tiếp nhận trong ca mẫu",
+      "temp": "Nhiệt độ",
+      "pulse": "Mạch",
+      "resp": "Nhịp thở",
+      "spo2": "SpO₂",
+      "unitTemp": "°C",
+      "unitPerMin": "l/ph",
+      "noValue": "—"
+    },
+    "notesTitle": "Trước khi bắt đầu"
   },
   "errors": {
     "notFoundCode": "Lỗi 404",

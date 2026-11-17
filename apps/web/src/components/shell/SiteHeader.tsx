@@ -7,6 +7,7 @@ import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { buttonClass } from "@/components/ui/Button";
 import { FOCUS_RING } from "@/components/ui/focus";
+import BrandMark from "./BrandMark";
 
 /** Moves keyboard focus to the page's <main> (works on every page, no id needed). */
 function skipToMain(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -33,6 +34,18 @@ export default function SiteHeader() {
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileRef = useRef<HTMLDivElement>(null);
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Landing only: the bar sticks to the top and tightens once the page scrolls past 80px.
+  const sticky = pathname === "/";
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!sticky) return;
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [sticky]);
+  const tight = sticky && scrolled;
 
   // Close both menus after navigation (state adjusted during render, no effect).
   if (lastPath !== pathname) {
@@ -88,7 +101,11 @@ export default function SiteHeader() {
   const mobileLinkCls = `block rounded-control px-3 py-3 font-medium text-ink hover:bg-canvas ${FOCUS_RING}`;
 
   return (
-    <header className="px-3 pt-3 sm:px-6 sm:pt-4">
+    <header
+      className={`px-3 pt-3 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] sm:px-6 sm:pt-4 ${
+        sticky ? "sticky top-0 z-40" : ""
+      } ${tight ? "-translate-y-2" : ""}`}
+    >
       <a
         href="#main"
         onClick={skipToMain}
@@ -98,15 +115,23 @@ export default function SiteHeader() {
       </a>
       <nav
         aria-label={vi.a11y.mainNav}
-        className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 rounded-full bg-surface py-2 pl-5 pr-2 shadow-[0_1px_0_0_var(--color-line)]"
+        className={`relative isolate mx-auto flex max-w-7xl origin-top items-center justify-between gap-3 rounded-full py-2 pl-5 pr-2 ring-1 transition-transform duration-[var(--dur-base)] ease-[var(--ease-out)] ${
+          tight ? "scale-[0.96] ring-line-strong/60" : "ring-line/70"
+        }`}
         ref={mobileRef}
       >
-        <Link href="/" className={`flex items-center gap-2 rounded-full font-extrabold tracking-tight text-ink ${FOCUS_RING}`}>
-          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center rounded-full bg-primary">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </span>
+        {/* Background layer: only its opacity animates (frosted and lifted once scrolled). */}
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 -z-10 rounded-full bg-surface/95 shadow-lift backdrop-blur transition-opacity duration-[var(--dur-base)] ${
+            tight ? "opacity-100" : "opacity-80"
+          }`}
+        />
+        <Link
+          href="/"
+          className={`font-display flex items-center gap-2 rounded-full text-lg font-bold tracking-tight text-ink ${FOCUS_RING}`}
+        >
+          <BrandMark />
           {vi.nav.brand}
         </Link>
 
@@ -114,6 +139,9 @@ export default function SiteHeader() {
         <div className="hidden items-center gap-1 text-sm sm:flex">
           <Link href="/setup" className={linkCls}>
             {vi.nav.start}
+          </Link>
+          <Link href="/transparency" className={linkCls}>
+            {vi.transparency.navLink}
           </Link>
           {signedIn && (
             <Link href="/history" className={linkCls}>
@@ -200,6 +228,11 @@ export default function SiteHeader() {
               <li>
                 <Link href="/setup" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
                   {vi.nav.start}
+                </Link>
+              </li>
+              <li>
+                <Link href="/transparency" className={mobileLinkCls} onClick={() => setMobileOpen(false)}>
+                  {vi.transparency.navLink}
                 </Link>
               </li>
               {signedIn && (

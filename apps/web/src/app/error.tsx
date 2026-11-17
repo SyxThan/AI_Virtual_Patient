@@ -35,14 +35,14 @@ export default function RouteError({
             <h1
               ref={headingRef}
               tabIndex={-1}
-              className="text-3xl font-extrabold tracking-tight text-ink outline-none sm:text-4xl"
+              className="font-display text-4xl font-bold tracking-tight text-ink outline-none sm:text-5xl"
             >
               {vi.errors.errorTitle}
             </h1>
             <p className="text-ink">{vi.errors.errorBody}</p>
           </div>
         </Tile>
-        <Tile tone="surface" className="flex flex-col justify-between gap-6 border border-line sm:col-span-2">
+        <Tile tone="surface" className="flex flex-col justify-between gap-6 sm:col-span-2">
           {error.digest ? (
             <p className="text-sm break-all text-ink-muted">{fmt(vi.errors.errorRef, { digest: error.digest })}</p>
           ) : (

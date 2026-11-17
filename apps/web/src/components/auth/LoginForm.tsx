@@ -6,6 +6,7 @@ import { useState } from "react";
 import vi from "../../../messages/vi.json";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { buttonClass } from "@/components/ui/Button";
+import { PAGE_TITLE } from "@/components/ui/PageShell";
 import { FOCUS_RING } from "@/components/ui/focus";
 import { authErrorMessage, safeNext } from "@/components/auth/authErrors";
 import { fmt } from "@/lib/sessionAuth";
@@ -111,7 +112,7 @@ export default function LoginForm() {
   if (!configured) {
     return (
       <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{vi.auth.title}</h1>
+        <h1 className={PAGE_TITLE}>{vi.auth.title}</h1>
         <p role="status" className={ALERT}>
           {vi.auth.unavailable}
         </p>
@@ -140,7 +141,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h1>
+      <h1 className={PAGE_TITLE}>{title}</h1>
 
       {status === "signedIn" && signedInEmail && mode !== "reset" && (
         <p className="rounded-control bg-primary-soft px-4 py-3 text-sm text-primary-strong">

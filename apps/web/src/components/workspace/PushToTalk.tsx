@@ -90,10 +90,15 @@ export default function PushToTalk({
           }`}
         >
           {recording ? (
-            <span
-              className="h-3 w-3 animate-pulse rounded-full bg-primary-soft motion-reduce:animate-none"
-              aria-hidden="true"
-            />
+            <span className="flex h-6 items-center gap-[3px]" aria-hidden="true">
+              {[0.5, 0.9, 0.6, 1, 0.7, 0.4, 0.8].map((h, i) => (
+                <span
+                  key={i}
+                  className="w-[3px] origin-center rounded-full bg-glow motion-safe:animate-wave"
+                  style={{ height: `${h * 100}%`, animationDelay: `${i * 110}ms` }}
+                />
+              ))}
+            </span>
           ) : (
             <MicIcon />
           )}

@@ -63,6 +63,8 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48); judge PR #49 |
 | **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | 🟡 PR mở |
 | **AVP-140** | **Slice 19** (`TASK-S19-01`) | Cảnh 3D phòng khám nhi (`mother_child.glb`): loader, collider theo model, mẹ nói/chớp mắt/nhìn người học, ban minh hoạ | **P0** | 🟡 PR mở |
+| **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | 🟡 PR mở |
+| **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
 
 ---
 
@@ -424,6 +426,14 @@ Người dùng chọn hướng C (lưới bento) ngày 2026-11-14 từ 4 phươn
 #### `TASK-S15-06` [P0]: Tích hợp & kiểm tra (AVP-130)
 * **Mô tả:** Gộp các PR S15-02..05, sửa chỗ lệch hệ thiết kế, kiểm tra trình duyệt (Playwright) ở 3 độ rộng + axe trên mọi trang, cập nhật tài liệu.
 * **Tiêu chí hoàn thành:** build + lint pass; báo cáo kiểm tra không còn lỗi serious/critical.
+
+#### `TASK-S15-07` [P1]: Bento Clinical v2, giao diện ấn tượng hơn (AVP-141)
+* **Mô tả:** Người dùng thấy giao diện v1 quá đơn giản (2026-11-16). Giữ lưới bento và bảng màu; thêm font hiển thị Bricolage Grotesque (bộ chữ tiếng Việt), nền có hai vùng sáng mềm, ô `surface` có viền mảnh + bóng nhẹ, ô `ink` thành sân khấu gradient. Trang chủ: hero là một lượt hỏi bệnh thật lấy từ ca (bong bóng mẹ/sinh viên, nút giữ để nói, sóng âm) với một chuỗi hiện dần khi tải; minh hoạ SVG vẽ tay cho từng tính năng; "Cách hoạt động" dạng đường ray đánh số; footer có nhóm TRINITY. Setup: ô ca bệnh kiểu bìa hồ sơ, ô bắt đầu trên nền tối. Workspace: lời mẹ trên nền `sand`, sóng âm khi ghi âm. Debrief: vòng điểm quanh điểm tổng. Không số liệu bịa, không chữ "chứng chỉ", `prefers-reduced-motion` tắt mọi chuyển động.
+* **Tiêu chí hoàn thành:** tsc + lint + build pass; 360px/1280px không cuộn ngang; `docs/specs/ui-design.md` cập nhật.
+
+#### `TASK-S15-08` [P1]: Landing page có chuyển động (AVP-142)
+* **Mô tả:** Người dùng yêu cầu ngày 2026-11-16 (ghi đè quy tắc "một chuyển động tự chạy" cho riêng landing) và đồng ý thêm thư viện `motion`. Monitor điện tim tự vẽ rồi chạy như máy thật, sinh hiệu lấy từ ca, hội thoại mẫu 10 giây lấy nguyên văn lời mẹ trong ca, minh hoạ động cho từng tính năng, hiện nội dung khi cuộn, "Cách hoạt động" ghim khi cuộn, vi tương tác. Chi tiết trong `docs/specs/ui-design.md` mục "Landing motion".
+* **Tiêu chí hoàn thành:** tsc + lint + build pass; 390px/1440px không cuộn ngang; không JS vẫn đọc được đủ chữ; reduced motion không còn vòng lặp; CLS < 0.05; Lighthouse mobile báo trước/sau trong PR.
 
 ---
 

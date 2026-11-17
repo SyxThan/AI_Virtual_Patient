@@ -55,7 +55,7 @@ export default function Modal({
         className={`max-h-[90vh] w-full overflow-y-auto rounded-t-tile bg-surface p-6 text-ink shadow-xl outline-none sm:rounded-tile ${className}`}
       >
         <div className="flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-lg font-bold tracking-tight">
+          <h2 id={titleId} className="font-display text-xl font-bold tracking-tight">
             {title}
           </h2>
           {showClose && (

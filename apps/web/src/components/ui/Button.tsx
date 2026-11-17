@@ -5,12 +5,12 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "inve
 export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: `bg-primary text-white hover:bg-primary-strong ${FOCUS_RING}`,
-  secondary: `border border-line-strong bg-surface text-ink hover:bg-canvas ${FOCUS_RING}`,
+  primary: `bg-primary text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] hover:-translate-y-0.5 hover:bg-[#0d7f79] ${FOCUS_RING}`,
+  secondary: `border border-line-strong bg-surface text-ink hover:border-ink/40 hover:bg-canvas ${FOCUS_RING}`,
   ghost: `text-ink hover:bg-ink/5 ${FOCUS_RING}`,
   danger: `bg-danger text-white hover:bg-danger/90 ${FOCUS_RING}`,
   // On dark (ink) tiles.
-  inverse: `bg-surface text-ink hover:bg-primary-soft ${FOCUS_RING_DARK}`,
+  inverse: `bg-surface text-ink shadow-[0_8px_24px_-12px_rgba(0,0,0,0.6)] hover:-translate-y-0.5 hover:bg-primary-soft ${FOCUS_RING_DARK}`,
 };
 
 // Every size keeps a >= 44px touch target except `sm` (dense toolbars only).
@@ -36,8 +36,9 @@ export function buttonClass({
   className?: string;
 } = {}): string {
   return [
-    "inline-flex items-center justify-center gap-2 font-semibold transition-colors",
-    "disabled:cursor-not-allowed disabled:opacity-50",
+    // Only transform animates (--dur-fast); colors switch instantly. Press sinks 1px.
+    "inline-flex items-center justify-center gap-2 font-semibold transition-transform duration-[var(--dur-fast)] ease-[var(--ease-out)] active:translate-y-px motion-reduce:hover:translate-y-0",
+    "disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0",
     pill ? "rounded-full" : "rounded-control",
     SIZES[size],
     VARIANTS[variant],

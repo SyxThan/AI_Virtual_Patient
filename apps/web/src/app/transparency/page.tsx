@@ -5,7 +5,7 @@ import MetricTile from "@/components/transparency/MetricTile";
 import Badge from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import PageShell from "@/components/ui/PageShell";
+import PageShell, { PAGE_TITLE } from "@/components/ui/PageShell";
 import {
   evalsSummary,
   fill,
@@ -31,7 +31,7 @@ export default function TransparencyPage() {
     <PageShell width="default">
       <header className="mb-8 space-y-3">
         <Badge tone="info">{T.badge}</Badge>
-        <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">{T.title}</h1>
+        <h1 className={PAGE_TITLE}>{T.title}</h1>
         <p className="max-w-[68ch] text-ink-muted">{T.intro}</p>
       </header>
 
@@ -178,7 +178,7 @@ export default function TransparencyPage() {
       </div>
 
       <Card as="section" className="mt-6 space-y-3" aria-labelledby="targets-title">
-        <h2 id="targets-title" className="text-lg font-bold tracking-tight text-ink">
+        <h2 id="targets-title" className="font-display text-xl font-bold tracking-tight text-ink">
           {T.targetsTitle}
         </h2>
         <ul className="max-w-[68ch] list-disc space-y-2 pl-5 leading-relaxed text-ink marker:text-primary">
