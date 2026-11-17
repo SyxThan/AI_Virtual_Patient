@@ -31,6 +31,7 @@ dev:
 
 test:
 > cd $(API_DIR) && python -m pytest -q
+> cd $(WEB_DIR) && npm test
 
 lint:
 > cd $(API_DIR) && python -m ruff check .

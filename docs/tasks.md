@@ -19,7 +19,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-009, AVP-011** | **Slice 3** (`TASK-S3-01`) | Patient Agent service, 3-tier guardrails, prompt cache | **P0** | ✅ Merged (PR #9, #11) |
 | **AVP-010, AVP-012** | **Slice 3** (`TASK-S3-02`) | Transcript Box, text turn loop (`POST /sessions/{id}/turns`) | **P0** | ✅ Merged (PR #9, #10) |
 | **AVP-102** | **Slice 4** (`TASK-S4-01`) | Vitals State Machine engine backend (5 trạng thái HFMD) | **P0** | ✅ Merged (PR #12) |
-| **AVP-102** | **Slice 4** (`TASK-S4-02`) | Monitor sinh hiệu frontend (`VitalsMonitor.tsx`) | **P0** | ✅ Merged (PR #12) |
+| **AVP-102** | **Slice 4** (`TASK-S4-02`) | Monitor sinh hiệu frontend (`VitalsMonitor.tsx`) | **P0** | ✅ Merged (PR #12); UI đã gỡ khỏi trang khám ngày 16/11/2026, API vẫn giữ |
 | **AVP-104** | **Slice 5** (`TASK-S5-01`) | Three.js canvas, avatar 3D người mẹ bế bé | **P0** | ✅ Merged (PR #13) |
 | **AVP-101, AVP-104** | **Slice 5** (`TASK-S5-02`) | Raycasting 4 vùng khám | **P0** | ✅ Merged (PR #14) |
 | **AVP-104** | **Slice 5** (`TASK-S5-03`) | Lip-sync cơ bản theo biên độ audio | **P1** | ✅ Merged (PR #15) |
@@ -62,6 +62,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-137** | **Slice 17** (`TASK-S17-03`) | `run.bat` mở server STT + hướng dẫn cài đặt | **P1** | ✅ Merged (PR #44) |
 | **AVP-011** | **Slice 18** | Bộ red-team guardrail `evals/redteam.py` (80 câu, 8 nhóm) + LLM-judge, mẫu người kiểm | **P0** | ✅ Merged (PR #48); judge PR #49 |
 | **AVP-139** | **Slice 18** | Trang `/transparency` "Minh bạch số liệu" + `evals/publish_summary.py` | **P1** | 🟡 PR mở |
+| **AVP-140** | **Slice 19** (`TASK-S19-01`) | Cảnh 3D phòng khám nhi (`mother_child.glb`): loader, collider theo model, mẹ nói/chớp mắt/nhìn người học, ban minh hoạ | **P0** | 🟡 PR mở |
 | **AVP-141** | **Slice 15** (`TASK-S15-07`) | Giao diện "Bento Clinical v2": font hiển thị, hero hội thoại, minh hoạ tile, chiều sâu bề mặt trên mọi trang | **P1** | 🟡 PR mở |
 | **AVP-142** | **Slice 15** (`TASK-S15-08`) | Landing page có chuyển động: monitor điện tim sống, hội thoại mẫu, minh hoạ động, "Cách hoạt động" ghim khi cuộn (thêm `motion`) | **P1** | 🟡 PR mở |
 
@@ -89,6 +90,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **Slice 16** | Giọng nói người bệnh bằng VieNeu-TTS | **P0** | ✅ Hoàn tất (PR #39–#41) |
 | **Slice 17** | Micro chạy tại máy: nhận dạng giọng nói bằng Whisper tự host | **P0** | ✅ Merged (PR #42–#44) |
 | **Slice 18** | Bằng chứng: đo độ trễ, độ lặp lại Evaluator, red-team guardrail (`evals/`) | **P0** | 🟡 PR #46 ✅, #47, red-team |
+| **Slice 19** | Dựng lại cảnh 3D: phòng khám nhi, mẹ bế bé (`docs/specs/avatar-asset.md`) | **P0** | 🟡 PR mở (AVP-140) |
 
 **Thứ tự đề xuất cho Giai đoạn 2:** S12-01 → S10-01 → S10-02 → S11-01 → S11-02 → S13-01 → S12-02 → S14-04 → S14-01 → S14-02 → các task P1/P2. Lý do: app shell và đăng nhập là nền cho lịch sử; xoá dữ liệu phải có trước khi cho người thật dùng (`database.md` §6); giới hạn chi phí phải có trước khi deploy công khai.
 
@@ -466,6 +468,19 @@ Người dùng duyệt ngày 2026-11-15 (đề xuất "A" trong kế hoạch ph�
 #### `TASK-S17-03` [P1]: Chạy server STT cùng dự án (AVP-137)
 * **Mô tả:** `run.bat` mở thêm cửa sổ STT (cổng 8890) khi `STT_PROVIDER=whisper`; README hướng dẫn cài (CPU/GPU, đặt cache model ngoài ổ C) và cấu hình `.env`.
 * **Tiêu chí hoàn thành:** `run.bat` mở đủ cửa sổ; không cấu hình thì hành vi như cũ; một lượt nói thật qua micro ra đúng chữ và người bệnh trả lời.
+
+---
+
+### Slice 19: Dựng lại cảnh 3D phòng khám nhi
+
+Thay hình khối procedural của Slice 5 bằng cảnh `mother_child.glb` do team dựng bằng Blender (nguồn và script build trong `assets/avatar/`, contract trong `docs/specs/avatar-asset.md`). Giữ three.js thuần, không thêm thư viện npm.
+
+#### `TASK-S19-01` [P0]: Cảnh 3D phòng khám, khám trên model, mẹ "sống" (AVP-140)
+* **Mô tả:** `ModelLoader` (GLTF + Draco tự host ở `/draco/`, tải trước song song với chunk three.js, cache một lần mỗi trang); `clinicRig` kiểm tra contract (bone `head`, morph `jawOpen`/`eyeBlink_*`, 4 collider, `child_skin`), sai contract thì về model procedural; máy không có WebGL thì hiện thông báo và vẫn khám bằng nút. 3 góc nhìn (Toàn cảnh, Trò chuyện, Khám bé) tính từ hộp bao của model; bấm vùng khám thì camera bay tới vùng đó và mẹ nhìn xuống bé. Mẹ lip-sync bằng `jawOpen` theo giọng người bệnh, chớp mắt, thở, quay đầu nhìn người học. Nút vùng khám liên kết hai chiều với model (rê nút làm sáng vùng trên da bé, hiện "Đã khám"). Lớp ban **minh hoạ** chỉ hiện ở vùng đã khám **và** backend trả `documented=true`.
+* **Hiệu năng:** shadow map tĩnh (vẽ một lần), raycast tối đa một lần mỗi khung hình, dừng vòng render khi khung 3D ra khỏi màn hình, tự hạ pixel ratio và tắt bóng nếu máy yếu (< ~42 fps trong 2 giây đầu). Cuộn chuột thường cuộn trang; Ctrl + cuộn hoặc toàn màn hình mới phóng to.
+* **File liên quan:** `apps/web/src/components/avatar/*`, `apps/web/public/models/mother_child.glb`, `apps/web/public/draco/`, `assets/avatar/`.
+* **Tiêu chí hoàn thành:** `npm test` (contract helpers), `npm run lint`, `tsc`, `next build` qua; cảnh tải được model thật trên trình duyệt; vùng `documented=false` không bao giờ có ban.
+* **Còn mở:** `TODO(clinician)` texture ban thật thay cho hoa văn procedural; có cần cảnh cởi quần để khám mông không (contract §5); lớp ban quanh miệng hiện trên da mặt, cần bác sĩ xác nhận cách minh hoạ tổn thương niêm mạc miệng. Chưa đo fps bằng script trong `evals/` nên chưa có số liệu (Hard Rule 3).
 
 ---
 

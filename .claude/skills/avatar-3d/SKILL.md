@@ -10,18 +10,30 @@ Guidance for implementing the Three.js 3D avatar (Mother holding child) and inte
 ## Stack & Conventions
 - **Engine:** Three.js (`three`, `@types/three`).
 - **Integration:** React client component loaded via `dynamic(() => import(...), { ssr: false })` to prevent SSR window errors.
-- **Model Format:** `.glb` / `.gltf` loaded via `GLTFLoader`. When 3D assets are pending, provide a stylized low-poly procedural rig fallback with matching mesh colliders.
-- **Coordinate Space:** Normalized units, centered at `(0, 0, 0)`, camera at `(0, 1.2, 2.5)` with `OrbitControls` limited to front and side view (preventing flipping behind the wall).
+- **Model:** `apps/web/public/models/mother_child.glb` (Draco; decoder self-hosted in `public/draco/`). The asset contract is `docs/specs/avatar-asset.md`; code relies ONLY on what it lists. Blender source + build/validate scripts: `assets/avatar/`.
+- **Coordinate Space:** metres, origin between the mother's feet on the floor, +Y up, characters face +Z. Room walls at −Z and −X: camera views always look from the front-right (`cameraViews.ts`), OrbitControls azimuth/polar limits keep it out of the walls.
+- **Fallback:** a file that breaks the contract or fails to load falls back to the procedural rig (`AnatomyColliders.ts`) with the same 4 colliders; no WebGL shows a notice and the exam buttons still work.
 
 ## Directory Structure
 ```
 apps/web/src/components/avatar/
-  AvatarCanvas.tsx        # Main Three.js Canvas container (SSR disabled)
-  ModelLoader.ts          # GLTFLoader with caching and procedural fallback
-  RaycastExam.tsx         # Raycasting event handler for physical exam regions
-  LipSyncController.ts    # Audio amplitude to mouth blend-shape / jaw bone mapping
-  AnatomyColliders.ts     # Definition of exam target meshes
+  AvatarCanvas.tsx        # Tile UI: stage, view presets, tooltip, region buttons (main chunk, no three import)
+  AvatarScene.tsx         # three.js scene: renderer, picking, camera flights, render loop (dynamic, ssr:false)
+  avatarContract.ts       # Pure constants/helpers from the contract (tested with node --test)
+  modelBytes.ts           # One cached .glb download + progress; no three import (prefetch from AvatarCanvas)
+  ModelLoader.ts          # GLTFLoader + DRACOLoader parse
+  clinicRig.ts            # Contract checks, colliders, morphs, head look-at, blink, breathing
+  lesionSkin.ts           # child_skin shader patch: region hover + ILLUSTRATIVE lesion reveal
+  cameraViews.ts          # Framings computed from model boxes + eased camera flight
+  sceneRig.ts             # SceneRig interface shared by model and fallback
+  AnatomyColliders.ts     # Procedural fallback rig
+  LipSyncController.ts    # Audio amplitude -> mouth level (drives jawOpen)
+  ExamFindingPanel.tsx    # Finding modal (text verbatim from case JSON via backend)
 ```
+
+## Safety rules specific to the avatar
+- The model carries no clinical data. Lesions are an illustrative procedural pattern, shown only for regions examined AND `documented === true`; never for unknown regions (Hard Rule 1). Label it "minh hoạ, chờ bác sĩ duyệt".
+- Part `info` strings in the .glb contain authoring notes: show only `label` to learners.
 
 ## Raycasting Anatomy Regions (HFMD Specific)
 The 4 primary examination regions for Hand, Foot, and Mouth Disease:

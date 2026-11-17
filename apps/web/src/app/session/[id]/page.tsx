@@ -4,7 +4,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import vi from "../../../../messages/vi.json";
-import type { ExamRegionId } from "@/components/avatar/AnatomyColliders";
+import {
+  parseFindings,
+  type ExamRegionId,
+  type RegionFindings,
+} from "@/components/avatar/avatarContract";
 import AvatarCanvas from "@/components/avatar/AvatarCanvas";
 import ExamFindingPanel, { type ExamActionResponse } from "@/components/avatar/ExamFindingPanel";
 import { patientLipSync } from "@/components/avatar/LipSyncController";
@@ -19,7 +23,6 @@ import FinishDialog from "@/components/workspace/FinishDialog";
 import PushToTalk from "@/components/workspace/PushToTalk";
 import SessionTimer from "@/components/workspace/SessionTimer";
 import TranscriptBox, { type PendingTurn, type Turn } from "@/components/workspace/TranscriptBox";
-import VitalsMonitor from "@/components/workspace/VitalsMonitor";
 import {
   useVoiceSession,
   type LockReason,
@@ -61,6 +64,15 @@ async function errorCode(res: Response): Promise<string | null> {
   }
 }
 
+/** Exam findings kept for this tab (sessionStorage may be blocked: then none). */
+function readFindings(key: string): RegionFindings {
+  try {
+    return parseFindings(window.sessionStorage.getItem(key));
+  } catch {
+    return {};
+  }
+}
+
 export default function SessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
@@ -85,8 +97,28 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   const [examResult, setExamResult] = useState<ExamActionResponse | null>(null);
   const [examLoading, setExamLoading] = useState(false);
   const [examError, setExamError] = useState<string | null>(null);
+  // Regions examined in this session -> `documented` (drives the avatar's region
+  // status and illustrative lesion layer). Per-viewer convenience only: kept in
+  // sessionStorage so a reload keeps it; the transcript stays the source of truth.
+  const [examFindings, setExamFindings] = useState<RegionFindings>({});
 
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const findingsKey = `avp.exam-findings.${id}`;
+  const recordFinding = useCallback(
+    (region: ExamRegionId, documented: boolean) => {
+      setExamFindings((cur) => {
+        const next = { ...cur, [region]: documented };
+        try {
+          window.sessionStorage.setItem(findingsKey, JSON.stringify(next));
+        } catch {
+          // storage blocked: the in-memory state still works
+        }
+        return next;
+      });
+    },
+    [findingsKey],
+  );
 
   const goToDebrief = useCallback(() => {
     setLoad("redirecting");
@@ -133,7 +165,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
   }, [voice.analyser]);
 
   // Restore on load / reload (T-SESSION-01): session (mode, status), transcript,
-  // guide (timer start, limit, checklist). Vitals restore inside VitalsMonitor.
+  // guide (timer start, limit, checklist).
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -160,6 +192,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         if (cancelled) return;
         setMeta(s);
         setTurns(t);
+        setExamFindings(readFindings(`avp.exam-findings.${id}`));
         setLoad("ready");
         if (!onboardingSeen()) setOnboardingOpen(true);
       } catch {
@@ -301,7 +334,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error();
-      setExamResult((await res.json()) as ExamActionResponse);
+      const result = (await res.json()) as ExamActionResponse;
+      setExamResult(result);
+      if (result.action === "examine_region" && result.region) recordFinding(result.region, result.documented);
       // The exam was recorded as transcript turns: reload the canonical transcript.
       await reloadTurns();
     } catch {
@@ -432,7 +467,7 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
         </div>
       )}
 
-      {/* < 1024 px: one column, avatar -> monitor -> chat (-> checklist).
+      {/* < 1024 px: one column, avatar -> chat (-> checklist).
           >= 1024 px: patient column left (5/12), chat column right (7/12). */}
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-start">
         <section
@@ -442,9 +477,9 @@ export default function SessionPage({ params }: { params: Promise<{ id: string }
           <AvatarCanvas
             onExamineRegion={examineRegion}
             onObserve={observeChild}
+            findings={examFindings}
             busy={examLoading || !!lock}
           />
-          <VitalsMonitor sessionId={id} disabled={!!lock} />
         </section>
 
         <section

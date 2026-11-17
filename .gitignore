@@ -25,3 +25,6 @@ skills-lock.json
 
 # Written by `next dev` (Next 16 agent rules) on every start
 apps/web/AGENTS.md
+
+# Blender build output (assets/avatar/build.sh)
+assets/avatar/out/
