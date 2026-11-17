@@ -1,0 +1,89 @@
+{
+  "corpus": "dengue-guidelines",
+  "corpus_version": 1,
+  "case_id": "case-02-dengue",
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-07, AVP-152). Mỗi chunk là bản TÓM TẮT do tác giả viết lại bằng tiếng Việt (origin: author_added), KHÔNG phải trích nguyên văn. Chưa có bác sĩ đối chiếu với bản gốc.",
+      "Nội dung lấy từ các tài liệu tập huấn của cơ sở y tế tóm tắt 2760/QĐ-BYT (Sở Y tế/BV tỉnh), không phải từ PDF gốc. TODO(clinician): so từng chunk với PDF gốc 2760/QĐ-BYT ngày 04/07/2023 và thêm số trang vào `section`.",
+      "TODO(clinician): phác đồ truyền dịch cho trẻ < 16 tuổi có dấu hiệu cảnh báo cố ý KHÔNG đưa vào (chưa đọc được bản gốc). Chỉ thêm từ văn bản gốc.",
+      "TODO(clinician): bản phân độ trên web ghi 'sốt ≤ 7 ngày'; bản 2011 ghi 'sốt cao đột ngột, liên tục từ 2-7 ngày'. Xác nhận câu chữ của bản 2023.",
+      "rights_checked=false: văn bản Bộ Y tế là tài liệu chuyên môn công khai, nhưng chưa có xác nhận quyền của chủ dự án cho Slice này."
+    ]
+  },
+  "documents": [
+    {
+      "source_key": "moh-qd-2760-2023",
+      "title": "Hướng dẫn chẩn đoán, điều trị sốt xuất huyết Dengue (Quyết định 2760/QĐ-BYT ngày 04/07/2023)",
+      "publisher": "Bộ Y tế",
+      "year": 2023,
+      "license_note": "Tài liệu hướng dẫn chuyên môn công khai của Bộ Y tế Việt Nam",
+      "rights_checked": false,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "Đại cương và phân độ",
+          "text": "Tóm tắt: sốt xuất huyết Dengue do vi rút Dengue (4 týp DEN-1 đến DEN-4) gây ra. Tái nhiễm týp khác thường nặng hơn lần đầu. Bệnh chia 3 mức độ (theo WHO 2009): sốt xuất huyết Dengue; sốt xuất huyết Dengue có dấu hiệu cảnh báo; sốt xuất huyết Dengue nặng. Mức độ có thể thay đổi trong quá trình bệnh nên phải đánh giá lại nhiều lần."
+        },
+        {
+          "section": "Giai đoạn lâm sàng - Giai đoạn sốt",
+          "text": "Tóm tắt: sốt cao đột ngột, liên tục; nhức đầu, chán ăn, buồn nôn; da xung huyết; đau cơ, đau khớp, nhức hai hố mắt. Nghiệm pháp dây thắt có thể dương tính; có thể có chấm xuất huyết dưới da, chảy máu chân răng hoặc chảy máu mũi. Xét nghiệm: Hct bình thường; tiểu cầu bình thường hoặc giảm dần nhưng còn trên 100.000/mm3; bạch cầu thường giảm."
+        },
+        {
+          "section": "Giai đoạn lâm sàng - Giai đoạn nguy hiểm",
+          "text": "Tóm tắt: thường vào ngày thứ 3-7 của bệnh. Người bệnh có thể còn sốt hoặc đã giảm sốt. Có thể xuất hiện dấu hiệu cảnh báo và biểu hiện thoát huyết tương: tràn dịch màng phổi, màng bụng, phù mi mắt, gan to, có thể đau. Thoát huyết tương nhiều dẫn đến sốc. Xét nghiệm: cô đặc máu khi Hct tăng trên 20% so với giá trị ban đầu của người bệnh (hoặc so với trung bình dân số cùng tuổi); tiểu cầu giảm dưới 100.000/mm3; AST/ALT thường tăng."
+        },
+        {
+          "section": "Giai đoạn lâm sàng - Giai đoạn hồi phục",
+          "text": "Tóm tắt: sau giai đoạn nguy hiểm, người bệnh hết sốt, thèm ăn, tiểu nhiều, huyết động ổn định. Có thể có ban hồi phục, ngứa, nhịp tim chậm. Hct về bình thường hoặc thấp hơn do pha loãng máu khi dịch được tái hấp thu; bạch cầu hồi phục trước, tiểu cầu hồi phục chậm hơn."
+        },
+        {
+          "section": "Phụ lục 2 - Phân độ: Sốt xuất huyết Dengue",
+          "text": "Tóm tắt: sống hoặc đến vùng có dịch; sốt (bản web ghi ≤ 7 ngày) kèm ít nhất 2 trong các dấu hiệu: buồn nôn hoặc nôn; phát ban; đau cơ, đau khớp, nhức hai hố mắt; xuất huyết da hoặc dấu dây thắt dương tính. Xét nghiệm: Hct bình thường hoặc tăng; bạch cầu bình thường hoặc giảm; tiểu cầu bình thường hoặc giảm."
+        },
+        {
+          "section": "Phụ lục 2 - Phân độ: Dấu hiệu cảnh báo",
+          "text": "Tóm tắt: có ít nhất 1 trong các dấu hiệu: vật vã, lừ đừ, li bì; đau bụng nhiều và liên tục hoặc tăng cảm giác đau vùng gan; nôn ói nhiều (từ 3 lần trong 1 giờ hoặc từ 4 lần trong 6 giờ); xuất huyết niêm mạc (chảy máu chân răng, mũi, nôn ra máu, tiêu phân đen hoặc có máu, xuất huyết âm đạo, tiểu máu); gan to trên 2 cm dưới bờ sườn; tiểu ít; Hct tăng kèm tiểu cầu giảm nhanh; AST/ALT từ 400 U/L trở lên (khi có điều kiện xét nghiệm); tràn dịch màng phổi, màng bụng trên siêu âm hoặc X-quang (khi có điều kiện)."
+        },
+        {
+          "section": "Phụ lục 2 - Phân độ: Sốt xuất huyết Dengue nặng",
+          "text": "Tóm tắt: có ít nhất 1 trong các biểu hiện: (1) thoát huyết tương nặng dẫn tới sốc sốt xuất huyết Dengue hoặc sốc nặng, hoặc ứ dịch gây suy hô hấp; (2) xuất huyết nặng; (3) suy tạng: gan (AST hoặc ALT từ 1000 U/L trở lên), thần kinh trung ương (rối loạn ý thức), tim và các cơ quan khác. Dấu hiệu sốc: vật vã, bứt rứt hoặc li bì; lạnh đầu chi, da lạnh ẩm; mạch nhanh nhỏ; huyết áp kẹt (hiệu số huyết áp tâm thu - tâm trương ≤ 20 mmHg); tụt huyết áp hoặc không đo được huyết áp, mạch; tiểu ít."
+        },
+        {
+          "section": "Chẩn đoán xét nghiệm",
+          "text": "Tóm tắt: xét nghiệm kháng nguyên NS1 từ ngày 1 đến ngày 7 (nhạy nhất trong 5 ngày đầu). Nếu NS1 âm tính, làm huyết thanh IgM/IgG từ ngày thứ 5. Có thể làm PCR hoặc phân lập vi rút trong giai đoạn sốt. Chẩn đoán phân biệt gồm các bệnh sốt phát ban do vi rút khác, tay chân miệng, sốt mò, sốt rét, nhiễm khuẩn huyết, bệnh lý huyết học và bệnh lý ngoại khoa vùng bụng."
+        },
+        {
+          "section": "Điều trị - Sốt xuất huyết Dengue (ngoại trú)",
+          "text": "Tóm tắt: phần lớn điều trị ngoại trú và theo dõi tại nhà. Hạ sốt chỉ dùng paracetamol 10-15 mg/kg/lần, cách mỗi 4-6 giờ, tổng liều không quá 60 mg/kg/24 giờ. Không dùng aspirin, analgin, ibuprofen (nguy cơ xuất huyết, toan máu). Uống nhiều nước: oresol, nước trái cây, nước cháo loãng với muối; tránh đồ uống có màu sẫm. Khám lại và xét nghiệm hằng ngày. Cân nhắc nhập viện với người sống một mình, ở xa cơ sở y tế, phụ nữ có thai, nhũ nhi, người cao tuổi, béo phì hoặc có bệnh mạn tính."
+        },
+        {
+          "section": "Điều trị - Có dấu hiệu cảnh báo",
+          "text": "Tóm tắt: người bệnh có dấu hiệu cảnh báo phải nhập viện điều trị. Hạ sốt; bù dịch sớm bằng đường uống nếu uống được; theo dõi mạch, huyết áp, dấu hiệu cảnh báo, lượng dịch vào ra và Hct. Truyền dịch khi nôn nhiều, không uống được, Hct tăng cao hoặc mất nước. Tốc độ truyền và cách giảm dần theo bảng riêng cho người ≥ 16 tuổi và trẻ < 16 tuổi trong văn bản gốc (chưa đưa vào bản tóm tắt này)."
+        },
+        {
+          "section": "Tư vấn - Dấu hiệu cần đến viện ngay",
+          "text": "Tóm tắt: dặn người bệnh hoặc người nhà đưa đến cơ sở y tế ngay khi: không ăn uống được; nôn nhiều; đau bụng nhiều; tay chân lạnh, ẩm; mệt lả, bứt rứt; chảy máu mũi, miệng hoặc xuất huyết âm đạo; không tiểu trên 6 giờ; thay đổi hành vi như lú lẫn, tăng kích thích, vật vã hoặc li bì."
+        }
+      ]
+    },
+    {
+      "source_key": "nd1-sxhd-nang-2023",
+      "title": "Cập nhật điều trị sốt xuất huyết Dengue nặng ở trẻ em 2023 (BV Nhi Đồng 1)",
+      "publisher": "Bệnh viện Nhi Đồng 1 TP.HCM",
+      "year": 2023,
+      "license_note": "Tài liệu hội nghị công khai của bệnh viện; dùng trích dẫn cho mục đích đào tạo, cần ghi nguồn",
+      "rights_checked": false,
+      "review_status": "draft",
+      "chunks": [
+        {
+          "section": "Ngưỡng huyết áp theo tuổi ở trẻ em",
+          "text": "Tóm tắt: tụt huyết áp ở trẻ 2-10 tuổi khi huyết áp tâm thu dưới (70 + 2 × tuổi) mmHg; trên 10 tuổi khi dưới 90 mmHg. Huyết áp trung bình mục tiêu khi hồi sức: ≥ 50 mmHg (≤ 1 tuổi), ≥ 60 mmHg (≤ 10 tuổi), ≥ 65 mmHg (> 10 tuổi). Lưu ý: ký hiệu so sánh trong bản trích bị lỗi; phải đối chiếu."
+        }
+      ]
+    }
+  ]
+}

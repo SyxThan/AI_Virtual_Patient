@@ -1,0 +1,903 @@
+{
+  "schema_version": "1",
+  "id": "case-02-dengue",
+  "title": {
+    "vi": "Sốt xuất huyết Dengue (trẻ em)",
+    "en": "Dengue with warning signs (child)"
+  },
+  "specialty": "Nhi - Truyền nhiễm",
+  "source": {
+    "document": "Hướng dẫn chẩn đoán, điều trị sốt xuất huyết Dengue (Quyết định 2760/QĐ-BYT ngày 04/07/2023)",
+    "year": 2023,
+    "section": "Phụ lục 2. Phân độ sốt xuất huyết Dengue; dấu hiệu cảnh báo",
+    "case_number": 28
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-07, AVP-152). Converted from the team's S20 data pack (case-02-dengue.draft.md + case-02-dengue.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the 2760/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
+      "source.case_number=28 is 'Bài 28. Sốt xuất huyết Dengue trẻ em (< 16 tuổi)' in the team's 53-disease table (BV Bệnh Nhiệt đới TP.HCM 2023); the case itself follows 2760/QĐ-BYT.",
+      "Teaching aim (proposed): the child is in the critical phase (fever just settled, day 5) with warning signs; the student must find the warning signs, read the haematocrit rise against the day-2 baseline and decide to admit, not send home.",
+      "The 2760/QĐ-BYT text was read from training material that summarises it, not from the original PDF. TODO(clinician): check the case against the original 2760/QĐ-BYT.",
+      "TODO(clinician): keep the child at 9 years / 28 kg (weight chosen near the WHO 2007 median for age)?",
+      "TODO(clinician): keep the tourniquet test (positive) on day 5, or only in the febrile phase?",
+      "TODO(clinician): keep the abdominal ultrasound (small fluid in Morrison's pouch) in l-ultrasound?",
+      "TODO(clinician): pulse 112 and resp rate 24 sit at the upper limit for age 5-12 (APLS); BP 100/76 gives pulse pressure 24 mmHg (not yet narrowed, shock when <= 20 per 2760). Confirm.",
+      "TODO(clinician): reference ranges are left null on purpose (none in the pack).",
+      "TODO(clinician): the pack proposes a 3-state vitals machine (S0 stable with warning signs, S1 pre-shock, S2 Dengue shock). Not wired: vitals_service only supports case-01-hfmd. Decide fixed vitals vs a state machine and the timings.",
+      "TODO(clinician): option to make the mother have given ibuprofen once, to test counselling (h-nsaid is currently negative).",
+      "The mother quotes the private clinic ('theo dõi sốt xuất huyết') and the neighbours' illness, so 'sốt xuất huyết' is NOT in forbidden_terms; the staging terms are.",
+      "Differentials are taken from the team's 53-disease table (Bài 28); confirm.",
+      "TODO(clinician): management[] has no fluid regimen or dose on purpose; add only from the original 2760/QĐ-BYT."
+    ]
+  },
+  "catalog": {
+    "patient_group": "child",
+    "display_complaint": "Bé sốt mấy ngày nay, sáng nay hết sốt rồi mà lại đau bụng, nôn hoài, người mệt lả.",
+    "cover": "/cases/dengue-cover.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "general",
+        "label": "Toàn trạng, tri giác",
+        "x": 0.5,
+        "y": 0.08
+      },
+      {
+        "id": "mucosa",
+        "label": "Niêm mạc miệng, mũi",
+        "x": 0.5,
+        "y": 0.17
+      },
+      {
+        "id": "vitals",
+        "label": "Sinh hiệu, đầu chi",
+        "x": 0.2,
+        "y": 0.54
+      },
+      {
+        "id": "chest",
+        "label": "Tim, phổi",
+        "x": 0.5,
+        "y": 0.33
+      },
+      {
+        "id": "abdomen",
+        "label": "Bụng",
+        "x": 0.5,
+        "y": 0.5
+      },
+      {
+        "id": "tourniquet",
+        "label": "Nghiệm pháp dây thắt",
+        "x": 0.72,
+        "y": 0.36
+      },
+      {
+        "id": "legs_skin",
+        "label": "Da hai cẳng chân",
+        "exam_region": "skin",
+        "x": 0.4,
+        "y": 0.8
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 2
+  },
+  "patient": {
+    "name": "Bé Nguyễn Minh K.",
+    "age": {
+      "value": 9,
+      "unit": "years"
+    },
+    "sex": "male",
+    "occupation": "Học sinh lớp 4",
+    "informant": {
+      "role": "mother"
+    },
+    "persona": {
+      "personality": "lo lắng, nói nhanh, hỏi lại nhiều",
+      "dialect": "south",
+      "emotional_state": "hoang mang vì con hết sốt mà lại mệt hơn",
+      "speech_style": "mẹ 36 tuổi, nội trợ; xưng em, gọi bác sĩ, có mang theo giấy xét nghiệm của phòng khám"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Bé sốt mấy ngày nay, sáng nay hết sốt rồi mà lại đau bụng, nôn hoài, người mệt lả.",
+    "triage_note": "Ngày 5 của bệnh, hết sốt từ sáng. Nhiệt độ 37,2°C, mạch 112 lần/phút, nhịp thở 24 lần/phút, huyết áp 100/76 mmHg, SpO2 98% khí trời. Lừ đừ, đau bụng, nôn nhiều.",
+    "severity_state": {
+      "label": "co-dau-hieu-canh-bao",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 112,
+      "temp_c": 37.2,
+      "resp_rate": 24,
+      "bp_systolic": 100,
+      "bp_diastolic": 76,
+      "spo2": 98
+    }
+  },
+  "history": [
+    {
+      "id": "h-fever",
+      "topic": "Sốt và ngày bệnh",
+      "polarity": "positive",
+      "lay_response": "Dạ bé sốt từ bốn hôm trước, hôm nay là ngày thứ năm. Sốt cao lắm, nhiệt kế ở nhà lên 39 tới 40 độ, uống thuốc hạ sốt thì bớt rồi sốt lại. Mà sáng nay bé hết sốt rồi bác sĩ.",
+      "clinical_note": "Sốt cao đột ngột liên tục ngày 1-4, hết sốt sáng ngày 5: thời điểm thường vào giai đoạn nguy hiểm (2760).",
+      "intents": [
+        "sốt mấy ngày",
+        "sốt từ khi nào",
+        "sốt cao bao nhiêu độ",
+        "còn sốt không",
+        "hết sốt từ lúc nào",
+        "uống thuốc hạ sốt có hạ không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-early-symptoms",
+      "topic": "Triệu chứng những ngày đầu",
+      "polarity": "positive",
+      "lay_response": "Mấy ngày đầu bé kêu nhức đầu, đau mỏi khắp người, còn kêu đau ở phía sau hai con mắt nữa.",
+      "clinical_note": "Nhức đầu, đau cơ, đau sau hốc mắt trong giai đoạn sốt.",
+      "intents": [
+        "có nhức đầu không",
+        "có đau mỏi người không",
+        "có đau mắt không",
+        "mấy ngày đầu bé bị sao"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-abdominal-pain",
+      "topic": "Đau bụng",
+      "polarity": "positive",
+      "lay_response": "Khoảng mười giờ sáng nay bé bắt đầu kêu đau bụng, đau ở phía trên bên phải nè, đau hoài không bớt, bé ôm bụng nằm co.",
+      "clinical_note": "Đau bụng nhiều, liên tục vùng gan: dấu hiệu cảnh báo (2760, Phụ lục 2).",
+      "intents": [
+        "có đau bụng không",
+        "đau bụng chỗ nào",
+        "đau bụng từ khi nào",
+        "đau liên tục hay từng cơn"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-vomiting",
+      "topic": "Nôn",
+      "polarity": "positive",
+      "lay_response": "Bé ói bốn lần rồi, trong khoảng sáu tiếng nay, ói ra đồ ăn với nước, cho uống gì cũng ói.",
+      "clinical_note": "Nôn nhiều (4 lần/6 giờ): dấu hiệu cảnh báo (2760, Phụ lục 2).",
+      "intents": [
+        "có nôn không",
+        "có ói không",
+        "nôn mấy lần",
+        "nôn ra gì"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-lethargy",
+      "topic": "Mệt, lừ đừ",
+      "polarity": "positive",
+      "lay_response": "Từ trưa tới giờ bé nằm lừ đừ, mệt lả, ít nói hẳn, kêu thì bé trả lời chậm chậm.",
+      "clinical_note": "Lừ đừ: dấu hiệu cảnh báo (2760, Phụ lục 2). Chưa vật vã.",
+      "intents": [
+        "bé có mệt không",
+        "bé có tỉnh không",
+        "có lừ đừ không",
+        "có quấy hay vật vã không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-urine",
+      "topic": "Đi tiểu",
+      "polarity": "positive",
+      "lay_response": "Từ sáng tới giờ bé mới đi tiểu có một lần, ít lắm. Lần cuối cách đây chừng năm tiếng.",
+      "clinical_note": "Tiểu ít: dấu hiệu cảnh báo; lần tiểu cuối khoảng 5 giờ trước (2760).",
+      "intents": [
+        "đi tiểu thế nào",
+        "tiểu nhiều hay ít",
+        "lần cuối đi tiểu lúc nào",
+        "nước tiểu màu gì"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-appetite",
+      "topic": "Ăn uống",
+      "polarity": "positive",
+      "lay_response": "Mấy hôm nay bé ăn ít lắm, hôm nay thì ăn gì cũng ói.",
+      "clinical_note": "Ăn kém từ ngày 2.",
+      "intents": [
+        "ăn uống thế nào",
+        "bé có ăn được không",
+        "uống nước được không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-petechiae",
+      "topic": "Chấm đỏ ngoài da",
+      "polarity": "positive",
+      "lay_response": "Tối hôm qua em thấy có mấy chấm đỏ nhỏ nhỏ ở hai cẳng chân của bé.",
+      "clinical_note": "Chấm xuất huyết dưới da hai cẳng chân từ tối ngày 4.",
+      "intents": [
+        "có nổi chấm đỏ không",
+        "da có gì lạ không",
+        "có bầm tím không",
+        "có phát ban không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-bleeding",
+      "topic": "Chảy máu",
+      "polarity": "negative",
+      "lay_response": "Dạ không, bé không chảy máu mũi, không chảy máu chân răng. Không ói ra máu, đi cầu không thấy đen hay có máu, nước tiểu cũng không đỏ.",
+      "clinical_note": "Không xuất huyết niêm mạc, không xuất huyết tiêu hóa, không tiểu máu.",
+      "intents": [
+        "có chảy máu cam không",
+        "có chảy máu chân răng không",
+        "có nôn ra máu không",
+        "đi cầu phân có đen không",
+        "nước tiểu có đỏ không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-breathing-seizure",
+      "topic": "Khó thở, co giật",
+      "polarity": "negative",
+      "lay_response": "Dạ bé không thở mệt, cũng không có co giật gì hết.",
+      "clinical_note": "Không khó thở, không co giật.",
+      "intents": [
+        "có khó thở không",
+        "thở có mệt không",
+        "có co giật không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-gi-resp",
+      "topic": "Tiêu chảy, ho, sổ mũi",
+      "polarity": "negative",
+      "lay_response": "Dạ bé không bị tiêu chảy, cũng không ho, không sổ mũi.",
+      "clinical_note": "Không tiêu chảy, không triệu chứng hô hấp trên.",
+      "intents": [
+        "có tiêu chảy không",
+        "có ho không",
+        "có sổ mũi không",
+        "đi cầu thế nào"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-warm-limbs",
+      "topic": "Tay chân ấm hay lạnh",
+      "polarity": "negative",
+      "lay_response": "Em sờ tay chân bé thấy vẫn ấm, không có lạnh.",
+      "clinical_note": "Mẹ phủ nhận chi lạnh.",
+      "intents": [
+        "tay chân bé có lạnh không",
+        "người bé có lạnh không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-meds",
+      "topic": "Thuốc đã dùng ở nhà",
+      "polarity": "positive",
+      "lay_response": "Em cho bé uống thuốc hạ sốt dạng gói, paracetamol đó bác sĩ, sốt thì uống, cách nhau chừng sáu tiếng. Hàm lượng bao nhiêu thì em không nhớ.",
+      "clinical_note": "Paracetamol khi sốt, cách khoảng 6 giờ; mẹ không nhớ hàm lượng.",
+      "intents": [
+        "đã uống thuốc gì",
+        "có cho uống thuốc hạ sốt không",
+        "uống thuốc gì ở nhà",
+        "uống cách mấy tiếng"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-nsaid",
+      "topic": "Ibuprofen, aspirin",
+      "polarity": "negative",
+      "lay_response": "Dạ không, em chỉ cho uống thuốc gói đó thôi, không có cho uống ibuprofen hay aspirin.",
+      "clinical_note": "Không dùng aspirin, ibuprofen (mẹ chỉ trả lời khi được hỏi đích danh).",
+      "intents": [
+        "có uống ibuprofen không",
+        "có uống aspirin không",
+        "có uống thuốc giảm đau nào khác không",
+        "có uống analgin không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-clinic-day2",
+      "topic": "Khám và xét nghiệm ở phòng khám ngày 2",
+      "polarity": "positive",
+      "lay_response": "Hôm thứ hai em có dắt bé đi phòng khám tư, người ta lấy máu xét nghiệm rồi dặn về theo dõi sốt xuất huyết. Giấy đây bác sĩ, trên giấy ghi NS1 dương tính, Hct 38 phần trăm, tiểu cầu 180 nghìn, bạch cầu 3 nghìn 8.",
+      "clinical_note": "Ngày 2: NS1 dương tính; Hct 38% (giá trị nền); tiểu cầu 180.000/mm³; bạch cầu 3.800/mm³ (giảm, hay gặp ở giai đoạn sốt).",
+      "intents": [
+        "đã đi khám ở đâu chưa",
+        "có làm xét nghiệm gì chưa",
+        "kết quả xét nghiệm trước",
+        "bác sĩ trước nói gì",
+        "có giấy tờ khám không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-prior-dengue",
+      "topic": "Đã từng bị sốt xuất huyết",
+      "polarity": "unknown",
+      "lay_response": "Cái này em không rõ nữa, hồi nhỏ bé sốt mấy lần mà em không biết có phải bị cái đó không.",
+      "clinical_note": "Tiền sử nhiễm Dengue trước đây: mẹ không biết (unknown).",
+      "intents": [
+        "bé từng bị sốt xuất huyết chưa",
+        "trước đây bị bệnh này chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-past-history",
+      "topic": "Tiền sử bản thân",
+      "polarity": "negative",
+      "lay_response": "Bé khỏe lắm, chích ngừa đủ hết theo lịch, không có bệnh gì mãn tính.",
+      "clinical_note": "Khỏe mạnh, tiêm chủng đủ theo TCMR (theo lời mẹ), không bệnh mạn tính.",
+      "intents": [
+        "bé có bệnh gì trước đây không",
+        "tiêm chủng đủ chưa",
+        "có bệnh mãn tính không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-allergy",
+      "topic": "Dị ứng",
+      "polarity": "negative",
+      "lay_response": "Dạ bé không có dị ứng thuốc gì hết.",
+      "clinical_note": "Không dị ứng thuốc.",
+      "intents": [
+        "có dị ứng thuốc không",
+        "có dị ứng gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-family",
+      "topic": "Tiền sử gia đình",
+      "polarity": "negative",
+      "lay_response": "Trong nhà không ai bị bệnh về máu hay hay chảy máu gì hết.",
+      "clinical_note": "Gia đình không có bệnh máu hay rối loạn đông máu.",
+      "intents": [
+        "gia đình có ai bệnh máu không",
+        "nhà có ai hay chảy máu không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-epi",
+      "topic": "Dịch tễ",
+      "polarity": "positive",
+      "lay_response": "Nhà em ở trong quận, mùa mưa muỗi nhiều lắm. Tuần trước bạn cùng lớp của bé với một người hàng xóm phải nằm viện vì sốt xuất huyết. Nhà em có mấy lu chứa nước.",
+      "clinical_note": "Sống ở vùng có dịch, mùa mưa; bạn cùng lớp và hàng xóm mắc bệnh; nhà có dụng cụ chứa nước (2760, Phụ lục 2).",
+      "intents": [
+        "xung quanh có ai bị bệnh không",
+        "nhà ở đâu",
+        "ở nhà có nhiều muỗi không",
+        "trường có ai bị bệnh không",
+        "nhà có chứa nước không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-general",
+      "region": "general",
+      "action": "Đánh giá toàn trạng và tri giác",
+      "finding": "Lừ đừ, mệt, còn tiếp xúc, trả lời chậm. Không vật vã. Tỉnh, không có dấu màng não, không có dấu thần kinh khu trú.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-vitals",
+      "region": "vitals",
+      "action": "Đo sinh hiệu",
+      "finding": "Nhiệt độ 37,2°C. Mạch 112 lần/phút, rõ. Nhịp thở 24 lần/phút. Huyết áp 100/76 mmHg. SpO2 98% khí trời. Cân nặng 28 kg.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-perfusion",
+      "region": "vitals",
+      "action": "Khám đầu chi và thời gian làm đầy mao mạch",
+      "finding": "Đầu chi ấm, mạch quay rõ, thời gian làm đầy mao mạch dưới 2 giây.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-mucosa",
+      "region": "mucosa",
+      "action": "Khám niêm mạc miệng, mũi",
+      "finding": "Niêm mạc hồng, không chảy máu chân răng, không chảy máu mũi.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-chest",
+      "region": "chest",
+      "action": "Khám tim, phổi",
+      "finding": "Rì rào phế nang rõ hai bên, không ran. Tim nhịp nhanh, đều, không âm thổi.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abdomen",
+      "region": "abdomen",
+      "action": "Khám bụng, gan",
+      "finding": "Bụng mềm, ấn đau vùng hạ sườn phải. Gan to 3 cm dưới bờ sườn phải, bờ tù, ấn đau. Không phản ứng thành bụng. Gõ không đục vùng thấp.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-tourniquet",
+      "region": "tourniquet",
+      "action": "Làm nghiệm pháp dây thắt",
+      "finding": "Nghiệm pháp dây thắt dương tính.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-skin",
+      "region": "skin",
+      "action": "Khám da hai cẳng chân",
+      "finding": "Chấm xuất huyết rải rác hai cẳng chân. Không có mảng bầm.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-hct",
+      "name": "Hematocrit (Hct)",
+      "aliases": [
+        "Hct",
+        "hematocrit",
+        "dung tích hồng cầu"
+      ],
+      "result_text": "Hct 46% (ngày 5).",
+      "value": 46,
+      "unit": "%",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-platelet",
+      "name": "Số lượng tiểu cầu",
+      "aliases": [
+        "tiểu cầu",
+        "PLT",
+        "platelet"
+      ],
+      "result_text": "Tiểu cầu 42.000/mm³ (ngày 5).",
+      "value": 42000,
+      "unit": "/mm³",
+      "ref_range": null,
+      "flag": "low",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-wbc",
+      "name": "Số lượng bạch cầu",
+      "aliases": [
+        "bạch cầu",
+        "WBC"
+      ],
+      "result_text": "Bạch cầu 3.200/mm³ (ngày 5).",
+      "value": 3200,
+      "unit": "/mm³",
+      "ref_range": null,
+      "flag": "low",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-cbc",
+      "name": "Tổng phân tích tế bào máu",
+      "aliases": [
+        "CTM",
+        "công thức máu",
+        "CBC"
+      ],
+      "result_text": "Ngày 5: Hct 46%; tiểu cầu 42.000/mm³; bạch cầu 3.200/mm³.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-ast-alt",
+      "name": "Men gan AST, ALT",
+      "aliases": [
+        "AST",
+        "ALT",
+        "men gan",
+        "SGOT",
+        "SGPT"
+      ],
+      "result_text": "AST 210 U/L, ALT 150 U/L.",
+      "value": null,
+      "unit": "U/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-ultrasound",
+      "name": "Siêu âm bụng",
+      "aliases": [
+        "siêu âm",
+        "siêu âm bụng",
+        "siêu âm ổ bụng"
+      ],
+      "result_text": "Gan to; ít dịch ở khoang Morrison.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    }
+  ],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "Sốt xuất huyết Dengue có dấu hiệu cảnh báo",
+    "severity_grade": "co-dau-hieu-canh-bao",
+    "differentials": [
+      "Nhiễm trùng huyết do não mô cầu",
+      "Sốc nhiễm khuẩn",
+      "Viêm dạ dày ruột cấp mất nước"
+    ],
+    "acceptable_alternatives": [
+      "Sốt xuất huyết Dengue có dấu hiệu cảnh báo, giai đoạn nguy hiểm",
+      "SXHD có dấu hiệu cảnh báo"
+    ]
+  },
+  "management": [
+    "Nhập viện, không cho điều trị ngoại trú (có dấu hiệu cảnh báo, 2760).",
+    "Theo dõi sát mạch, huyết áp, hiệu áp, đầu chi, lượng nước tiểu, tri giác, dấu hiệu cảnh báo và Hct định kỳ.",
+    "TODO(clinician): truyền dịch theo phác đồ trẻ em có dấu hiệu cảnh báo của 2760/QĐ-BYT; loại dịch, tốc độ và liều chỉ thêm từ bản gốc.",
+    "Tư vấn mẹ: hạ sốt chỉ bằng paracetamol, không dùng aspirin, ibuprofen, analgin; báo ngay khi bé vật vã, lạnh tay chân, đau bụng tăng, nôn ra máu hoặc không tiểu."
+  ],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-opening",
+        "domain": "communication",
+        "criterion": "Chào hỏi, giới thiệu bản thân, xác nhận danh tính bé và mẹ, giải thích mục đích buổi khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Làm 1-2 trong 3 việc",
+          "2": "Làm đủ 3 việc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chào chị, tôi là bác sĩ",
+          "Bé tên gì, mấy tuổi",
+          "Hôm nay tôi sẽ hỏi và khám cho bé"
+        ],
+        "reliability": "low"
+      },
+      {
+        "id": "r-fever-day",
+        "domain": "history",
+        "criterion": "Hỏi ngày bệnh thứ mấy và diễn tiến sốt, đặc biệt đã hết sốt từ khi nào",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi số ngày sốt nhưng không hỏi hết sốt từ khi nào",
+          "2": "Xác định ngày 5 của bệnh và hết sốt từ sáng nay"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé sốt mấy ngày rồi",
+          "Bây giờ còn sốt không",
+          "Hết sốt từ lúc nào"
+        ]
+      },
+      {
+        "id": "r-warning-signs",
+        "domain": "history",
+        "criterion": "Hỏi đủ các dấu hiệu cảnh báo: lừ đừ hoặc vật vã, đau bụng vùng gan, nôn (số lần), xuất huyết niêm mạc, tiểu ít",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Hỏi không quá 1 nhóm",
+          "1": "Hỏi 2-3 nhóm",
+          "2": "Hỏi ít nhất 4 trong 5 nhóm"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé có mệt, lừ đừ không",
+          "Có đau bụng không, đau chỗ nào",
+          "Có nôn không, mấy lần",
+          "Có chảy máu mũi, chân răng không",
+          "Bé đi tiểu thế nào"
+        ]
+      },
+      {
+        "id": "r-urine",
+        "domain": "history",
+        "criterion": "Hỏi lượng nước tiểu và lần tiểu cuối",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi chung chung về đi tiểu",
+          "2": "Hỏi cả lượng nước tiểu và thời điểm tiểu lần cuối"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Hôm nay bé tiểu mấy lần, nhiều hay ít",
+          "Lần cuối bé đi tiểu là lúc nào"
+        ]
+      },
+      {
+        "id": "r-meds-nsaid",
+        "domain": "history",
+        "criterion": "Hỏi thuốc đã dùng, đặc biệt có dùng aspirin, ibuprofen, analgin không",
+        "weight": 2,
+        "critical": true,
+        "anchors": {
+          "0": "Không hỏi thuốc",
+          "1": "Chỉ hỏi chung đã uống thuốc gì",
+          "2": "Hỏi đích danh aspirin, ibuprofen hoặc analgin"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Ở nhà đã cho bé uống thuốc gì",
+          "Có cho uống ibuprofen hay aspirin không"
+        ]
+      },
+      {
+        "id": "r-epi-history",
+        "domain": "epidemiology",
+        "criterion": "Hỏi yếu tố dịch tễ (vùng dịch, người xung quanh mắc bệnh) và tiền sử, bệnh nền",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi một trong hai (dịch tễ hoặc tiền sử)",
+          "2": "Hỏi cả dịch tễ và tiền sử"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Xung quanh nhà, trường có ai bị sốt xuất huyết không",
+          "Trước giờ bé có bệnh gì không"
+        ]
+      },
+      {
+        "id": "r-hemodynamics",
+        "domain": "physical_exam",
+        "criterion": "Đánh giá huyết động: mạch, huyết áp và tính hiệu áp, chi ấm hay lạnh, thời gian làm đầy mao mạch",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không đánh giá hoặc chỉ 1 yếu tố",
+          "1": "Đánh giá 2-3 yếu tố",
+          "2": "Đủ 4 yếu tố và nêu được hiệu áp"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đo mạch, huyết áp",
+          "Hiệu áp bao nhiêu",
+          "Sờ đầu chi, đo thời gian làm đầy mao mạch"
+        ]
+      },
+      {
+        "id": "r-abdomen-liver",
+        "domain": "physical_exam",
+        "criterion": "Khám bụng tìm gan to, đo kích thước dưới bờ sườn và tìm điểm đau vùng gan",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám bụng",
+          "1": "Khám bụng nhưng không đo gan",
+          "2": "Phát hiện gan to 3 cm dưới bờ sườn, ấn đau"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám bụng",
+          "Gan to bao nhiêu cm dưới bờ sườn"
+        ]
+      },
+      {
+        "id": "r-bleeding-exam",
+        "domain": "physical_exam",
+        "criterion": "Khám da, niêm mạc tìm xuất huyết (chấm xuất huyết, chảy máu chân răng, mũi)",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Chỉ khám da hoặc chỉ khám niêm mạc",
+          "2": "Khám cả da và niêm mạc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám da xem có chấm xuất huyết",
+          "Khám niêm mạc miệng, mũi"
+        ]
+      },
+      {
+        "id": "r-labs-reading",
+        "domain": "investigations",
+        "criterion": "Đọc xét nghiệm: nhận ra Hct tăng trên 20% so với giá trị nền và tiểu cầu giảm nhanh",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Không nhận ra",
+          "1": "Nêu được một trong hai",
+          "2": "Nêu cả hai và so với giá trị nền ngày 2"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho làm công thức máu, Hct, tiểu cầu",
+          "Hct tăng bao nhiêu so với lần trước",
+          "Tiểu cầu giảm từ bao nhiêu xuống bao nhiêu"
+        ]
+      },
+      {
+        "id": "r-dx-grade",
+        "domain": "diagnosis",
+        "criterion": "Phân độ đúng: sốt xuất huyết Dengue có dấu hiệu cảnh báo, giai đoạn nguy hiểm; nêu được vì sao chưa phải sốt xuất huyết Dengue nặng",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Phân độ sai hoặc không chẩn đoán",
+          "1": "Phân độ đúng nhưng không giải thích",
+          "2": "Phân độ đúng và giải thích vì sao chưa phải thể nặng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chẩn đoán bệnh gì, mức độ nào",
+          "Bé đang ở giai đoạn nào",
+          "Vì sao chưa phải thể nặng"
+        ]
+      },
+      {
+        "id": "r-admit",
+        "domain": "management",
+        "criterion": "Quyết định nhập viện, không cho về điều trị ngoại trú",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Cho về nhà",
+          "1": "Lưỡng lự, hẹn khám lại trong ngày",
+          "2": "Quyết định cho bé nhập viện"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bé cần nhập viện",
+          "Không cho về nhà"
+        ]
+      },
+      {
+        "id": "r-monitoring",
+        "domain": "management",
+        "criterion": "Nêu kế hoạch theo dõi: mạch, huyết áp, nước tiểu, dấu hiệu cảnh báo, Hct định kỳ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không nêu",
+          "1": "Nêu 2-3 thông số",
+          "2": "Nêu ít nhất 4 thông số"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Theo dõi mạch, huyết áp, nước tiểu",
+          "Làm lại Hct định kỳ"
+        ]
+      },
+      {
+        "id": "r-counselling",
+        "domain": "management",
+        "criterion": "Giải thích cho mẹ: hạ sốt chỉ bằng paracetamol, không dùng aspirin hay ibuprofen; dấu hiệu nặng cần báo ngay",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không tư vấn",
+          "1": "Tư vấn một trong hai ý",
+          "2": "Tư vấn đủ hai ý"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chỉ dùng paracetamol, không dùng aspirin, ibuprofen",
+          "Thấy bé vật vã, lạnh tay chân, nôn ra máu thì báo ngay"
+        ]
+      },
+      {
+        "id": "r-closing",
+        "domain": "communication",
+        "criterion": "Tóm tắt lại cho mẹ, hỏi còn thắc mắc gì không, dùng từ dễ hiểu và giải thích thuật ngữ",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Chỉ tóm tắt hoặc chỉ hỏi lại",
+          "2": "Tóm tắt và hỏi lại thắc mắc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Tóm lại tình trạng của bé cho mẹ",
+          "Chị còn thắc mắc gì không"
+        ],
+        "reliability": "low"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "Hướng dẫn chẩn đoán, điều trị sốt xuất huyết Dengue (Quyết định 2760/QĐ-BYT ngày 04/07/2023)",
+      "section": "Phụ lục 2. Phân độ; dấu hiệu cảnh báo; sốt xuất huyết Dengue nặng"
+    },
+    {
+      "document": "Cập nhật điều trị sốt xuất huyết Dengue nặng ở trẻ em 2023 (BV Nhi Đồng 1)",
+      "section": "Ngưỡng huyết áp theo tuổi ở trẻ em"
+    }
+  ],
+  "forbidden_terms": [
+    "dengue",
+    "dấu hiệu cảnh báo",
+    "giai đoạn nguy hiểm",
+    "cô đặc máu",
+    "thoát huyết tương",
+    "sốc"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Dạ cái đó em không rõ ạ.",
+      "Dạ em không để ý cái đó, em không chắc nữa bác sĩ."
+    ],
+    "not_ordered_lab": [
+      "Dạ bác sĩ chưa cho bé làm xét nghiệm đó ạ."
+    ],
+    "out_of_scope": [
+      "Dạ em chỉ biết bé bị như vậy thôi, bác sĩ coi giùm bé giúp em."
+    ]
+  }
+}
