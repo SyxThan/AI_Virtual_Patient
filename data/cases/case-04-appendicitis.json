@@ -1,0 +1,989 @@
+{
+  "schema_version": "1",
+  "id": "case-04-appendicitis",
+  "title": {
+    "vi": "Viêm ruột thừa cấp (người lớn)",
+    "en": "Acute appendicitis, uncomplicated (adult)"
+  },
+  "specialty": "Ngoại tổng hợp",
+  "source": {
+    "document": "Diagnosis and treatment of acute appendicitis: 2020 update of the WSES Jerusalem guidelines (World J Emerg Surg 2020;15:27)",
+    "year": 2020,
+    "section": "Chẩn đoán: thang điểm lâm sàng và chẩn đoán hình ảnh (khuyến cáo 1.9)"
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-09, AVP-154). Converted from the team's S20 data pack (case-04-appendicitis.draft.md + case-04-appendicitis.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the Alvarado and AIR criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
+      "Teaching aim (proposed): elicit the migrating pain (periumbilical to right lower abdomen), examine McBurney's point and the peritoneal signs, rule out differentials (urinary, GI, scrotal), compute the scores and see that Alvarado is high while AIR is only intermediate, so ultrasound is still needed.",
+      "Sources in the pack (data/source/appendicitis/source.json): no national Bộ Y tế guideline for this disease (Bộ Y tế only has the surgical technique procedures 201/QĐ-BYT, 16/01/2014). International: wses-2025 'Diagnosis and Treatment of Acute Appendicitis: 2025 Edition of the WSES Jerusalem Guidelines' (JAMA Surg 2026, not open access, abstract only); wses-2020 'Diagnosis and treatment of acute appendicitis: 2020 update of the WSES Jerusalem guidelines' (World J Emerg Surg 2020;15:27, CC BY 4.0); wses-2016 'WSES Jerusalem guidelines for diagnosis and treatment of acute appendicitis' (World J Emerg Surg 2016;11:34); air-andersson-2008 'Appendicitis Inflammatory Response score (AIR)' (World J Surg 2008;32(8):1843-1849); alvarado-1986 'A practical score for the early diagnosis of acute appendicitis' (Ann Emerg Med 1986;15(5):557-564). Hospital level: 'Phác đồ điều trị khoa Ngoại tổng hợp - Viêm ruột thừa cấp' (BVĐK Hoằng Hóa). The OSCE file also cites wikem-appendicitis, which has no entry in source.json.",
+      "RAG corpus: NOT ingested (no file in data/guidelines/). Owner decision 2026-11-18: only Bộ Y tế documents get rights_checked=true; international documents (WSES, WikEM, score papers) are not ingested. Rights not confirmed by owner; the debrief has no citations for this case until a citable source is approved.",
+      "TODO(clinician): accept WSES as the main source (no Bộ Y tế national guideline), or name a specific hospital protocol?",
+      "TODO(clinician): keep the patient male, 24 years (chosen so the MVP case needs no menstrual or pregnancy history), or change to a woman of reproductive age (then add last menstrual period, possible pregnancy, gynaecological symptoms and a pregnancy test)?",
+      "TODO(clinician): include a digital rectal exam? Not in the case: no exam entry and no hotspot, so the exam stage cannot reveal it.",
+      "TODO(clinician): grade Alvarado, AIR or both? Which is the scoring standard? Answer key from the pack: Alvarado 10/10 (migrating pain 1 + anorexia 1 + nausea/vomiting 1 + RLQ tenderness 2 + rebound 1 + temperature >= 37.3°C 1 + WBC > 10 G/L 2 + neutrophils > 75% 1; 9-10 very likely). AIR 6/12 (vomiting 1 + RLQ pain 1 + light guarding 1 + temperature >= 38.5°C 0 + neutrophils 70-84% 1 + WBC 10-14.9 G/L 1 + CRP 10-49 mg/L 1; 5-8 intermediate risk: observe and image, WSES 2020 1.9). AIR thresholds 0-4 / 5-8 / 9-12 are from the original paper; confirm.",
+      "TODO(clinician): confirm the differential list (author-written, not in the corpus): mesenteric adenitis, ileocaecitis, right renal colic, Meckel's diverticulitis, gastroenteritis; in a young man testicular torsion (ruled out by the scrotal exam).",
+      "TODO(clinician): pulse 98/min 'slightly fast, fits pain and fever' is marked [BS] in the pack; confirm.",
+      "TODO(clinician): tongue 'dry, white coating' is marked [BS] in the pack; confirm.",
+      "TODO(clinician): every lab value is simulated (pack: 'Giá trị giả lập để khớp tiêu chí'); confirm each number. ref_range is null on purpose (none in the pack). The blood count has only WBC and neutrophils because the pack gives no other values.",
+      "TODO(clinician): ultrasound result (appendix 9 mm, non-compressible, periappendiceal fat stranding, no free fluid, no abscess) and the sign 'diameter > 6 mm, non-compressible' (pack cites a 2021 study at BV ĐH Tây Nguyên) are marked [BS]; confirm.",
+      "TODO(clinician): vitals are fixed for the MVP (pack proposal). The pack offers an optional 'peritonitis' state (fever > 38.5°C, faster pulse, diffuse guarding) to penalise sending the patient home. Not wired: vitals_service only supports case-01-hfmd. Vitals are reachable only through the 'Sinh hiệu' exam hotspot (e-vitals).",
+      "TODO(clinician): rubric weights, critical items (OSCE red_flag) and the level coefficients dat 1.0 / dat_mot_phan 0.5 / chua_dat 0 are proposals. Criteria whose source column is only '[BS] xác nhận': C01, H03, H04, E01, E04, R03, M02, C99.",
+      "Rubric mapping from the OSCE file: C01 r-opening, H01 r-pain-history, H02 r-gi-symptoms, H03 r-exclusion-history, H04 r-background, E01 r-abdomen-technique, E02 r-peritoneal-signs, E03 r-maneuvers, E04 r-groin-scrotum, R01 r-investigations, R02 r-scores, R03 r-dx-differentials, M01 r-initial-management, M02 r-explain-plan, C99 r-closing. Levels: chua_dat=0, dat_mot_phan=1, dat=2; red_flag -> critical. Domains: exam -> physical_exam; R01 -> investigations; R02, R03 -> diagnosis.",
+      "TODO(clinician): the OSCE file has no epidemiology criterion. H04 (past surgery, medicines, allergy, last meal) is mapped to the 'epidemiology' domain as background history, the way Dengue's r-epi-history covers past history, so all 7 domains are covered. Confirm, or add a real epidemiology criterion.",
+      "TODO(clinician): E04 (scrotal/groin exam) has no partial level in the pack ('—'); anchor 1 says not applicable. Confirm.",
+      "Exam layout: the pack's 'Dấu hiệu' row is one hotspot (e-abd-signs, Blumberg, Rovsing, psoas, obturator, pain on coughing). Palpation is split into four quadrant hotspots; 'không sờ thấy khối' (pack: no mass) is repeated in each quadrant. Patient's right is on the viewer's left of the cover.",
+      "management[] has no antibiotic or analgesic drug or dose on purpose (pack: the case does not teach antibiotic doses). The patient-reported paracetamol 500 mg tablet is history, not a recommendation.",
+      "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67)."
+    ]
+  },
+  "catalog": {
+    "patient_group": "adult",
+    "display_complaint": "Em bị đau bụng từ tối qua, giờ đau dồn xuống bụng dưới bên phải, đi lại đau lắm.",
+    "cover": "/cases/appendicitis-cover.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "general",
+        "label": "Toàn trạng",
+        "x": 0.5,
+        "y": 0.075
+      },
+      {
+        "id": "mouth",
+        "label": "Lưỡi",
+        "x": 0.5,
+        "y": 0.16
+      },
+      {
+        "id": "vitals",
+        "label": "Sinh hiệu",
+        "x": 0.19,
+        "y": 0.59
+      },
+      {
+        "id": "abdomen_inspect",
+        "label": "Nhìn bụng",
+        "x": 0.5,
+        "y": 0.35
+      },
+      {
+        "id": "abdomen_ruq",
+        "label": "Sờ hạ sườn phải",
+        "x": 0.39,
+        "y": 0.42
+      },
+      {
+        "id": "abdomen_luq",
+        "label": "Sờ hạ sườn trái",
+        "x": 0.61,
+        "y": 0.42
+      },
+      {
+        "id": "abdomen_percussion",
+        "label": "Gõ, nghe bụng",
+        "x": 0.5,
+        "y": 0.49
+      },
+      {
+        "id": "abdomen_rlq",
+        "label": "Sờ hố chậu phải",
+        "x": 0.39,
+        "y": 0.565
+      },
+      {
+        "id": "abdomen_llq",
+        "label": "Sờ hố chậu trái",
+        "x": 0.61,
+        "y": 0.565
+      },
+      {
+        "id": "abdomen_signs",
+        "label": "Các nghiệm pháp bụng",
+        "x": 0.5,
+        "y": 0.62
+      },
+      {
+        "id": "flank",
+        "label": "Hố thắt lưng hai bên",
+        "x": 0.307,
+        "y": 0.49
+      },
+      {
+        "id": "groin_scrotum",
+        "label": "Bìu, bẹn",
+        "x": 0.5,
+        "y": 0.725
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 4
+  },
+  "patient": {
+    "name": "Trần Văn H.",
+    "age": {
+      "value": 24,
+      "unit": "years"
+    },
+    "sex": "male",
+    "occupation": "Sinh viên",
+    "informant": {
+      "role": "self"
+    },
+    "persona": {
+      "personality": "hợp tác, trả lời ngắn, hơi lo",
+      "dialect": "north",
+      "emotional_state": "lo lắng vì đau bụng tăng dần, nhăn mặt khi cử động",
+      "speech_style": "nam sinh viên 24 tuổi tự kể bệnh; xưng em, gọi bác sĩ; nói đời thường, không dùng từ chuyên môn"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Em bị đau bụng từ tối qua, giờ đau dồn xuống bụng dưới bên phải, đi lại đau lắm.",
+    "triage_note": "Đau bụng khoảng 18 giờ, nay khu trú bụng dưới bên phải. Nhiệt độ 37,9°C, mạch 98 lần/phút, nhịp thở 18 lần/phút, huyết áp 124/78 mmHg, SpO2 99% khí trời. Đi lại khom người.",
+    "severity_state": {
+      "label": "chua-bien-chung",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 98,
+      "temp_c": 37.9,
+      "resp_rate": 18,
+      "bp_systolic": 124,
+      "bp_diastolic": 78,
+      "spo2": 99
+    }
+  },
+  "history": [
+    {
+      "id": "h-pain-onset",
+      "topic": "Đau bụng lúc đầu",
+      "polarity": "positive",
+      "lay_response": "Dạ tối qua khoảng chín giờ em bắt đầu thấy đau âm ỉ quanh rốn, khó chỉ đúng chỗ lắm, cũng không thấy đau lan đi đâu.",
+      "clinical_note": "Khởi phát khoảng 21 giờ tối qua (cách khoảng 18 giờ): đau âm ỉ quanh rốn, khó xác định vị trí, không lan.",
+      "intents": [
+        "đau bụng từ khi nào",
+        "lúc đầu đau ở đâu",
+        "đau như thế nào",
+        "đau có lan đi đâu không",
+        "đau bao lâu rồi"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-pain-migration",
+      "topic": "Đau chuyển chỗ",
+      "polarity": "positive",
+      "lay_response": "Đến khoảng sáu giờ sáng nay thì đau chuyển xuống bụng dưới bên phải, đau đúng một chỗ ở đó, đau liên tục và cứ tăng dần lên.",
+      "clinical_note": "Khoảng 6 giờ sáng: đau chuyển xuống và khu trú hố chậu phải, liên tục, tăng dần (đau di chuyển: 1 điểm Alvarado).",
+      "intents": [
+        "bây giờ đau ở đâu",
+        "đau có chuyển chỗ không",
+        "đau liên tục hay từng cơn",
+        "đau có tăng lên không",
+        "chỉ chỗ đau"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-pain-aggravating",
+      "topic": "Yếu tố làm đau tăng",
+      "polarity": "positive",
+      "lay_response": "Em đi lại là đau hơn, ho cũng đau, sáng nay ngồi xe đi qua ổ gà là đau nhói lên.",
+      "clinical_note": "Đau tăng khi đi lại, khi ho, khi xe đi qua ổ gà.",
+      "intents": [
+        "có gì làm đau tăng không",
+        "đi lại có đau hơn không",
+        "ho có đau không",
+        "có gì làm đỡ đau không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-anorexia",
+      "topic": "Ăn uống, chán ăn",
+      "polarity": "positive",
+      "lay_response": "Từ tối qua em chán ăn, không muốn ăn gì, sáng nay em bỏ bữa sáng luôn.",
+      "clinical_note": "Chán ăn từ tối qua, bỏ bữa sáng (1 điểm Alvarado).",
+      "intents": [
+        "ăn uống thế nào",
+        "có chán ăn không",
+        "sáng nay ăn gì chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-nausea-vomiting",
+      "topic": "Buồn nôn, nôn",
+      "polarity": "positive",
+      "lay_response": "Em có buồn nôn, nôn một lần lúc hai giờ sáng. Lúc đó em đau bụng trước rồi mới nôn.",
+      "clinical_note": "Buồn nôn, nôn 1 lần lúc 2 giờ sáng, nôn sau khi đã đau (Alvarado 1, AIR 1).",
+      "intents": [
+        "có buồn nôn không",
+        "có nôn không",
+        "nôn mấy lần",
+        "đau trước hay nôn trước",
+        "nôn lúc nào"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-fever",
+      "topic": "Sốt",
+      "polarity": "positive",
+      "lay_response": "Em thấy người hơi sốt, ớn lạnh.",
+      "clinical_note": "Cảm giác sốt nhẹ, ớn lạnh. Người bệnh không đo nhiệt độ ở nhà (pack không ghi).",
+      "intents": [
+        "có sốt không",
+        "có ớn lạnh không",
+        "có rét run không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-bowel",
+      "topic": "Đi cầu, trung tiện",
+      "polarity": "negative",
+      "lay_response": "Dạ em không bị tiêu chảy, cũng không táo bón. Sáng hôm qua em đi cầu bình thường, giờ vẫn xì hơi được.",
+      "clinical_note": "Không tiêu chảy, không táo bón; đi cầu bình thường sáng hôm qua; vẫn trung tiện.",
+      "intents": [
+        "có tiêu chảy không",
+        "có táo bón không",
+        "đi cầu thế nào",
+        "lần cuối đi cầu lúc nào",
+        "có trung tiện được không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-blood-stool",
+      "topic": "Đi cầu ra máu",
+      "polarity": "negative",
+      "lay_response": "Dạ em không thấy đi cầu ra máu.",
+      "clinical_note": "Không đi cầu ra máu.",
+      "intents": [
+        "đi cầu có máu không",
+        "phân có máu không",
+        "phân có đen không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-urinary",
+      "topic": "Tiểu tiện, đau hông lưng",
+      "polarity": "negative",
+      "lay_response": "Em đi tiểu không buốt, không rắt, nước tiểu không có máu. Em cũng không đau ở hông lưng lan xuống bẹn.",
+      "clinical_note": "Không tiểu buốt, tiểu rắt, tiểu máu. Không đau hông lưng lan xuống bẹn.",
+      "intents": [
+        "đi tiểu có buốt không",
+        "có tiểu rắt không",
+        "nước tiểu có máu không",
+        "có đau lưng lan xuống bẹn không",
+        "đi tiểu thế nào"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-scrotal",
+      "topic": "Bìu, tinh hoàn",
+      "polarity": "negative",
+      "lay_response": "Dạ ở bìu em không đau, cũng không sưng.",
+      "clinical_note": "Không đau, không sưng bìu.",
+      "intents": [
+        "bìu có đau không",
+        "tinh hoàn có sưng không",
+        "có đau ở dưới bìu không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-chest",
+      "topic": "Ngực, ho, khó thở",
+      "polarity": "negative",
+      "lay_response": "Em không đau ngực, không bị ho, cũng không khó thở.",
+      "clinical_note": "Không đau ngực, không ho, không khó thở.",
+      "intents": [
+        "có đau ngực không",
+        "có ho không",
+        "có khó thở không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-first-episode",
+      "topic": "Đã từng đau như vậy",
+      "polarity": "negative",
+      "lay_response": "Đây là lần đầu em bị đau như thế này.",
+      "clinical_note": "Chưa từng có cơn đau tương tự.",
+      "intents": [
+        "trước đây đã bị như vậy chưa",
+        "đã từng đau bụng thế này chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-prior-tests",
+      "topic": "Kết quả khám, xét nghiệm trước đây",
+      "polarity": "unknown",
+      "lay_response": "Cái đó em không rõ, kết quả xét nghiệm trước đây em không nhớ nữa.",
+      "clinical_note": "Người bệnh không biết các xét nghiệm trước đây (unknown).",
+      "intents": [
+        "trước đây có làm xét nghiệm gì không",
+        "kết quả khám trước đây",
+        "đã từng siêu âm bụng chưa"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-meds",
+      "topic": "Thuốc đã dùng",
+      "polarity": "positive",
+      "lay_response": "Lúc hai giờ sáng em uống một viên paracetamol loại 500, đỡ được chút ít. Ngoài ra em không uống thuốc giảm đau nào khác.",
+      "clinical_note": "Paracetamol 500 mg 1 viên lúc 2 giờ sáng, đỡ ít. Không dùng thuốc giảm đau khác.",
+      "intents": [
+        "đã uống thuốc gì chưa",
+        "uống thuốc giảm đau chưa",
+        "uống thuốc có đỡ không",
+        "uống lúc mấy giờ"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-past-history",
+      "topic": "Tiền sử bản thân, phẫu thuật",
+      "polarity": "negative",
+      "lay_response": "Em vẫn khỏe, chưa mổ bụng lần nào, không có bệnh mạn tính gì.",
+      "clinical_note": "Khỏe mạnh, chưa phẫu thuật bụng, không bệnh mạn tính.",
+      "intents": [
+        "trước đây có bệnh gì không",
+        "đã mổ bao giờ chưa",
+        "có bệnh mạn tính không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-allergy",
+      "topic": "Dị ứng",
+      "polarity": "negative",
+      "lay_response": "Dạ em không dị ứng thuốc gì.",
+      "clinical_note": "Không dị ứng thuốc.",
+      "intents": [
+        "có dị ứng thuốc không",
+        "có dị ứng gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-family",
+      "topic": "Tiền sử gia đình",
+      "polarity": "negative",
+      "lay_response": "Trong nhà em không ai bị bệnh gì đặc biệt.",
+      "clinical_note": "Gia đình không ghi nhận bệnh đặc biệt.",
+      "intents": [
+        "gia đình có ai bị bệnh gì không",
+        "bố mẹ có bệnh gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-social",
+      "topic": "Thuốc lá, rượu bia",
+      "polarity": "positive",
+      "lay_response": "Em không hút thuốc, thỉnh thoảng có uống bia.",
+      "clinical_note": "Không hút thuốc, uống bia thỉnh thoảng.",
+      "intents": [
+        "có hút thuốc không",
+        "có uống rượu bia không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-travel",
+      "topic": "Đi xa gần đây",
+      "polarity": "negative",
+      "lay_response": "Dạo này em không đi du lịch đâu cả.",
+      "clinical_note": "Không đi du lịch gần đây.",
+      "intents": [
+        "gần đây có đi đâu xa không",
+        "có đi du lịch không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-last-meal",
+      "topic": "Lần ăn uống cuối",
+      "polarity": "positive",
+      "lay_response": "Bữa cuối em ăn lúc bảy giờ tối qua, sáng nay lúc sáu giờ em có uống nước.",
+      "clinical_note": "Ăn cuối 19 giờ tối qua, uống nước lúc 6 giờ sáng (cần cho gây mê nếu mổ).",
+      "intents": [
+        "lần cuối ăn lúc mấy giờ",
+        "lần cuối uống nước lúc nào",
+        "từ sáng tới giờ có ăn uống gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-general",
+      "region": "general",
+      "action": "Đánh giá toàn trạng",
+      "finding": "Tỉnh, vẻ mặt đau, đi lại khom người, nằm co chân phải.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-tongue",
+      "region": "mouth",
+      "action": "Khám lưỡi",
+      "finding": "Lưỡi khô, rêu trắng.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-vitals",
+      "region": "vitals",
+      "action": "Đo sinh hiệu",
+      "finding": "Nhiệt độ 37,9°C. Mạch 98 lần/phút. Huyết áp 124/78 mmHg. Nhịp thở 18 lần/phút. SpO2 99% khí trời. Cân nặng 62 kg, chiều cao 168 cm.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abd-inspect",
+      "region": "abdomen_inspect",
+      "action": "Nhìn bụng",
+      "finding": "Bụng cân đối, di động theo nhịp thở, không sẹo mổ.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-palp-ruq",
+      "region": "abdomen_ruq",
+      "action": "Sờ bụng vùng hạ sườn phải",
+      "finding": "Bụng mềm ở hạ sườn phải. Không sờ thấy khối.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-palp-luq",
+      "region": "abdomen_luq",
+      "action": "Sờ bụng vùng hạ sườn trái",
+      "finding": "Bụng mềm ở hạ sườn trái. Không sờ thấy khối.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-palp-llq",
+      "region": "abdomen_llq",
+      "action": "Sờ bụng vùng hố chậu trái",
+      "finding": "Bụng mềm ở hố chậu trái. Không sờ thấy khối.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-palp-rlq",
+      "region": "abdomen_rlq",
+      "action": "Sờ bụng vùng hố chậu phải",
+      "finding": "Ấn đau khu trú tại điểm McBurney. Phản ứng thành bụng nhẹ ở hố chậu phải. Không sờ thấy khối.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abd-signs",
+      "region": "abdomen_signs",
+      "action": "Làm các nghiệm pháp bụng",
+      "finding": "Phản ứng dội (Blumberg) dương tính ở hố chậu phải. Rovsing dương tính. Dấu cơ thắt lưng chậu âm tính. Dấu cơ bịt âm tính. Đau tăng khi ho.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abd-percussion",
+      "region": "abdomen_percussion",
+      "action": "Gõ và nghe bụng",
+      "finding": "Gõ trong. Nhu động ruột giảm nhẹ.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-flank",
+      "region": "flank",
+      "action": "Khám hố thắt lưng",
+      "finding": "Rung thận âm tính hai bên.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-groin-scrotum",
+      "region": "groin_scrotum",
+      "action": "Khám bìu, bẹn",
+      "finding": "Bìu, bẹn bình thường, không thoát vị.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-wbc",
+      "name": "Số lượng bạch cầu",
+      "aliases": [
+        "bạch cầu",
+        "WBC"
+      ],
+      "result_text": "Bạch cầu 13,2 G/L.",
+      "value": 13.2,
+      "unit": "G/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-neutrophil",
+      "name": "Tỉ lệ bạch cầu trung tính",
+      "aliases": [
+        "trung tính",
+        "bạch cầu trung tính",
+        "NEU",
+        "neutrophil"
+      ],
+      "result_text": "Bạch cầu trung tính 82%.",
+      "value": 82,
+      "unit": "%",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-cbc",
+      "name": "Tổng phân tích tế bào máu",
+      "aliases": [
+        "CTM",
+        "công thức máu",
+        "CBC"
+      ],
+      "result_text": "Bạch cầu 13,2 G/L; trung tính 82%.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-crp",
+      "name": "CRP",
+      "aliases": [
+        "CRP",
+        "protein C phản ứng"
+      ],
+      "result_text": "CRP 32 mg/L.",
+      "value": 32,
+      "unit": "mg/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-urinalysis",
+      "name": "Tổng phân tích nước tiểu",
+      "aliases": [
+        "nước tiểu",
+        "tổng phân tích nước tiểu",
+        "TPTNT"
+      ],
+      "result_text": "Bình thường, không có hồng cầu, không có bạch cầu.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-ultrasound",
+      "name": "Siêu âm bụng",
+      "aliases": [
+        "siêu âm",
+        "siêu âm bụng",
+        "siêu âm ổ bụng"
+      ],
+      "result_text": "Ruột thừa đường kính 9 mm, không đè xẹp, thâm nhiễm mỡ xung quanh. Không có dịch ổ bụng, không có áp xe.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    }
+  ],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "Viêm ruột thừa cấp chưa biến chứng",
+    "severity_grade": "chua-bien-chung",
+    "differentials": [
+      "Viêm hạch mạc treo",
+      "Viêm hồi manh tràng",
+      "Cơn đau quặn thận phải",
+      "Viêm túi thừa Meckel",
+      "Viêm dạ dày ruột",
+      "Xoắn tinh hoàn"
+    ],
+    "acceptable_alternatives": [
+      "Viêm ruột thừa cấp",
+      "Viêm ruột thừa cấp, chưa biến chứng"
+    ]
+  },
+  "management": [
+    "Không cho về nhà: nhịn ăn uống, giảm đau, mời ngoại khoa khám.",
+    "Chỉ định siêu âm bụng; khi xác định chẩn đoán thì phẫu thuật cắt ruột thừa (thường nội soi).",
+    "Trì hoãn ngắn 12-24 giờ trong bệnh viện là an toàn với viêm ruột thừa chưa biến chứng (WSES 2016, 4.1).",
+    "TODO(clinician): ca không dạy liều kháng sinh; không thêm loại thuốc, liều giảm đau hay kháng sinh khi chưa có nguồn được duyệt."
+  ],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-opening",
+        "domain": "communication",
+        "criterion": "Chào hỏi, giới thiệu bản thân, xác nhận danh tính người bệnh, giải thích mục đích buổi khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Làm 1-2 trong 3 việc",
+          "2": "Làm đủ 3 việc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chào em, tôi là bác sĩ",
+          "Em tên gì, bao nhiêu tuổi",
+          "Hôm nay tôi sẽ hỏi bệnh và khám cho em"
+        ],
+        "reliability": "low"
+      },
+      {
+        "id": "r-pain-history",
+        "domain": "history",
+        "criterion": "Khai thác đặc điểm đau: khởi phát, vị trí ban đầu, di chuyển xuống hố chậu phải, tính chất, yếu tố tăng giảm",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không khai thác",
+          "1": "Có hỏi vị trí đau nhưng bỏ sót đau di chuyển",
+          "2": "Khai thác được đau di chuyển và ít nhất 3 đặc điểm khác"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Em đau bụng từ khi nào",
+          "Lúc đầu đau ở đâu",
+          "Bây giờ đau ở đâu, có chuyển chỗ không",
+          "Đau liên tục hay từng cơn",
+          "Có gì làm đau tăng hay giảm không"
+        ]
+      },
+      {
+        "id": "r-gi-symptoms",
+        "domain": "history",
+        "criterion": "Hỏi chán ăn, buồn nôn, nôn và thứ tự với đau",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi một phần",
+          "2": "Hỏi đủ chán ăn, buồn nôn, nôn và thứ tự với đau"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Em có chán ăn không",
+          "Có buồn nôn, nôn không",
+          "Đau trước hay nôn trước"
+        ]
+      },
+      {
+        "id": "r-exclusion-history",
+        "domain": "history",
+        "criterion": "Hỏi triệu chứng để loại trừ: tiết niệu, tiêu hóa (tiêu chảy, đi cầu ra máu), bìu/tinh hoàn",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi 1-2 nhóm",
+          "2": "Hỏi đủ 3 nhóm"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đi tiểu có buốt, rắt, có máu không",
+          "Có tiêu chảy, đi cầu ra máu không",
+          "Bìu, tinh hoàn có đau, sưng không"
+        ]
+      },
+      {
+        "id": "r-background",
+        "domain": "epidemiology",
+        "criterion": "Hỏi tiền sử phẫu thuật bụng, thuốc đã dùng, dị ứng, thời điểm ăn uống cuối",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi 1-2 mục",
+          "2": "Hỏi ít nhất 3 mục"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Em đã mổ bụng bao giờ chưa",
+          "Đã uống thuốc gì chưa",
+          "Có dị ứng thuốc không",
+          "Lần cuối ăn uống lúc mấy giờ"
+        ]
+      },
+      {
+        "id": "r-abdomen-technique",
+        "domain": "physical_exam",
+        "criterion": "Khám bụng đúng trình tự (nhìn, sờ nhẹ từ vùng không đau, sờ sâu), bộc lộ đủ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Ấn thẳng vào vùng đau trước",
+          "1": "Thiếu trình tự",
+          "2": "Đúng trình tự, bắt đầu từ xa vùng đau"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Nhìn bụng trước",
+          "Sờ từ hố chậu trái hoặc vùng không đau trước",
+          "Sờ hố chậu phải sau cùng"
+        ]
+      },
+      {
+        "id": "r-peritoneal-signs",
+        "domain": "physical_exam",
+        "criterion": "Tìm điểm đau McBurney, phản ứng thành bụng, phản ứng dội",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Khám 1-2 dấu",
+          "2": "Khám đủ 3 dấu"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Ấn điểm McBurney",
+          "Tìm phản ứng thành bụng",
+          "Tìm phản ứng dội (Blumberg)"
+        ]
+      },
+      {
+        "id": "r-maneuvers",
+        "domain": "physical_exam",
+        "criterion": "Làm ít nhất 2 nghiệm pháp: Rovsing, cơ thắt lưng chậu, cơ bịt",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm nghiệm pháp nào",
+          "1": "Làm 1 nghiệm pháp",
+          "2": "Làm ít nhất 2 nghiệm pháp"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Làm nghiệm pháp Rovsing",
+          "Làm dấu cơ thắt lưng chậu",
+          "Làm dấu cơ bịt"
+        ]
+      },
+      {
+        "id": "r-groin-scrotum",
+        "domain": "physical_exam",
+        "criterion": "Khám bìu/bẹn ở nam để loại trừ xoắn tinh hoàn, thoát vị",
+        "weight": 2,
+        "critical": true,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Không áp dụng (bảng kiểm gốc không có mức đạt một phần)",
+          "2": "Có khám bìu, bẹn"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám bìu, tinh hoàn",
+          "Khám vùng bẹn tìm thoát vị"
+        ]
+      },
+      {
+        "id": "r-investigations",
+        "domain": "investigations",
+        "criterion": "Chỉ định xét nghiệm phù hợp: công thức máu, CRP, nước tiểu; siêu âm bụng",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không chỉ định",
+          "1": "Thiếu siêu âm hoặc CRP",
+          "2": "Đủ xét nghiệm và có siêu âm bụng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho làm công thức máu",
+          "Làm CRP",
+          "Làm tổng phân tích nước tiểu",
+          "Siêu âm bụng"
+        ]
+      },
+      {
+        "id": "r-scores",
+        "domain": "diagnosis",
+        "criterion": "Tính điểm Alvarado và/hoặc AIR đúng và diễn giải nguy cơ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không tính hoặc tính sai nhiều",
+          "1": "Tính sai không quá 1 điểm",
+          "2": "Tính đúng và diễn giải nguy cơ"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Điểm Alvarado bao nhiêu",
+          "Điểm AIR bao nhiêu",
+          "Nguy cơ thấp, trung bình hay cao"
+        ]
+      },
+      {
+        "id": "r-dx-differentials",
+        "domain": "diagnosis",
+        "criterion": "Nêu chẩn đoán viêm ruột thừa cấp chưa biến chứng và ít nhất 3 chẩn đoán phân biệt",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Chẩn đoán sai",
+          "1": "Chẩn đoán đúng, dưới 3 chẩn đoán phân biệt",
+          "2": "Chẩn đoán đúng và đủ ít nhất 3 chẩn đoán phân biệt"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chẩn đoán là gì, đã có biến chứng chưa",
+          "Chẩn đoán phân biệt với bệnh gì"
+        ]
+      },
+      {
+        "id": "r-initial-management",
+        "domain": "management",
+        "criterion": "Xử trí ban đầu: nhịn ăn uống, giảm đau, mời ngoại khoa; không cho về",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Cho về hoặc không mời ngoại khoa",
+          "1": "Mời ngoại khoa nhưng thiếu nhịn ăn uống hoặc giảm đau",
+          "2": "Đủ: nhịn ăn uống, giảm đau, mời ngoại khoa, không cho về"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Em nhịn ăn uống nhé",
+          "Cho thuốc giảm đau",
+          "Mời bác sĩ ngoại khoa khám",
+          "Không cho về nhà"
+        ]
+      },
+      {
+        "id": "r-explain-plan",
+        "domain": "management",
+        "criterion": "Giải thích cho người bệnh về chẩn đoán, khả năng phẫu thuật và các bước tiếp theo",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không giải thích",
+          "1": "Giải thích sơ sài",
+          "2": "Giải thích rõ ràng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Em có thể phải mổ",
+          "Các bước tiếp theo là siêu âm và khám ngoại khoa"
+        ]
+      },
+      {
+        "id": "r-closing",
+        "domain": "communication",
+        "criterion": "Tóm tắt lại cho người bệnh, hỏi còn thắc mắc gì không, dùng từ dễ hiểu, không dùng thuật ngữ chưa giải thích",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Chỉ tóm tắt hoặc chỉ hỏi lại",
+          "2": "Tóm tắt và hỏi lại thắc mắc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Tóm lại tình trạng của em",
+          "Em còn thắc mắc gì không"
+        ],
+        "reliability": "low"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "Diagnosis and treatment of acute appendicitis: 2020 update of the WSES Jerusalem guidelines (World J Emerg Surg 2020;15:27)",
+      "section": "1.9: thang điểm lâm sàng (AIR) và chẩn đoán hình ảnh",
+      "url": "https://wjes.biomedcentral.com/articles/10.1186/s13017-020-00306-3"
+    },
+    {
+      "document": "WSES Jerusalem guidelines for diagnosis and treatment of acute appendicitis (World J Emerg Surg 2016;11:34)",
+      "section": "Bảng so sánh các thang điểm; 4.1-4.2: thời điểm phẫu thuật",
+      "url": "https://wjes.biomedcentral.com/articles/10.1186/s13017-016-0090-5"
+    },
+    {
+      "document": "Alvarado A. A practical score for the early diagnosis of acute appendicitis (Ann Emerg Med 1986;15(5):557-564)",
+      "section": "Thang điểm Alvarado"
+    },
+    {
+      "document": "Andersson M, Andersson RE. Appendicitis Inflammatory Response score (World J Surg 2008;32(8):1843-1849)",
+      "section": "Thang điểm AIR"
+    }
+  ],
+  "forbidden_terms": [
+    "ruột thừa",
+    "mcburney",
+    "phản ứng thành bụng",
+    "phản ứng dội",
+    "blumberg",
+    "rovsing",
+    "cơ thắt lưng chậu",
+    "cơ bịt",
+    "hố chậu",
+    "alvarado",
+    "viêm phúc mạc",
+    "manh tràng",
+    "mạc treo"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Dạ cái đó em không rõ ạ.",
+      "Dạ em không để ý cái đó, em không chắc nữa bác sĩ ạ."
+    ],
+    "not_ordered_lab": [
+      "Dạ bác sĩ chưa cho em làm xét nghiệm đó ạ."
+    ],
+    "out_of_scope": [
+      "Dạ em chỉ biết là em đau bụng như vậy thôi, bác sĩ khám giúp em với."
+    ]
+  }
+}
