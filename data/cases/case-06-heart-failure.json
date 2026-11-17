@@ -1,0 +1,953 @@
+{
+  "schema_version": "1",
+  "id": "case-06-heart-failure",
+  "title": {
+    "vi": "Suy tim mạn mất bù cấp (người cao tuổi)",
+    "en": "Acute decompensation of chronic heart failure (elderly)"
+  },
+  "specialty": "Nội - Tim mạch (người cao tuổi)",
+  "source": {
+    "document": "Hướng dẫn chẩn đoán và điều trị suy tim cấp và mạn (Quyết định 1857/QĐ-BYT ngày 05/07/2022)",
+    "year": 2022,
+    "section": "Bảng 3. Triệu chứng và dấu hiệu; Bảng 4. Peptide bài niệu; III. Suy tim cấp (yếu tố thúc đẩy, xử trí ban đầu)"
+  },
+  "review": {
+    "status": "draft",
+    "reviewer": null,
+    "date": null,
+    "notes": [
+      "DRAFT (S20-11, AVP-156). The project owner chose heart failure over COPD for S20-11 on 2026-11-18. Converted from the team's S20 data pack (case-06-heart-failure.draft.md + case-06-heart-failure.osce.json, 2026-11-18). The scenario, lay wording, vitals, exam findings and lab values are author-chosen SIMULATED numbers picked to fit the 1857/QĐ-BYT criteria, not taken from a real patient. Every entry is origin=author_added and needs clinician review.",
+      "source.case_number is omitted: this case is not one of the team's 53-disease table (that table is infectious-disease protocols). The schema was changed in this PR to make case_number optional; confirm with the project owner.",
+      "Teaching aim (proposed by the pack): elicit orthopnoea, paroxysmal nocturnal dyspnoea, oedema and weight gain; find the precipitating factors (salty food, stopped diuretic); examine neck veins, hepatojugular reflux, crackles, S3 and oedema; read NT-proBNP against the age threshold; recognise the criteria for intensive-care transfer.",
+      "Informant: the pack says the patient tells the story and her son answers the medication part. The schema has one informant, so informant.role=self and the son's knowledge (prescription photo, old discharge paper on his phone, confirming the stopped diuretic) is put into the patient's own words as things her son says or shows. The pack supports each of these. TODO(clinician): keep 'patient tells, son adds', or only one speaker?",
+      "Persona (tier 2, not clinical): name 'Bà Lê Thị H.', northern dialect, xưng 'tôi' are author choices; the pack gives none.",
+      "KNOWN APP GAP (not fixed here, code is out of scope): apps/api/avp_api/services/patient_agent.py has a hard-coded static prompt 'NGƯỜI MẸ của một bé 18 tháng tuổi', xưng 'em', and labels the patient's lines 'Mẹ:'. For this self-informant elderly case the Patient Agent will still be told it is a mother. Needs a separate code task.",
+      "TODO(clinician): keep the patient at female / 74 years / 61 kg? The pack picks 74 so the 55-75 age band (NT-proBNP > 900 pg/mL) applies.",
+      "TODO(clinician): the pack gives 58 kg one week earlier but does not say how the patient knows it; h-weight has her say she weighed herself at home. Confirm.",
+      "TODO(clinician): list of drug names the son reads from the prescription photo (pack question 2). Not filled: h-meds only says 'one water pill in the morning and several heart drugs', no names and no doses.",
+      "TODO(clinician): keep troponin T hs (18 then 19 ng/L after 3 h), chest X-ray and the ECG in labs[] (pack question 3)? No bedside echo result is in the pack, so none is listed.",
+      "TODO(clinician): labs[].flag values other than NT-proBNP are author-chosen (troponin 'normal' encodes only the pack's 'no dynamic rise'; creatinine 112 µmol/L 'high', sodium 134 mmol/L 'low', glucose 9.8 mmol/L 'high', Hb 118 g/L 'low' use common adult ranges). ref_range is left null on purpose (none in the pack). Confirm each value and flag; the pack marks creatinine [BS].",
+      "TODO(clinician): resp rate 24/min is chosen just below the > 25/min ICU-transfer criterion (pack marks it [BS]); confirm pulse 106, BP 148/88, SpO2 89% on room air.",
+      "TODO(clinician): heart exam (apex in 6th intercostal space outside the left mid-clavicular line, S3, systolic murmur 2/6 at the apex) is marked [BS] in the pack. Confirm.",
+      "TODO(clinician): the pack proposes a 2-state vitals machine (S0 acute decompensation; S1 acute pulmonary oedema: RR 32, SpO2 84%, BP 172/96, rising crackles, sweating) triggered e.g. by lying the patient flat or withholding oxygen. Not wired: vitals_service only supports case-01-hfmd. Decide fixed vitals vs a state machine and the triggers (pack question 4).",
+      "TODO(clinician): diagnosis.differentials only lists acute coronary syndrome (the pack says it must be excluded). Add any other differentials you want scored.",
+      "TODO(clinician): management[] has no drug name or dose of its own; the IV loop diuretic rule (1-2 times the daily oral dose) is copied from the pack/1857 and the case does not score doses.",
+      "Rubric conversion: pack levels chua_dat/dat_mot_phan/dat -> anchors 0/1/2; red_flag -> critical. Pack domains mapped: exam -> physical_exam; reasoning R01 (NT-proBNP) -> investigations; reasoning R02 -> diagnosis; H04 (cardiac history, old EF, current drugs) -> epidemiology, because the pack has no epidemiology criterion and the schema needs all 7 domains. TODO(clinician): confirm the H04 -> epidemiology mapping, the weights and the critical flags; scoring coefficients 1.0/0.5/0 from the pack are not in the schema (the scorer uses anchors).",
+      "forbidden_terms hold the diagnosis, staging and exam-sign words a lay patient would not say. 'nhồi máu cơ tim', 'stent', 'tăng huyết áp', 'tiểu đường' and 'thuốc lợi tiểu' are NOT forbidden: the patient knows them from her discharge paper and prescriptions.",
+      "RAG corpus data/guidelines/heart-failure_chunks.json holds only 1857/QĐ-BYT (rights_checked=true for MOH documents set on the project owner's instruction, 2026-11-18, S20-11). Not ingested: esc-hf-2021-2023 (ESC 2021 heart failure guideline + 2023 update), rights not confirmed by owner.",
+      "1857/QĐ-BYT was read from web copies (see the pack's source.json), not from a verified original. TODO(clinician): check the case against the original 1857/QĐ-BYT."
+    ]
+  },
+  "catalog": {
+    "patient_group": "elderly",
+    "display_complaint": "Mấy đêm nay tôi nằm xuống là ngộp, phải ngồi dậy mới thở được, chân thì sưng lên.",
+    "cover": "/cases/heart-failure-cover.svg",
+    "exam_mode": "2d",
+    "exam_regions": [
+      {
+        "id": "general",
+        "label": "Toàn trạng",
+        "x": 0.5,
+        "y": 0.1
+      },
+      {
+        "id": "neck",
+        "label": "Cổ",
+        "x": 0.5,
+        "y": 0.245
+      },
+      {
+        "id": "vitals",
+        "label": "Sinh hiệu, đầu chi",
+        "x": 0.2,
+        "y": 0.54
+      },
+      {
+        "id": "lungs",
+        "label": "Phổi",
+        "x": 0.41,
+        "y": 0.34
+      },
+      {
+        "id": "heart",
+        "label": "Tim",
+        "x": 0.56,
+        "y": 0.38
+      },
+      {
+        "id": "abdomen",
+        "label": "Bụng, gan",
+        "x": 0.44,
+        "y": 0.5
+      },
+      {
+        "id": "legs",
+        "label": "Hai cẳng chân",
+        "x": 0.4,
+        "y": 0.82
+      }
+    ],
+    "estimated_minutes": null,
+    "order": 6
+  },
+  "patient": {
+    "name": "Bà Lê Thị H.",
+    "age": {
+      "value": 74,
+      "unit": "years"
+    },
+    "sex": "female",
+    "occupation": "Nội trợ",
+    "informant": {
+      "role": "self"
+    },
+    "persona": {
+      "personality": "hiền, nói chậm, hay ngắt câu để thở",
+      "dialect": "north",
+      "emotional_state": "mệt và lo vì mấy đêm không nằm ngủ được",
+      "speech_style": "bà 74 tuổi, nội trợ; xưng tôi, gọi bác sĩ; con trai đi cùng, có ảnh đơn thuốc và giấy ra viện cũ trong điện thoại"
+    }
+  },
+  "presentation": {
+    "chief_complaint": "Mấy đêm nay tôi nằm xuống là ngộp, phải ngồi dậy mới thở được, chân thì sưng lên.",
+    "triage_note": "Nữ 74 tuổi, khó thở tăng dần 1 tuần, 3 đêm nay khó thở khi nằm, phù hai chân. Huyết áp 148/88 mmHg, mạch 106 lần/phút, nhịp thở 24 lần/phút, SpO2 89% khí trời, nhiệt độ 36,8°C, cân nặng 61 kg.",
+    "severity_state": {
+      "label": "mat-bu-cap",
+      "confirmed": false
+    },
+    "vitals": {
+      "pulse": 106,
+      "temp_c": 36.8,
+      "resp_rate": 24,
+      "bp_systolic": 148,
+      "bp_diastolic": 88,
+      "spo2": 89
+    }
+  },
+  "history": [
+    {
+      "id": "h-exertional-dyspnea",
+      "topic": "Khó thở khi đi lại, mệt",
+      "polarity": "positive",
+      "lay_response": "Khoảng một tuần nay tôi mệt lắm, đi lại trong nhà thôi cũng thấy khó thở. Mọi khi tôi còn đi bộ được, giờ đi được một đoạn ngắn là phải đứng lại, càng ngày càng đi được ít hơn.",
+      "clinical_note": "Mệt, khó thở khi gắng sức nhẹ (đi lại trong nhà) khoảng 1 tuần, quãng đi bộ giảm dần.",
+      "intents": [
+        "khó thở từ khi nào",
+        "đi lại có khó thở không",
+        "làm việc nhẹ có mệt không",
+        "đi bộ được bao xa",
+        "có mệt không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-orthopnea",
+      "topic": "Khó thở khi nằm",
+      "polarity": "positive",
+      "lay_response": "Ba đêm nay cứ nằm xuống là tôi ngộp, phải kê ba cái gối cao mới nằm được.",
+      "clinical_note": "Khó thở khi nằm 3 đêm nay, phải kê 3 gối.",
+      "intents": [
+        "nằm có khó thở không",
+        "nằm mấy gối",
+        "ngủ phải kê gối cao không",
+        "nằm đầu thấp được không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-pnd",
+      "topic": "Thức giấc giữa đêm vì khó thở",
+      "polarity": "positive",
+      "lay_response": "Có hai lần đang ngủ tôi giật mình tỉnh dậy vì ngộp thở, phải ngồi dậy ra bên cửa sổ một lúc mới đỡ.",
+      "clinical_note": "Khó thở kịch phát về đêm: 2 lần thức giấc vì ngộp, phải ngồi dậy bên cửa sổ.",
+      "intents": [
+        "đêm có bị tỉnh dậy vì khó thở không",
+        "đang ngủ có ngộp thở không",
+        "ban đêm có phải ngồi dậy để thở không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-oedema",
+      "topic": "Sưng chân",
+      "polarity": "positive",
+      "lay_response": "Hai chân tôi sưng dần lên, lúc đầu ở mắt cá rồi lên tới bắp chân, cả hai bên như nhau.",
+      "clinical_note": "Phù hai chi dưới tăng dần từ mắt cá lên cẳng chân, hai bên.",
+      "intents": [
+        "chân có sưng không",
+        "phù từ khi nào",
+        "sưng ở đâu",
+        "sưng một bên hay hai bên"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-weight",
+      "topic": "Cân nặng",
+      "polarity": "positive",
+      "lay_response": "Tuần trước tôi cân ở nhà được 58 cân. Dạo này người nặng nề, quần áo mặc chật hơn hẳn.",
+      "clinical_note": "Một tuần trước 58 kg; nay 61 kg khi đo tại viện (tăng 3 kg/tuần, trên ngưỡng 2 kg/tuần của 1857 Bảng 3). Quần áo chật hơn.",
+      "intents": [
+        "có tăng cân không",
+        "cân nặng bao nhiêu",
+        "quần áo có chật hơn không",
+        "người có nặng nề không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-cough",
+      "topic": "Ho",
+      "polarity": "positive",
+      "lay_response": "Tôi có ho, ho khan thôi, toàn về đêm.",
+      "clinical_note": "Ho khan về đêm.",
+      "intents": [
+        "có ho không",
+        "ho khan hay có đờm",
+        "ho lúc nào"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-urine",
+      "topic": "Đi tiểu",
+      "polarity": "positive",
+      "lay_response": "Mấy hôm nay tôi đi tiểu ít hơn mọi khi.",
+      "clinical_note": "Tiểu ít hơn.",
+      "intents": [
+        "đi tiểu thế nào",
+        "tiểu nhiều hay ít",
+        "nước tiểu có ít đi không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-salty-food",
+      "topic": "Ăn uống tuần trước",
+      "polarity": "positive",
+      "lay_response": "Tuần trước nhà tôi làm giỗ, mấy ngày liền tôi ăn toàn đồ mặn, dưa, mắm, thịt kho.",
+      "clinical_note": "Yếu tố thúc đẩy: ăn mặn nhiều ngày (đám giỗ tuần trước). Chỉ khai khi được hỏi.",
+      "intents": [
+        "dạo này ăn uống thế nào",
+        "có ăn mặn không",
+        "gần đây có ăn gì khác thường không",
+        "có ăn nhiều muối không"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-stopped-diuretic",
+      "topic": "Bỏ thuốc lợi tiểu",
+      "polarity": "positive",
+      "lay_response": "Thú thật với bác sĩ, năm hôm nay tôi không uống viên thuốc lợi tiểu buổi sáng, vì uống vào đi tiểu nhiều, đêm phải dậy mấy lần. Con trai tôi nó cũng biết chuyện này.",
+      "clinical_note": "Yếu tố thúc đẩy: không tuân thủ điều trị, bỏ thuốc lợi tiểu 5 ngày vì tiểu nhiều, dậy đêm. Con trai xác nhận. Chỉ khai khi được hỏi.",
+      "intents": [
+        "có uống thuốc đều không",
+        "có bỏ thuốc không",
+        "thuốc lợi tiểu có uống không",
+        "lần cuối uống thuốc là khi nào"
+      ],
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-chest-pain",
+      "topic": "Đau ngực",
+      "polarity": "negative",
+      "lay_response": "Không, tôi không đau ngực, cũng không thấy ngực nặng như có gì đè lên.",
+      "clinical_note": "Không đau ngực, không nặng ngực (cần hỏi để tìm hội chứng vành cấp, 1857).",
+      "intents": [
+        "có đau ngực không",
+        "ngực có nặng không",
+        "có tức ngực không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-palpitations-syncope",
+      "topic": "Hồi hộp, ngất",
+      "polarity": "negative",
+      "lay_response": "Tôi không thấy hồi hộp, tim đập thình thịch thì không, cũng chưa ngất lần nào.",
+      "clinical_note": "Không hồi hộp, không ngất.",
+      "intents": [
+        "có hồi hộp không",
+        "tim có đập nhanh không",
+        "có ngất không",
+        "có choáng ngã không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-infection",
+      "topic": "Sốt, ho đờm, đau họng",
+      "polarity": "negative",
+      "lay_response": "Tôi không sốt, ho thì không có đờm xanh đờm vàng gì, họng cũng không đau.",
+      "clinical_note": "Không sốt, không ho đờm mủ, không đau họng.",
+      "intents": [
+        "có sốt không",
+        "có khạc đờm không",
+        "đờm màu gì",
+        "có đau họng không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-calf-hemoptysis",
+      "topic": "Đau bắp chân một bên, ho ra máu",
+      "polarity": "negative",
+      "lay_response": "Bắp chân tôi không đau bên nào cả, chỉ sưng thôi. Tôi cũng không ho ra máu.",
+      "clinical_note": "Không đau một bên bắp chân, không ho ra máu.",
+      "intents": [
+        "bắp chân có đau không",
+        "có đau một bên chân không",
+        "có ho ra máu không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-neg-nsaid",
+      "topic": "Thuốc giảm đau kháng viêm",
+      "polarity": "negative",
+      "lay_response": "Tôi không uống thuốc giảm đau xương khớp hay thuốc kháng viêm gì cả.",
+      "clinical_note": "Không dùng thuốc giảm đau kháng viêm.",
+      "intents": [
+        "có uống thuốc giảm đau không",
+        "có uống thuốc kháng viêm không",
+        "có uống thuốc xương khớp không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-past-mi",
+      "topic": "Tiền sử bệnh tim",
+      "polarity": "positive",
+      "lay_response": "Năm 2021 tôi bị nhồi máu cơ tim, có đặt stent rồi. Giấy ra viện con trai tôi chụp lại trong điện thoại đây bác sĩ.",
+      "clinical_note": "Nhồi máu cơ tim năm 2021, đã đặt stent (theo giấy ra viện).",
+      "intents": [
+        "trước đây có bệnh tim không",
+        "có từng nằm viện vì tim không",
+        "có đặt stent không",
+        "có bị nhồi máu cơ tim không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-old-echo",
+      "topic": "Siêu âm tim lần trước",
+      "polarity": "positive",
+      "lay_response": "Sáu tháng trước tôi có siêu âm tim. Trên giấy ra viện chỗ chữ EF ghi 32 phần trăm, cái đó là gì thì tôi không hiểu.",
+      "clinical_note": "Siêu âm tim 6 tháng trước: phân suất tống máu thất trái 32% (theo giấy ra viện, EF ≤ 40%). Người bệnh không biết chỉ số EF nghĩa là gì.",
+      "intents": [
+        "đã siêu âm tim chưa",
+        "kết quả siêu âm tim lần trước",
+        "EF bao nhiêu",
+        "giấy ra viện ghi gì"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-htn-dm",
+      "topic": "Bệnh mạn tính khác",
+      "polarity": "positive",
+      "lay_response": "Tôi bị huyết áp cao mười lăm năm nay, tiểu đường thì mười năm rồi.",
+      "clinical_note": "Tăng huyết áp 15 năm, đái tháo đường týp 2 10 năm.",
+      "intents": [
+        "có bệnh gì khác không",
+        "có bị huyết áp cao không",
+        "có bị tiểu đường không",
+        "bệnh mạn tính"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-meds",
+      "topic": "Thuốc đang dùng",
+      "polarity": "positive",
+      "lay_response": "Sáng nào tôi cũng có một viên thuốc lợi tiểu, với mấy thứ thuốc tim nữa. Tên thuốc thì tôi không nhớ, con trai tôi có chụp đơn thuốc trong điện thoại.",
+      "clinical_note": "Một thuốc lợi tiểu buổi sáng và nhiều thuốc tim mạch khác; không nhớ tên; con trai có ảnh đơn thuốc. Tên thuốc: TODO(clinician). Ca không dạy liều.",
+      "intents": [
+        "đang uống thuốc gì",
+        "thuốc hằng ngày",
+        "tên thuốc là gì",
+        "có đơn thuốc không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-social",
+      "topic": "Hút thuốc, rượu bia",
+      "polarity": "negative",
+      "lay_response": "Tôi không hút thuốc, rượu bia cũng không uống.",
+      "clinical_note": "Không hút thuốc lá, không uống rượu.",
+      "intents": [
+        "có hút thuốc không",
+        "có uống rượu không",
+        "có uống bia không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-allergy",
+      "topic": "Dị ứng",
+      "polarity": "negative",
+      "lay_response": "Tôi không dị ứng thuốc gì cả.",
+      "clinical_note": "Không dị ứng.",
+      "intents": [
+        "có dị ứng thuốc không",
+        "có dị ứng gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "h-family",
+      "topic": "Tiền sử gia đình",
+      "polarity": "negative",
+      "lay_response": "Nhà tôi thì không thấy ai bị bệnh gì đặc biệt.",
+      "clinical_note": "Gia đình: không ghi nhận đặc biệt.",
+      "intents": [
+        "gia đình có ai bị bệnh tim không",
+        "bố mẹ anh chị em có bệnh gì không"
+      ],
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "exam": [
+    {
+      "id": "e-general",
+      "region": "general",
+      "action": "Đánh giá toàn trạng",
+      "finding": "Tỉnh, ngồi đầu cao, thở nhanh, nói được câu dài vừa phải.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-vitals",
+      "region": "vitals",
+      "action": "Đo sinh hiệu",
+      "finding": "Huyết áp 148/88 mmHg. Mạch 106 lần/phút, đều. Nhịp thở 24 lần/phút. SpO2 89% khí trời. Nhiệt độ 36,8°C. Cân nặng 61 kg.",
+      "red_flag": true,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-perfusion",
+      "region": "vitals",
+      "action": "Khám đầu chi và thời gian làm đầy mao mạch",
+      "finding": "Đầu chi ấm, thời gian làm đầy mao mạch dưới 2 giây.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-neck",
+      "region": "neck",
+      "action": "Khám tĩnh mạch cổ ở tư thế 45° và làm nghiệm pháp phản hồi gan - tĩnh mạch cổ",
+      "finding": "Tĩnh mạch cổ nổi ở tư thế 45°. Phản hồi gan - tĩnh mạch cổ dương tính.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-lungs",
+      "region": "lungs",
+      "action": "Gõ và nghe phổi",
+      "finding": "Ran ẩm (ran nổ) hai đáy phổi, lên đến 1/3 dưới. Gõ đục nhẹ đáy phải.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-heart",
+      "region": "heart",
+      "action": "Sờ mỏm tim và nghe tim",
+      "finding": "Mỏm tim ở khoang liên sườn VI, ngoài đường trung đòn trái, diện đập rộng. Nhịp tim nhanh, đều. Có tiếng T3 (ngựa phi). Âm thổi tâm thu 2/6 ở mỏm.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-abdomen",
+      "region": "abdomen",
+      "action": "Khám bụng, gan",
+      "finding": "Gan to 2 cm dưới bờ sườn, mềm, hơi đau. Không báng rõ.",
+      "red_flag": false,
+      "origin": "author_added"
+    },
+    {
+      "id": "e-legs",
+      "region": "legs",
+      "action": "Khám phù và bắp chân hai bên",
+      "finding": "Phù mềm, ấn lõm hai cẳng chân, đối xứng. Bắp chân không đau.",
+      "red_flag": false,
+      "origin": "author_added"
+    }
+  ],
+  "labs": [
+    {
+      "id": "l-ntprobnp",
+      "name": "NT-proBNP",
+      "aliases": [
+        "NT-proBNP",
+        "BNP",
+        "peptide bài niệu",
+        "pro-BNP"
+      ],
+      "result_text": "NT-proBNP 3.850 pg/mL.",
+      "value": 3850,
+      "unit": "pg/mL",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-troponin",
+      "name": "Troponin T độ nhạy cao",
+      "aliases": [
+        "troponin",
+        "troponin T",
+        "hs-TnT",
+        "men tim"
+      ],
+      "result_text": "Troponin T hs 18 ng/L; lặp lại sau 3 giờ 19 ng/L.",
+      "value": null,
+      "unit": "ng/L",
+      "ref_range": null,
+      "flag": "normal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-creatinine",
+      "name": "Creatinin máu",
+      "aliases": [
+        "creatinin",
+        "creatinine",
+        "chức năng thận"
+      ],
+      "result_text": "Creatinin 112 µmol/L.",
+      "value": 112,
+      "unit": "µmol/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-electrolytes",
+      "name": "Điện giải đồ",
+      "aliases": [
+        "điện giải",
+        "natri",
+        "kali",
+        "Na",
+        "K",
+        "ion đồ"
+      ],
+      "result_text": "Natri 134 mmol/L; Kali 4,6 mmol/L.",
+      "value": null,
+      "unit": "mmol/L",
+      "ref_range": null,
+      "flag": "low",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-glucose",
+      "name": "Glucose máu",
+      "aliases": [
+        "glucose",
+        "đường máu",
+        "đường huyết"
+      ],
+      "result_text": "Glucose máu 9,8 mmol/L.",
+      "value": 9.8,
+      "unit": "mmol/L",
+      "ref_range": null,
+      "flag": "high",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-hb",
+      "name": "Hemoglobin",
+      "aliases": [
+        "Hb",
+        "hemoglobin",
+        "huyết sắc tố",
+        "công thức máu",
+        "CTM"
+      ],
+      "result_text": "Hb 118 g/L.",
+      "value": 118,
+      "unit": "g/L",
+      "ref_range": null,
+      "flag": "low",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-ecg",
+      "name": "Điện tâm đồ",
+      "aliases": [
+        "điện tim",
+        "ECG",
+        "EKG",
+        "điện tâm đồ"
+      ],
+      "result_text": "Nhịp nhanh xoang 106 lần/phút; sóng Q cũ ở V1-V4; không có ST chênh mới.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    },
+    {
+      "id": "l-cxr",
+      "name": "X-quang ngực thẳng",
+      "aliases": [
+        "X-quang ngực",
+        "X-quang phổi",
+        "chụp phổi",
+        "phim phổi"
+      ],
+      "result_text": "Bóng tim to; tái phân bố tuần hoàn phổi; tràn dịch màng phổi phải lượng ít.",
+      "value": null,
+      "unit": null,
+      "ref_range": null,
+      "flag": "abnormal",
+      "origin": "author_added"
+    }
+  ],
+  "overuse_orders": [],
+  "diagnosis": {
+    "primary": "Suy tim mạn phân suất tống máu giảm, đợt mất bù cấp",
+    "severity_grade": "mat-bu-cap",
+    "differentials": [
+      "Hội chứng vành cấp"
+    ],
+    "acceptable_alternatives": [
+      "Suy tim mạn mất bù cấp",
+      "Đợt mất bù cấp của suy tim mạn phân suất tống máu giảm (EF 32%)",
+      "Suy tim PSTM giảm mất bù cấp, NYHA IV, giai đoạn C"
+    ]
+  },
+  "management": [
+    "Nhập viện.",
+    "Thở oxy vì SpO2 dưới 90% (1857).",
+    "Lợi tiểu quai đường tĩnh mạch; người đang uống lợi tiểu quai thì liều tĩnh mạch khởi đầu bằng 1-2 lần liều uống hằng ngày (1857). Ca không chấm liều cụ thể.",
+    "Theo dõi lượng nước tiểu, cân nặng, điện giải và creatinin.",
+    "Loại trừ hội chứng vành cấp.",
+    "Đánh giá tiêu chí chuyển hồi sức hoặc đơn vị chăm sóc tim mạch đặc biệt (SpO2 dưới 90% dù thở oxy, nhịp thở trên 25 lần/phút, tần số tim dưới 40 hoặc trên 130 lần/phút, huyết áp tâm thu dưới 90 mmHg, giảm tưới máu, nguy cơ đặt nội khí quản; 1857).",
+    "Tư vấn ăn nhạt, uống thuốc đều (không tự bỏ thuốc lợi tiểu), tự cân hằng ngày."
+  ],
+  "rubric": {
+    "version": 1,
+    "scale": [
+      0,
+      1,
+      2
+    ],
+    "items": [
+      {
+        "id": "r-opening",
+        "domain": "communication",
+        "criterion": "Chào hỏi, giới thiệu bản thân, xác nhận danh tính người bệnh và người nhà, giải thích mục đích buổi khám",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Làm 1-2 trong 3 việc",
+          "2": "Làm đủ 3 việc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chào bác, tôi là bác sĩ",
+          "Bác tên gì, năm nay bao nhiêu tuổi",
+          "Anh là gì của bác",
+          "Hôm nay tôi sẽ hỏi bệnh và khám cho bác"
+        ],
+        "reliability": "low"
+      },
+      {
+        "id": "r-dyspnea",
+        "domain": "history",
+        "criterion": "Khai thác khó thở: khi gắng sức, khi nằm (số gối), kịch phát về đêm; thời gian diễn tiến",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Hỏi không quá 1 kiểu khó thở",
+          "1": "Hỏi 2 kiểu khó thở",
+          "2": "Hỏi đủ 3 kiểu khó thở"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bác khó thở từ bao giờ, đi lại có khó thở không",
+          "Nằm xuống có khó thở không, bác phải kê mấy cái gối",
+          "Đêm đang ngủ có phải tỉnh dậy vì khó thở không"
+        ]
+      },
+      {
+        "id": "r-fluid",
+        "domain": "history",
+        "criterion": "Hỏi phù, tăng cân, lượng nước tiểu",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi phù hoặc nước tiểu nhưng thiếu tăng cân",
+          "2": "Hỏi đủ phù, tăng cân và lượng nước tiểu"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chân bác có sưng không",
+          "Dạo này bác có tăng cân không",
+          "Bác đi tiểu nhiều hay ít"
+        ]
+      },
+      {
+        "id": "r-precipitants",
+        "domain": "history",
+        "criterion": "Tìm yếu tố thúc đẩy: ăn mặn, bỏ thuốc, nhiễm trùng, đau ngực, hồi hộp, thuốc kháng viêm",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không tìm yếu tố thúc đẩy",
+          "1": "Tìm ra một yếu tố",
+          "2": "Tìm ra cả ăn mặn và bỏ thuốc, có hỏi đau ngực"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Dạo này bác ăn uống thế nào, có ăn mặn không",
+          "Bác có uống thuốc đều không, có bỏ thuốc không",
+          "Bác có đau ngực không",
+          "Có sốt, ho đờm không",
+          "Có hồi hộp không",
+          "Có uống thuốc giảm đau kháng viêm không"
+        ]
+      },
+      {
+        "id": "r-background",
+        "domain": "epidemiology",
+        "criterion": "Hỏi tiền sử tim mạch, EF cũ, thuốc đang dùng",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không hỏi",
+          "1": "Hỏi một phần",
+          "2": "Hỏi đủ tiền sử tim mạch, EF cũ và thuốc đang dùng"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Trước đây bác có bệnh tim không",
+          "Lần siêu âm tim trước kết quả thế nào",
+          "Bác đang uống những thuốc gì"
+        ]
+      },
+      {
+        "id": "r-vitals-danger",
+        "domain": "physical_exam",
+        "criterion": "Đánh giá sinh hiệu và tiêu chí nguy hiểm: SpO2, nhịp thở, mạch, huyết áp, tưới máu đầu chi",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Đánh giá không quá 2 trong 5 yếu tố",
+          "1": "Đánh giá 3-4 yếu tố",
+          "2": "Đánh giá đủ 5 yếu tố"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Đo SpO2, đếm nhịp thở",
+          "Đo mạch, huyết áp",
+          "Sờ đầu chi, đo thời gian làm đầy mao mạch"
+        ]
+      },
+      {
+        "id": "r-neck-veins",
+        "domain": "physical_exam",
+        "criterion": "Khám tĩnh mạch cổ ở 45° và phản hồi gan - tĩnh mạch cổ",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Khám một trong hai",
+          "2": "Khám cả hai, đúng kỹ thuật"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám tĩnh mạch cổ ở tư thế 45 độ",
+          "Làm nghiệm pháp phản hồi gan - tĩnh mạch cổ"
+        ]
+      },
+      {
+        "id": "r-heart-lungs",
+        "domain": "physical_exam",
+        "criterion": "Khám tim (mỏm tim, T3) và phổi (ran ẩm, mức độ)",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Khám một phần",
+          "2": "Khám đủ tim và phổi"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Sờ mỏm tim, nghe tim tìm T3",
+          "Nghe phổi, ran ẩm lên đến đâu"
+        ]
+      },
+      {
+        "id": "r-liver-legs",
+        "domain": "physical_exam",
+        "criterion": "Khám gan, phù chi dưới (ấn lõm), bắp chân",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không khám",
+          "1": "Khám một phần",
+          "2": "Khám đủ gan, phù và bắp chân"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Khám bụng, gan có to không",
+          "Ấn xem phù có lõm không",
+          "Khám bắp chân hai bên"
+        ]
+      },
+      {
+        "id": "r-ntprobnp",
+        "domain": "investigations",
+        "criterion": "Diễn giải NT-proBNP theo ngưỡng tuổi",
+        "weight": 2,
+        "critical": false,
+        "anchors": {
+          "0": "Không diễn giải",
+          "1": "Nói NT-proBNP tăng nhưng không theo ngưỡng tuổi",
+          "2": "Diễn giải đúng theo ngưỡng tuổi (trên 900 pg/mL ở nhóm 55-75 tuổi)"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho làm NT-proBNP",
+          "NT-proBNP 3.850 cao hơn ngưỡng 900 của nhóm 55-75 tuổi"
+        ]
+      },
+      {
+        "id": "r-dx",
+        "domain": "diagnosis",
+        "criterion": "Chẩn đoán suy tim mạn phân suất tống máu giảm mất bù cấp, nêu yếu tố thúc đẩy và cần loại trừ hội chứng vành cấp",
+        "weight": 3,
+        "critical": false,
+        "anchors": {
+          "0": "Chẩn đoán sai hoặc không chẩn đoán",
+          "1": "Chẩn đoán đúng nhưng thiếu yếu tố thúc đẩy hoặc thiếu loại trừ hội chứng vành cấp",
+          "2": "Chẩn đoán đúng, nêu yếu tố thúc đẩy và cần loại trừ hội chứng vành cấp"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Chẩn đoán là gì",
+          "Yếu tố nào làm bệnh nặng lên",
+          "Cần loại trừ hội chứng vành cấp"
+        ]
+      },
+      {
+        "id": "r-acute-management",
+        "domain": "management",
+        "criterion": "Nhập viện, thở oxy (SpO2 < 90%), lợi tiểu quai tĩnh mạch, theo dõi nước tiểu, cân nặng, điện giải",
+        "weight": 3,
+        "critical": true,
+        "anchors": {
+          "0": "Không cho thở oxy hoặc không dùng lợi tiểu",
+          "1": "Có oxy và lợi tiểu nhưng thiếu kế hoạch theo dõi",
+          "2": "Đủ nhập viện, oxy, lợi tiểu quai tĩnh mạch và theo dõi"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Cho bác nhập viện",
+          "Cho thở oxy",
+          "Dùng lợi tiểu quai đường tĩnh mạch",
+          "Theo dõi nước tiểu, cân nặng, điện giải"
+        ]
+      },
+      {
+        "id": "r-counselling",
+        "domain": "management",
+        "criterion": "Tư vấn ăn nhạt, tuân thủ thuốc, tự cân hằng ngày",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không tư vấn",
+          "1": "Tư vấn một phần",
+          "2": "Tư vấn đủ ba ý"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Bác cần ăn nhạt",
+          "Uống thuốc đều, không tự bỏ thuốc",
+          "Tự cân mỗi ngày"
+        ]
+      },
+      {
+        "id": "r-closing",
+        "domain": "communication",
+        "criterion": "Tóm tắt lại cho người bệnh và người nhà, hỏi còn thắc mắc gì không, dùng từ dễ hiểu, không dùng thuật ngữ chưa giải thích",
+        "weight": 1,
+        "critical": false,
+        "anchors": {
+          "0": "Không làm",
+          "1": "Chỉ tóm tắt hoặc chỉ hỏi lại",
+          "2": "Tóm tắt và hỏi lại thắc mắc"
+        },
+        "origin": "author_added",
+        "expected_questions": [
+          "Tóm lại tình trạng của bác",
+          "Bác và anh còn thắc mắc gì không"
+        ],
+        "reliability": "low"
+      }
+    ]
+  },
+  "citations": [
+    {
+      "document": "Hướng dẫn chẩn đoán và điều trị suy tim cấp và mạn (Quyết định 1857/QĐ-BYT ngày 05/07/2022)",
+      "section": "Bảng 3. Triệu chứng và dấu hiệu; Bảng 4. Peptide bài niệu"
+    },
+    {
+      "document": "Hướng dẫn chẩn đoán và điều trị suy tim cấp và mạn (Quyết định 1857/QĐ-BYT ngày 05/07/2022)",
+      "section": "III. Suy tim cấp: nguyên nhân, yếu tố thúc đẩy, xử trí ban đầu"
+    }
+  ],
+  "forbidden_terms": [
+    "suy tim",
+    "mất bù",
+    "phân suất tống máu",
+    "PSTM",
+    "NYHA",
+    "giai đoạn C",
+    "phù phổi",
+    "ngựa phi",
+    "tĩnh mạch cổ",
+    "hội chứng vành cấp",
+    "NT-proBNP"
+  ],
+  "fallback_lines": {
+    "unknown_symptom": [
+      "Cái đó thì tôi không rõ bác sĩ ạ.",
+      "Tôi không để ý cái đó, tôi không chắc nữa."
+    ],
+    "not_ordered_lab": [
+      "Bác sĩ chưa cho tôi làm xét nghiệm đó."
+    ],
+    "out_of_scope": [
+      "Tôi chỉ biết là mình bị như thế thôi, bác sĩ xem giúp tôi."
+    ]
+  }
+}
