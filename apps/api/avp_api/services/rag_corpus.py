@@ -11,13 +11,22 @@ from avp_api.db.repositories.rag_repo import ChunkIn, DocumentIn, RagRepository,
 from avp_api.providers.embeddings import EmbeddingProvider
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
-DEFAULT_CORPUS = REPO_ROOT / "data" / "guidelines" / "hfmd_moh_chunks.json"
+GUIDELINES_DIR = REPO_ROOT / "data" / "guidelines"
+DEFAULT_CORPUS = GUIDELINES_DIR / "hfmd_moh_chunks.json"
+
+# Sentinel: take the case scope from the corpus file (AVP-151).
+FROM_FILE = "__from_file__"
 
 
-def load_corpus(path: Path = DEFAULT_CORPUS) -> list[DocumentIn]:
+def load_corpus(path: Path = DEFAULT_CORPUS, case_id: str | None = FROM_FILE) -> list[DocumentIn]:
+    """Case scope (AVP-151): a document's `case_id` key wins, else the file's
+    top-level `case_id`, else None (shared by every case). Passing `case_id`
+    (a case id, or None for shared) overrides both."""
     raw = json.loads(path.read_text(encoding="utf-8"))
+    file_case = raw.get("case_id")
     docs = []
     for d in raw["documents"]:
+        scope = d.get("case_id", file_case) if case_id == FROM_FILE else case_id
         docs.append(
             DocumentIn(
                 source_key=d["source_key"],
@@ -28,6 +37,7 @@ def load_corpus(path: Path = DEFAULT_CORPUS) -> list[DocumentIn]:
                 rights_checked=d.get("rights_checked") is True,
                 review_status=d.get("review_status", "draft"),
                 chunks=[ChunkIn(section=c["section"], text=c["text"]) for c in d["chunks"]],
+                case_id=scope,
             )
         )
     return docs

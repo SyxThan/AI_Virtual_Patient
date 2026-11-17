@@ -1,6 +1,7 @@
 {
   "corpus": "hfmd-guidelines",
   "corpus_version": 1,
+  "case_id": "case-01-hfmd",
   "review": {
     "status": "draft",
     "reviewer": null,

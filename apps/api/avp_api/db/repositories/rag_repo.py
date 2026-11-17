@@ -5,6 +5,10 @@ Rights gate (T-RAG-03): `ingest_document` refuses any document whose
 `source_documents` and keeps only rights-checked documents, so a row that got in
 some other way is never cited.
 
+Case scope (AVP-151): a document belongs to one case (`case_id`) or is shared by
+all cases (`case_id` None). `search_chunks` takes the session's case and returns
+chunks of that case's documents plus shared ones, never another case's.
+
 Cold path only: nothing in the patient hot path imports this module (ADR-0002).
 """
 
@@ -17,7 +21,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session as OrmSession
 
 from avp_api.db import models
@@ -41,6 +45,8 @@ class DocumentIn:
     rights_checked: bool
     review_status: str = "draft"
     chunks: list[ChunkIn] = field(default_factory=list)
+    # None = shared by every case (e.g. a general MOH guideline).
+    case_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -54,6 +60,7 @@ class RetrievedChunk:
     text: str
     review_status: str
     score: float  # cosine similarity, 1 = identical direction
+    case_id: str | None = None  # None = shared document
 
 
 class RagRepository(Protocol):
@@ -62,8 +69,17 @@ class RagRepository(Protocol):
     ) -> str: ...
 
     def search_chunks(
-        self, query_embedding: list[float], embedding_model: str, top_k: int = 5
-    ) -> list[RetrievedChunk]: ...
+        self,
+        query_embedding: list[float],
+        embedding_model: str,
+        top_k: int = 5,
+        *,
+        case_id: str | None,
+    ) -> list[RetrievedChunk]:
+        """Chunks of `case_id`'s documents and of shared documents only.
+        case_id=None searches shared documents only. Required keyword so no caller
+        can forget the scope."""
+        ...
 
 
 def check_rights(doc: DocumentIn) -> None:
@@ -75,6 +91,7 @@ def document_hash(doc: DocumentIn, embedding_model: str) -> str:
     payload = {
         "doc": [doc.source_key, doc.title, doc.publisher, doc.year, doc.license_note],
         "review_status": doc.review_status,
+        "case_id": doc.case_id,
         "chunks": [[c.section, c.text] for c in doc.chunks],
         "embedding_model": embedding_model,
     }
@@ -123,6 +140,7 @@ class SqlRagRepository:
             row.title, row.publisher, row.year = doc.title, doc.publisher, doc.year
             row.license_note, row.rights_checked = doc.license_note, True
             row.review_status, row.content_hash = doc.review_status, digest
+            row.case_id = doc.case_id
             self.db.flush()
             self.db.execute(
                 delete(models.SourceChunk).where(models.SourceChunk.document_id == row.id)
@@ -145,8 +163,16 @@ class SqlRagRepository:
             raise
 
     def search_chunks(
-        self, query_embedding: list[float], embedding_model: str, top_k: int = 5
+        self,
+        query_embedding: list[float],
+        embedding_model: str,
+        top_k: int = 5,
+        *,
+        case_id: str | None,
     ) -> list[RetrievedChunk]:
+        doc_case = models.SourceDocument.case_id
+        shared = doc_case.is_(None)
+        in_scope = shared if case_id is None else or_(shared, doc_case == case_id)
         dist = models.SourceChunk.embedding.cosine_distance(query_embedding).label("dist")
         rows = self.db.execute(
             select(models.SourceChunk, models.SourceDocument, dist)
@@ -155,6 +181,7 @@ class SqlRagRepository:
                 models.SourceDocument.rights_checked.is_(True),
                 models.SourceChunk.embedding_model == embedding_model,
                 models.SourceChunk.embedding.is_not(None),
+                in_scope,
             )
             .order_by(dist)
             .limit(top_k)
@@ -170,6 +197,7 @@ class SqlRagRepository:
                 text=chunk.text,
                 review_status=doc.review_status,
                 score=1.0 - float(d),
+                case_id=doc.case_id,
             )
             for chunk, doc, d in rows
         ]
@@ -203,17 +231,25 @@ class InMemoryRagRepository:
                 text=chunk.text,
                 review_status=doc.review_status,
                 score=0.0,
+                case_id=doc.case_id,
             )
             self.chunks.append((meta, vec, embedding_model))
         return "updated" if prev is not None else "inserted"
 
     def search_chunks(
-        self, query_embedding: list[float], embedding_model: str, top_k: int = 5
+        self,
+        query_embedding: list[float],
+        embedding_model: str,
+        top_k: int = 5,
+        *,
+        case_id: str | None,
     ) -> list[RetrievedChunk]:
         scored = [
             (cosine(query_embedding, vec), meta)
             for meta, vec, model in self.chunks
-            if model == embedding_model and self.docs[meta.source_key][0].rights_checked
+            if model == embedding_model
+            and self.docs[meta.source_key][0].rights_checked
+            and meta.case_id in (None, case_id)
         ]
         scored.sort(key=lambda x: x[0], reverse=True)
         return [_with_score(meta, s) for s, meta in scored[:top_k]]
