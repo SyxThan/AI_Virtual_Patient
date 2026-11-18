@@ -43,7 +43,12 @@ class _Handler(BaseHTTPRequestHandler):
         body = srv.body if srv.status == 200 else b'{"error":{"message":"secret echo"}}'
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
-        self.wfile.write(body)
+        piece = getattr(srv, "piece", 0) or len(body) or 1
+        for i in range(0, len(body), piece):  # like VieNeu: audio leaves as it is made
+            self.wfile.write(body[i : i + piece])
+            self.wfile.flush()
+            if piece < len(body):
+                time.sleep(0.02)
 
     def log_message(self, *args):  # keep test output quiet
         pass
@@ -183,3 +188,81 @@ def test_server_down_is_typed(server):
     with pytest.raises(VoiceProviderError) as ei:
         asyncio.run(tts.synthesize_timed(p, "xin chào", timeout_s=3.0))
     assert ei.value.reason == "provider_error"
+
+
+# --- streaming (AVP-167) -----------------------------------------------------
+
+
+async def _collect(provider, text: str, timeout_s: float = 5.0) -> list:
+    return [p async for p in tts.stream_timed(provider, text, timeout_s=timeout_s)]
+
+
+def test_stream_cuts_whole_sample_wav_parts_in_order(server, monkeypatch):
+    monkeypatch.setattr(tts, "FIRST_PART_BYTES", 1000)
+    monkeypatch.setattr(tts, "NEXT_PART_BYTES", 2001)  # odd: cuts must stay whole samples
+    server.body = PCM + b"\x05"  # 4800 bytes + a trailing half sample
+    server.piece = 701  # odd-sized network chunks
+    p = tts.VieNeuTTSProvider(_url(server), None, None, 5.0)
+    parts = asyncio.run(_collect(p, "xin chào"))
+    assert len(parts) >= 2  # the first part left before the reply was finished
+    frames = b"".join(tts.wav_frames(x.value.audio) for x in parts)
+    assert frames == PCM  # nothing lost, nothing reordered, half sample dropped
+    assert all(x.value.mime == "audio/wav" for x in parts)
+    assert [x.elapsed_ms for x in parts] == sorted(x.elapsed_ms for x in parts)
+    assert server.seen[0]["body"]["response_format"] == "pcm"
+
+
+def test_stream_result_is_cached_and_replayed_as_one_part(server):
+    p = tts.VieNeuTTSProvider(_url(server), None, "v", 5.0)
+    first = asyncio.run(_collect(p, "Dạ."))
+    again = asyncio.run(_collect(p, "Dạ."))
+    assert len(server.seen) == 1  # second time served from the cache
+    assert len(again) == 1
+    joined = b"".join(tts.wav_frames(x.value.audio) for x in first)
+    assert tts.wav_frames(again[0].value.audio) == joined
+    # The whole-reply path shares the same cache entry.
+    whole = asyncio.run(tts.synthesize_timed(p, "Dạ.", timeout_s=5.0))
+    assert tts.wav_frames(whole.value.audio) == joined and len(server.seen) == 1
+
+
+def test_cache_key_includes_voice_and_provider(server):
+    a = tts.VieNeuTTSProvider(_url(server), None, "voice A", 5.0)
+    b = tts.VieNeuTTSProvider(_url(server), None, "voice B", 5.0)
+    asyncio.run(tts.synthesize_timed(a, "Dạ.", timeout_s=5.0))
+    asyncio.run(tts.synthesize_timed(b, "Dạ.", timeout_s=5.0))
+    asyncio.run(tts.synthesize_timed(a, "Dạ.", timeout_s=5.0))
+    assert [r["body"].get("voice") for r in server.seen] == ["voice A", "voice B"]
+
+
+def test_failed_stream_is_not_cached(server):
+    server.status = 500
+    p = tts.VieNeuTTSProvider(_url(server), None, None, 5.0)
+    with pytest.raises(VoiceProviderError) as ei:
+        asyncio.run(_collect(p, "xin chào"))
+    assert ei.value.reason == "provider_error"
+    assert len(tts.tts_cache()) == 0
+    server.status = 200
+    assert asyncio.run(_collect(p, "xin chào"))  # retried for real, not a cached failure
+    assert len(server.seen) == 2
+
+
+def test_stream_empty_body_is_empty_result(server):
+    server.body = b""
+    p = tts.VieNeuTTSProvider(_url(server), None, None, 5.0)
+    with pytest.raises(VoiceProviderError) as ei:
+        asyncio.run(_collect(p, "xin chào"))
+    assert ei.value.reason == "empty_result"
+
+
+def test_stream_slow_server_times_out(server):
+    server.delay_s = 1.0
+    p = tts.VieNeuTTSProvider(_url(server), None, None, 5.0)
+    with pytest.raises(VoiceProviderError) as ei:
+        asyncio.run(_collect(p, "xin chào", timeout_s=0.2))
+    assert ei.value.reason == "timeout"
+    assert len(tts.tts_cache()) == 0
+
+
+def test_fake_provider_is_never_cached():
+    asyncio.run(tts.synthesize_timed(tts.FakeTTSProvider(), "Dạ.", timeout_s=5.0))
+    assert len(tts.tts_cache()) == 0

@@ -5,9 +5,12 @@ running dev server) and the real case JSON, so the Patient Agent prompt is the
 production one. Each synthetic student question goes through /ws/sessions/{id}
 exactly as the browser sends it, and we record:
 
-  server side (the "timing" message): stt_ms, llm_ms, tts_ms
+  server side (the "timing" message): stt_ms, llm_ms, tts_ms (TTS start -> last
+  audio part), tts_first_ms (TTS start -> first audio part), audio_parts
   client side (perf_counter around the socket): first_text_ms (question sent ->
-  patient transcript), first_audio_ms (question sent -> patient audio)
+  patient transcript), first_audio_ms (question sent -> FIRST audio part, i.e.
+  when playback can start; AVP-167 streams a reply in parts), last_audio_ms
+  (question sent -> last audio part)
 
 The target "first audio < 1.5 s" is a target, not a result (Hard rule 3). What
 this script writes to evals/results/ is the only latency anyone may quote.
@@ -65,8 +68,11 @@ class TurnResult:
     stt_ms: int | None = None
     llm_ms: int | None = None
     tts_ms: int | None = None
+    tts_first_ms: int | None = None
+    audio_parts: int | None = None
     first_text_ms: int | None = None
     first_audio_ms: int | None = None
+    last_audio_ms: int | None = None
     errors: list[str] = field(default_factory=list)
 
 
@@ -172,9 +178,13 @@ def _run_turn(ws, payload, mode: str) -> TurnResult:
         if kind == "transcript" and msg.get("speaker") == "patient":
             res.first_text_ms = elapsed
         elif kind == "audio":
-            res.first_audio_ms = elapsed
+            if res.first_audio_ms is None:  # playback starts on the first part
+                res.first_audio_ms = elapsed
+            res.last_audio_ms = elapsed
         elif kind == "timing":
             res.stt_ms, res.llm_ms, res.tts_ms = msg["stt_ms"], msg["llm_ms"], msg["tts_ms"]
+            res.tts_first_ms = msg.get("tts_first_ms")
+            res.audio_parts = msg.get("audio_parts")
             return res
         elif kind == "error":
             code = str(msg.get("code"))
@@ -245,6 +255,8 @@ def run(providers: str, mode: str, sessions: int, warmup: int) -> dict:
             "case_version": int(case.get("version", 1)),
             "setup": "in-process FastAPI + WebSocket, in-memory repos; "
             "excludes browser audio capture/playback and network",
+            "first_audio_definition": "question sent -> first audio part received "
+            "(playback can start); last_audio_ms is the last part",
         },
         "contains_fake_provider": fake,
         "note": (
@@ -256,8 +268,10 @@ def run(providers: str, mode: str, sessions: int, warmup: int) -> dict:
             "stt_ms": common.summarize(col("stt_ms")),
             "llm_ms": common.summarize(col("llm_ms")),
             "tts_ms": common.summarize(col("tts_ms")),
+            "tts_first_ms": common.summarize(col("tts_first_ms")),
             "first_text_ms": common.summarize(col("first_text_ms")),
             "first_audio_ms": common.summarize(first_audio),
+            "last_audio_ms": common.summarize(col("last_audio_ms")),
         },
         "target": {
             "metric": "first_audio_ms p95",
@@ -276,8 +290,11 @@ def run(providers: str, mode: str, sessions: int, warmup: int) -> dict:
                 "stt_ms": t.stt_ms,
                 "llm_ms": t.llm_ms,
                 "tts_ms": t.tts_ms,
+                "tts_first_ms": t.tts_first_ms,
+                "audio_parts": t.audio_parts,
                 "first_text_ms": t.first_text_ms,
                 "first_audio_ms": t.first_audio_ms,
+                "last_audio_ms": t.last_audio_ms,
                 "errors": t.errors,
             }
             for t in measured
@@ -304,7 +321,7 @@ def main(argv: list[str] | None = None, out_dir: Path | None = None) -> Path:
     fa = result["summary_ms"]["first_audio_ms"]
     print(
         f"turns={result['turns_total']} errors={result['turns_with_errors']} "
-        f"first_audio p50={fa['p50']} p95={fa['p95']} ms "
+        f"first_audio (first part) p50={fa['p50']} p95={fa['p95']} ms "
         f"(fake={result['contains_fake_provider']}) -> {path}"
     )
     return path

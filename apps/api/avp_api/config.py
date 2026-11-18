@@ -68,6 +68,9 @@ class Settings(BaseSettings):
     # overloaded model could hold a scoring job forever). A timeout counts as
     # transient: the Evaluator then uses its fallback model (AVP-144).
     llm_timeout_s: float = 60.0
+    # Hot-path deadline for one Patient call (AVP-167): a student is waiting, so a
+    # stuck request is cut here and, being transient, goes to the Patient fallback.
+    llm_patient_timeout_s: float = Field(default=15.0, gt=0)
     # RAG embeddings (Slice 8, AVP-018). Changing the model means re-ingesting the
     # corpus: chunks are stored with the model id and only same-model chunks match.
     embedding_model: str | None = None

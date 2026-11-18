@@ -215,10 +215,11 @@ def get_llm_provider() -> LLMProvider:
     s = get_settings()
     if s.llm_provider == "gemini" and s.llm_api_key and s.llm_model_patient:
         wait = getattr(s, "llm_patient_max_retry_wait_s", 2.0)
-        primary = GeminiProvider(s.llm_api_key, s.llm_model_patient, s.llm_timeout_s, wait)
+        timeout = getattr(s, "llm_patient_timeout_s", 15.0)
+        primary = GeminiProvider(s.llm_api_key, s.llm_model_patient, timeout, wait)
         fallback = getattr(s, "llm_model_patient_fallback", None)
         if fallback and fallback != s.llm_model_patient:
-            fb = GeminiProvider(s.llm_api_key, fallback, s.llm_timeout_s, wait)
+            fb = GeminiProvider(s.llm_api_key, fallback, timeout, wait)
             return FallbackLLMProvider(primary, fb)
         return primary
     return FakeLLMProvider()

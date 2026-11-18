@@ -9,13 +9,22 @@ Protocol (docs/specs/openapi.yaml x-websocket, voice-pipeline skill):
             or {"type": "cancel"} to drop the buffered audio.
   server -> {"type": "transcript", "speaker": "student", "text"}
             {"type": "transcript", "speaker": "patient", "text", "turn_idx"}
-            {"type": "audio", "data": "<base64>", "mime"}
-            {"type": "timing", "stt_ms", "llm_ms", "tts_ms"}   (measured, never invented)
+            {"type": "audio", "data": "<base64>", "mime", "part"}   (one or more)
+            {"type": "timing", "stt_ms", "llm_ms", "tts_ms", "tts_first_ms", "audio_parts"}
             {"type": "error", "code", "message"}               (socket stays open)
+
+Audio is streamed (AVP-167): a reply arrives as `part` 0, 1, 2 ... in play order,
+each a complete file of `mime` (a WAV for VieNeu); the client plays them back to
+back and treats `part` 0 (or a message without `part`, from an older server) as
+the start of a new reply. A cached line or a non-streaming provider sends one
+part. `timing` closes the turn: `tts_first_ms` is TTS start -> first part ready,
+`tts_ms` is TTS start -> last part (null if the stream failed), `audio_parts` is
+the count sent. All times are measured, never invented.
 
 The middle of every turn is `turns_service.submit_turn`, which owns the Patient
 Agent guardrails and persistence; voice only adds STT before and TTS after it.
-Any STT/TTS failure degrades to text and keeps the socket open.
+Only that final, guardrail-checked text is spoken; no LLM token is ever voiced
+before the check. Any STT/TTS failure degrades to text and keeps the socket open.
 """
 
 from __future__ import annotations
@@ -26,7 +35,7 @@ import json
 import logging
 import time
 from collections.abc import Callable, Iterator
-from contextlib import AbstractContextManager, contextmanager
+from contextlib import AbstractContextManager, aclosing, contextmanager
 
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from fastapi.concurrency import run_in_threadpool
@@ -37,7 +46,7 @@ from avp_api.db.repositories.session_repo import SessionRepository, SqlSessionRe
 from avp_api.db.repositories.turn_repo import SqlTurnRepository, TurnRepository
 from avp_api.providers.llm import LLMProvider, get_llm_provider
 from avp_api.providers.stt import STTProvider, get_stt_provider, transcribe_timed
-from avp_api.providers.tts import TTSProvider, get_tts_provider, synthesize_timed
+from avp_api.providers.tts import TTSProvider, get_tts_provider, stream_timed
 from avp_api.providers.voice_common import VoiceProviderError
 from avp_api.services import session_service, turns_service
 
@@ -167,20 +176,39 @@ async def voice_session(
                 "turn_idx": reply.turn_idx,
             }
         )
+        # Only the final, guardrail-checked reply text is spoken (never LLM tokens):
+        # submit_turn above has already validated, regenerated or fallen back.
         tts_ms: int | None = None
+        tts_first_ms: int | None = None
+        part = 0
         try:
-            spoken = await synthesize_timed(tts, reply.text)
-            tts_ms = spoken.elapsed_ms
-            await ws.send_json(
-                {
-                    "type": "audio",
-                    "data": base64.b64encode(spoken.value.audio).decode("ascii"),
-                    "mime": spoken.value.mime,
-                }
-            )
+            async with aclosing(stream_timed(tts, reply.text)) as parts:
+                async for spoken in parts:
+                    await ws.send_json(
+                        {
+                            "type": "audio",
+                            "data": base64.b64encode(spoken.value.audio).decode("ascii"),
+                            "mime": spoken.value.mime,
+                            "part": part,
+                        }
+                    )
+                    if part == 0:
+                        tts_first_ms = spoken.elapsed_ms
+                    tts_ms = spoken.elapsed_ms
+                    part += 1
         except VoiceProviderError:
+            tts_ms = None  # incomplete: never report a partial stream as a TTS time
             await _send_error(ws, "TTS_FAILED")  # text reply already delivered
-        await ws.send_json({"type": "timing", "stt_ms": stt_ms, "llm_ms": llm_ms, "tts_ms": tts_ms})
+        await ws.send_json(
+            {
+                "type": "timing",
+                "stt_ms": stt_ms,
+                "llm_ms": llm_ms,
+                "tts_ms": tts_ms,
+                "tts_first_ms": tts_first_ms,
+                "audio_parts": part,
+            }
+        )
 
     buffer = bytearray()
     overflow = False

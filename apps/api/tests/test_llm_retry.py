@@ -121,6 +121,7 @@ def _settings(**over):
         llm_model_evaluator="m-eval",
         llm_model_evaluator_fallback=None,
         llm_timeout_s=30.0,
+        llm_patient_timeout_s=15.0,
         llm_patient_max_retry_wait_s=2.0,
         llm_evaluator_max_retry_wait_s=30.0,
     )
@@ -136,6 +137,8 @@ def test_patient_factory_wraps_a_distinct_fallback(monkeypatch):
     assert isinstance(p, FallbackLLMProvider)
     assert (p.primary.model_id, p.fallback.model_id) == ("m-patient", "m-lite")
     assert p.primary._max_retry_wait_s == 2.0
+    # Hot path: the short Patient deadline, not the cold-path LLM_TIMEOUT_S.
+    assert p.primary._timeout_s == 15.0 and p.fallback._timeout_s == 15.0
 
     monkeypatch.setattr(
         llm_mod, "get_settings", lambda: _settings(llm_model_patient_fallback="m-patient")
@@ -148,6 +151,7 @@ def test_evaluator_uses_its_own_key_and_longer_budget(monkeypatch):
     p = llm_mod.get_evaluator_provider()
     assert isinstance(p, GeminiProvider)
     assert p._api_key == "k-eval" and p._max_retry_wait_s == 30.0
+    assert p._timeout_s == 30.0  # scoring keeps the long LLM_TIMEOUT_S
 
     monkeypatch.setattr(llm_mod, "get_settings", lambda: _settings())
     assert llm_mod.get_evaluator_provider()._api_key == "k"
