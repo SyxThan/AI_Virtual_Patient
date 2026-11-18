@@ -25,7 +25,11 @@ from pydantic import ValidationError
 from avp_api.db.repositories.evaluation_repo import EvaluationRecord
 from avp_api.db.repositories.rag_repo import RagRepository, RetrievedChunk
 from avp_api.db.repositories.turn_repo import TurnRecord
-from avp_api.providers.embeddings import EmbeddingProvider, FakeEmbeddingProvider
+from avp_api.providers.embeddings import (
+    EmbeddingProvider,
+    FakeEmbeddingProvider,
+    embed_queries,
+)
 from avp_api.providers.llm import FakeLLMProvider, LLMProvider, describe_provider_error
 from avp_api.schemas.debrief import (
     CitationItem,
@@ -116,7 +120,7 @@ def retrieve_sources(
         return {}, {}
     min_score = _MIN_SCORE.get(embedder.model_id, _DEFAULT_MIN_SCORE)
     try:
-        vectors = embedder.embed([_query_for(c) for c in focus], kind="query")
+        vectors = embed_queries(embedder, [_query_for(c) for c in focus])
         hits = [
             rag.search_chunks(v, embedder.model_id, top_k=_TOP_K, case_id=case_id) for v in vectors
         ]

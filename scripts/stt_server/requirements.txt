@@ -3,3 +3,7 @@ faster-whisper>=1.1,<2
 # faster-whisper 1.2 passes metadata_errors= to av.open(); PyAV 19 rejects it.
 # Tested with PyAV 15.1.
 av>=12,<16
+# NVIDIA GPU (WHISPER_DEVICE=cuda, AVP-167): CTranslate2 needs cuBLAS 12 and cuDNN 9.
+# On Windows install these wheels too; server.py puts their DLL folders on PATH:
+#   nvidia-cublas-cu12
+#   nvidia-cudnn-cu12==9.*

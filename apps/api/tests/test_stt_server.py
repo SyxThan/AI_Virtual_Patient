@@ -230,3 +230,21 @@ def test_missing_model_exits_with_message(monkeypatch, capsys):
     monkeypatch.delenv("WHISPER_MODEL", raising=False)
     assert server_mod.main() == 2
     assert "WHISPER_MODEL" in capsys.readouterr().err
+
+
+def test_cuda_dll_dirs_lists_nvidia_wheel_bins(tmp_path):
+    sp = tmp_path / "site-packages"
+    for lib in ("cudnn", "cublas"):
+        (sp / "nvidia" / lib / "bin").mkdir(parents=True)
+    (sp / "nvidia" / "no_bin_here").mkdir()
+    found = server_mod.cuda_dll_dirs([str(sp), str(tmp_path / "missing")])
+    assert found == [str(sp / "nvidia" / "cublas" / "bin"), str(sp / "nvidia" / "cudnn" / "bin")]
+
+
+def test_warmup_wav_is_a_short_valid_wav():
+    import io
+    import wave
+
+    with wave.open(io.BytesIO(server_mod._warmup_wav(0.5)), "rb") as w:
+        assert (w.getnchannels(), w.getsampwidth(), w.getframerate()) == (1, 2, 16000)
+        assert w.getnframes() == 8000

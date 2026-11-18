@@ -11,9 +11,10 @@ It never logs audio or transcripts: only sizes, outcome and elapsed time.
 
 Environment (all optional except the model):
   WHISPER_MODEL          faster-whisper model name or local path (e.g. "small"); required
-  WHISPER_DEVICE         cpu | cuda | auto (default cpu)
+  WHISPER_DEVICE         cpu | cuda | auto (default cpu). cuda needs the cuBLAS 12 and
+                         cuDNN 9 wheels (requirements.txt); their DLLs are found here.
   WHISPER_COMPUTE_TYPE   e.g. int8, int8_float16, float16 (default int8)
-  WHISPER_BEAM_SIZE      default 5
+  WHISPER_BEAM_SIZE      default 5 (1 is faster)
   STT_SERVER_HOST        default 127.0.0.1
   STT_SERVER_PORT        default 8890
   STT_SERVER_API_KEY     if set, requests must send "Authorization: Bearer <key>"
@@ -75,10 +76,62 @@ def parse_multipart(content_type: str, body: bytes) -> dict[str, bytes]:
     return fields
 
 
+def cuda_dll_dirs(site_packages: list[str]) -> list[str]:
+    """`nvidia/<lib>/bin` folders of the pip CUDA wheels (nvidia-cublas-cu12,
+    nvidia-cudnn-cu12) found under the given site-packages folders."""
+    found: list[str] = []
+    for sp in site_packages:
+        root = os.path.join(sp, "nvidia")
+        if not os.path.isdir(root):
+            continue
+        for lib in sorted(os.listdir(root)):
+            bin_dir = os.path.join(root, lib, "bin")
+            if os.path.isdir(bin_dir) and bin_dir not in found:
+                found.append(bin_dir)
+    return found
+
+
+def expose_cuda_dlls() -> list[str]:
+    """On Windows, CTranslate2 loads cuBLAS/cuDNN by name; put the pip wheels'
+    DLL folders on PATH before faster-whisper is imported. No-op elsewhere."""
+    if os.name != "nt":
+        return []
+    import site
+
+    dirs = cuda_dll_dirs([*site.getsitepackages(), site.getusersitepackages()])
+    for d in dirs:
+        os.add_dll_directory(d)
+    if dirs:
+        os.environ["PATH"] = os.pathsep.join([*dirs, os.environ.get("PATH", "")])
+    return dirs
+
+
+def _warmup_wav(seconds: float = 1.0, rate: int = 16000) -> bytes:
+    """A short, quiet tone: enough to run the model once at start-up."""
+    import math
+    import struct
+    import wave
+
+    n = int(seconds * rate)
+    frames = b"".join(
+        struct.pack("<h", int(800 * math.sin(2 * math.pi * 220 * i / rate))) for i in range(n)
+    )
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(rate)
+        w.writeframes(frames)
+    return buf.getvalue()
+
+
 def make_whisper_transcriber(
     model: str, device: str = "cpu", compute_type: str = "int8", beam_size: int = 5
 ) -> Transcriber:
-    """Load faster-whisper once; calls are serialised (one model, one turn at a time)."""
+    """Load faster-whisper once; calls are serialised (one model, one turn at a time).
+    The model runs once on a short tone so the first student turn is not the slow one."""
+    if device != "cpu":
+        expose_cuda_dlls()
     from faster_whisper import WhisperModel  # heavy import, only in the real server
 
     whisper = WhisperModel(model, device=device, compute_type=compute_type)
@@ -91,6 +144,12 @@ def make_whisper_transcriber(
             )
             return " ".join(s.text.strip() for s in segments if s.text.strip())
 
+    t0 = time.perf_counter()
+    segments, _info = whisper.transcribe(
+        io.BytesIO(_warmup_wav()), language="vi", beam_size=beam_size, vad_filter=False
+    )
+    list(segments)
+    logger.info("warm-up done in %d ms", int((time.perf_counter() - t0) * 1000))
     return transcribe
 
 

@@ -124,7 +124,7 @@ def test_stt_failure_keeps_socket_and_text_still_works() -> None:
 
 
 def test_tts_timeout_falls_back_to_text(monkeypatch) -> None:
-    monkeypatch.setattr(ws_router, "synthesize_timed", _fast_timeout_synth)
+    monkeypatch.setattr(ws_router, "stream_timed", _fast_timeout_stream)
     turns = FakeTurnRepo()
     with _client(turns, tts=_SlowTTS()).websocket_connect(f"/ws/sessions/{SID}") as ws:
         _auth(ws)
@@ -142,10 +142,67 @@ def test_tts_timeout_falls_back_to_text(monkeypatch) -> None:
     assert len(turns.rows) == 2
 
 
-async def _fast_timeout_synth(provider, text, timeout_s=None):
+def _fast_timeout_stream(provider, text, timeout_s=None):
     from avp_api.providers import tts
 
-    return await tts.synthesize_timed(provider, text, timeout_s=0.05)
+    return tts.stream_timed(provider, text, timeout_s=0.05)
+
+
+class _PartsTTS(TTSProvider):
+    """Streams three WAV parts, like VieNeu does for a longer reply."""
+
+    name = "parts"
+    mime = "audio/wav"
+
+    def __init__(self, fail_after: int | None = None) -> None:
+        self.fail_after = fail_after
+
+    async def synthesize(self, text: str, voice_id: str | None = None) -> bytes:
+        raise AssertionError("the WebSocket must stream, not synthesize")
+
+    async def stream(self, text: str, voice_id: str | None = None):
+        from avp_api.providers.tts import pcm16_to_wav
+
+        for i in range(3):
+            if self.fail_after is not None and i == self.fail_after:
+                raise RuntimeError("tts died mid-reply")
+            yield pcm16_to_wav(bytes([i, 0]) * 100, 24000)
+
+
+def test_voice_reply_streams_audio_parts_in_order() -> None:
+    turns = FakeTurnRepo()
+    with _client(turns, tts=_PartsTTS()).websocket_connect(f"/ws/sessions/{SID}") as ws:
+        _auth(ws)
+        _speak(ws)
+        assert ws.receive_json()["speaker"] == "student"
+        patient = ws.receive_json()
+        assert patient["speaker"] == "patient"
+        parts = [ws.receive_json() for _ in range(3)]
+        timing = ws.receive_json()
+    assert [p["type"] for p in parts] == ["audio"] * 3
+    assert [p["part"] for p in parts] == [0, 1, 2]
+    # Each part is its own playable WAV, in synthesis order.
+    assert [base64.b64decode(p["data"])[44] for p in parts] == [0, 1, 2]
+    assert timing["type"] == "timing" and timing["audio_parts"] == 3
+    assert 0 <= timing["tts_first_ms"] <= timing["tts_ms"]
+
+
+def test_stream_failure_mid_reply_keeps_parts_and_reports_tts_failed() -> None:
+    turns = FakeTurnRepo()
+    with _client(turns, tts=_PartsTTS(fail_after=1)).websocket_connect(f"/ws/sessions/{SID}") as ws:
+        _auth(ws)
+        _speak(ws)
+        ws.receive_json()  # student
+        ws.receive_json()  # patient text
+        first = ws.receive_json()
+        err = ws.receive_json()
+        timing = ws.receive_json()
+    assert first["type"] == "audio" and first["part"] == 0
+    assert err["code"] == "TTS_FAILED"
+    # A partial stream is never reported as a TTS time.
+    assert timing["tts_ms"] is None and timing["audio_parts"] == 1
+    assert timing["tts_first_ms"] is not None
+    assert len(turns.rows) == 2
 
 
 def test_oversized_audio_is_rejected_without_closing(monkeypatch) -> None:

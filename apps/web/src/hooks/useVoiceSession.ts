@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import vi from "../../messages/vi.json";
+import { AudioPartQueue, type AudioClock } from "@/lib/audioQueue";
 import { API_URL, authHeaders, fmt, whenAuthReady, wsAuthMessage } from "@/lib/sessionAuth";
 
 /**
@@ -28,6 +29,12 @@ import { API_URL, authHeaders, fmt, whenAuthReady, wsAuthMessage } from "@/lib/s
  * audio comes from `POST /sessions/{id}/turns/{idx}/speech` and plays through the
  * same AnalyserNode, so the avatar lip-syncs to typed turns too. 204 (no real
  * TTS configured) plays nothing; a failure is only a notice, the text stands.
+ *
+ * Streamed replies (AVP-167): a voice reply arrives as `audio` parts 0, 1, 2 ...
+ * Part 0 (or a message without `part`) starts a new reply and cuts the old one;
+ * later parts are decoded in order and scheduled back to back on the
+ * AudioContext clock, so playback starts with the first part and has no gaps.
+ * Every part goes through the same AnalyserNode, so lip-sync follows it.
  */
 
 export type VoiceStatus =
@@ -45,8 +52,15 @@ export type LockReason = "TIME_LIMIT_REACHED" | "SESSION_FINISHED";
 type ServerEvent =
   | { type: "ready" }
   | { type: "transcript"; speaker: "student" | "patient"; text: string; turn_idx?: number }
-  | { type: "audio"; data: string; mime: string }
-  | { type: "timing"; stt_ms: number | null; llm_ms: number | null; tts_ms: number | null }
+  | { type: "audio"; data: string; mime: string; part?: number }
+  | {
+      type: "timing";
+      stt_ms: number | null;
+      llm_ms: number | null;
+      tts_ms: number | null;
+      tts_first_ms?: number | null;
+      audio_parts?: number;
+    }
   | { type: "error"; code: string; message: string };
 
 const MIME = "audio/webm;codecs=opus";
@@ -108,7 +122,8 @@ export function useVoiceSession({
   const analyserRef = useRef<AnalyserNode | null>(null);
   // Read-only tap on the microphone for the push-to-talk waveform (never sent anywhere).
   const micTapRef = useRef<{ source: MediaStreamAudioSourceNode; node: AnalyserNode; buf: Uint8Array<ArrayBuffer> } | null>(null);
-  const playingRef = useRef<AudioBufferSourceNode | null>(null);
+  // Streamed reply parts, scheduled back to back (AVP-167); created on first use.
+  const queueRef = useRef<AudioPartQueue | null>(null);
   const stopRequestedRef = useRef(false);
   const closingRef = useRef(false); // intentional close: never reconnect
   const attemptsRef = useRef(0);
@@ -186,31 +201,44 @@ export function useVoiceSession({
     void ctxRef.current.resume();
   }, []);
 
-  const playBuffer = useCallback(async (data: ArrayBuffer) => {
-    const ctx = ctxRef.current;
-    const out = analyserRef.current;
-    if (!ctx || !out) return;
-    try {
-      const buffer = await ctx.decodeAudioData(data);
-      playingRef.current?.stop();
-      const src = ctx.createBufferSource();
-      src.buffer = buffer;
-      src.connect(out);
-      src.start();
-      playingRef.current = src;
-    } catch {
-      setNotice(vi.voice.playbackFailed);
+  const queue = useCallback((): AudioPartQueue => {
+    if (!queueRef.current) {
+      queueRef.current = new AudioPartQueue(
+        () => {
+          const ctx = ctxRef.current;
+          const out = analyserRef.current;
+          return ctx && out ? { ctx: ctx as unknown as AudioClock, out } : null;
+        },
+        () => setNotice(vi.voice.playbackFailed),
+      );
     }
+    return queueRef.current;
   }, []);
 
+  /** Stop every scheduled part and drop the rest of the reply. */
+  const cutPlayback = useCallback(() => queue().cut(), [queue]);
+
+  /** Decode and schedule one part right after the previous one; `fresh` starts
+   *  a new reply (cuts whatever is playing). */
+  const enqueueAudio = useCallback(
+    (data: ArrayBuffer, fresh: boolean): Promise<void> => queue().enqueue(data, fresh),
+    [queue],
+  );
+
+  const playBuffer = useCallback(
+    (data: ArrayBuffer) => enqueueAudio(data, true),
+    [enqueueAudio],
+  );
+
   const play = useCallback(
-    async (b64: string) => {
+    (b64: string, part: number | undefined) => {
       const bin = atob(b64);
       const bytes = new Uint8Array(bin.length);
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-      await playBuffer(bytes.buffer);
+      // No `part` = an older server sending the whole reply at once.
+      return enqueueAudio(bytes.buffer, !part);
     },
-    [playBuffer],
+    [enqueueAudio],
   );
 
   /** Read a saved patient turn aloud (typed turns). Never throws. */
@@ -248,9 +276,8 @@ export function useVoiceSession({
     speechSeqRef.current++;
     speechAbortRef.current?.abort();
     speechAbortRef.current = null;
-    playingRef.current?.stop();
-    playingRef.current = null;
-  }, []);
+    cutPlayback();
+  }, [cutPlayback]);
 
   const handleEvent = useCallback(
     (ev: ServerEvent) => {
@@ -260,7 +287,7 @@ export function useVoiceSession({
           if (ev.speaker === "student") setStatus("processing");
           break;
         case "audio":
-          void play(ev.data);
+          void play(ev.data, ev.part);
           break;
         case "timing":
           clearReplyTimer();

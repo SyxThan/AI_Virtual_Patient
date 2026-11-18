@@ -19,6 +19,7 @@ from abc import ABC, abstractmethod
 from typing import Literal
 
 from avp_api.config import get_settings
+from avp_api.providers.cache import BoundedLRU
 
 EMBEDDING_DIM = 768
 EmbedKind = Literal["document", "query"]
@@ -123,3 +124,34 @@ def get_embedding_provider() -> EmbeddingProvider:
     if s.llm_provider == "gemini" and s.llm_api_key and s.embedding_model:
         return GeminiEmbeddingProvider(s.llm_api_key, s.embedding_model, s.llm_timeout_s)
     return FakeEmbeddingProvider()
+
+
+# Debrief retrieval embeds one deterministic query per focused criterion (built
+# from the versioned rubric), so the same few queries recur on every debrief.
+# Cache them in-process by (provider type, model, dimension, text) (AVP-167).
+QueryKey = tuple[str, str, int, str]
+_query_cache: BoundedLRU[QueryKey, tuple[float, ...]] = BoundedLRU(512)
+
+
+def query_cache() -> BoundedLRU[QueryKey, tuple[float, ...]]:
+    """The process-wide query-embedding cache (exposed for tests and stats)."""
+    return _query_cache
+
+
+def embed_queries(embedder: EmbeddingProvider, texts: list[str]) -> list[list[float]]:
+    """`embedder.embed(texts, kind="query")` with an LRU in front: only texts not
+    seen before reach the provider, in one batched call. Order is preserved."""
+    keys = [(type(embedder).__name__, embedder.model_id, embedder.dimension, t) for t in texts]
+    found = [_query_cache.get(k) for k in keys]
+    missing = list(dict.fromkeys(t for t, v in zip(texts, found, strict=True) if v is None))
+    if missing:
+        fresh = embedder.embed(missing, kind="query")
+        if len(fresh) != len(missing):
+            raise ValueError("embedding count mismatch")
+        by_text = dict(zip(missing, fresh, strict=True))
+        for i, (k, t) in enumerate(zip(keys, texts, strict=True)):
+            if found[i] is None:
+                vec = tuple(by_text[t])
+                _query_cache.put(k, vec)
+                found[i] = vec
+    return [list(v) for v in found if v is not None]

@@ -54,10 +54,23 @@ class Settings(BaseSettings):
     # Second Evaluator/Debrief model, used only when the first is overloaded or out
     # of quota after its own retries (AVP-144). Unset = no fallback.
     llm_model_evaluator_fallback: str | None = None
+    # Hot-path fallback (AVP-167): a different Patient model, which has its own
+    # quota, answers when the first is rate-limited or overloaded. Unset = none.
+    llm_model_patient_fallback: str | None = None
+    # Optional second key (another Google project) for Evaluator/Debrief, so
+    # scoring has its own quota. Unset = LLM_API_KEY.
+    llm_api_key_evaluator: str | None = Field(default=None, repr=False)
+    # Longest total wait for retries on 429/5xx before giving up on a model.
+    # Small on the hot path (the student is waiting), larger for background scoring.
+    llm_patient_max_retry_wait_s: float = Field(default=2.0, ge=0)
+    llm_evaluator_max_retry_wait_s: float = Field(default=30.0, ge=0)
     # Per-request deadline for Gemini calls (the SDK has none by default, so an
     # overloaded model could hold a scoring job forever). A timeout counts as
     # transient: the Evaluator then uses its fallback model (AVP-144).
     llm_timeout_s: float = 60.0
+    # Hot-path deadline for one Patient call (AVP-167): a student is waiting, so a
+    # stuck request is cut here and, being transient, goes to the Patient fallback.
+    llm_patient_timeout_s: float = Field(default=15.0, gt=0)
     # RAG embeddings (Slice 8, AVP-018). Changing the model means re-ingesting the
     # corpus: chunks are stored with the model id and only same-model chunks match.
     embedding_model: str | None = None

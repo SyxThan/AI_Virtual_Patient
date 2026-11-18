@@ -39,6 +39,9 @@ def configured_models(s) -> list[tuple[str, str, str]]:
     out: list[tuple[str, str, str]] = []
     if s.llm_model_patient:
         out.append(("patient", s.llm_model_patient, "llm"))
+    patient_fb = getattr(s, "llm_model_patient_fallback", None)
+    if patient_fb and patient_fb != s.llm_model_patient:
+        out.append(("patient fallback", patient_fb, "llm"))
     evaluator = s.llm_model_evaluator or s.llm_model_patient
     if evaluator:
         out.append(("evaluator", evaluator, "llm"))
