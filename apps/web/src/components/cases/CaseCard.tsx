@@ -85,7 +85,8 @@ export default function CaseCard({
               alt=""
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover object-[50%_30%]"
+              // 2D covers are portrait exam figures: anchor the top so the face stays in the card.
+              className={`object-cover ${c.exam_mode === "2d" ? "object-top" : "object-[50%_30%]"}`}
             />
           ) : (
             <CoverPlaceholder group={c.patient_group} />
