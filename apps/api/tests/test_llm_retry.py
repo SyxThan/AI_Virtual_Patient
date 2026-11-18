@@ -1,6 +1,8 @@
 """Gemini retry budget, server retry hints and the Patient fallback (AVP-167).
 
-No network: the SDK client is replaced by a scripted fake.
+No network: the SDK client is replaced by a scripted fake. google-genai is the
+optional `llm` extra (CI installs only `dev`), so the tests that need its error
+types and request config skip without it; backoff and factory tests always run.
 """
 
 from __future__ import annotations
@@ -9,7 +11,6 @@ import random
 from types import SimpleNamespace
 
 import pytest
-from google.genai import errors as genai_errors
 
 from avp_api.providers import llm as llm_mod
 from avp_api.providers.llm import (
@@ -19,8 +20,15 @@ from avp_api.providers.llm import (
     server_retry_delay_s,
 )
 
+try:
+    from google.genai import errors as genai_errors
+except ImportError:  # optional extra not installed
+    genai_errors = None
 
-def _rate_limited(delay: str | None = None) -> genai_errors.ClientError:
+needs_sdk = pytest.mark.skipif(genai_errors is None, reason="google-genai (extra 'llm') missing")
+
+
+def _rate_limited(delay: str | None = None):
     details = []
     if delay is not None:
         details.append({"@type": "type.googleapis.com/google.rpc.RetryInfo", "retryDelay": delay})
@@ -35,7 +43,7 @@ def _rate_limited(delay: str | None = None) -> genai_errors.ClientError:
     return genai_errors.ClientError(429, body)
 
 
-def _overloaded() -> genai_errors.ServerError:
+def _overloaded():
     return genai_errors.ServerError(
         503, {"error": {"code": 503, "message": "busy", "status": "UNAVAILABLE"}}
     )
@@ -69,6 +77,7 @@ def client(monkeypatch):
     return install
 
 
+@needs_sdk
 def test_retry_delay_is_read_from_retry_info_only():
     assert server_retry_delay_s(_rate_limited("21s")) == 21.0
     assert server_retry_delay_s(_rate_limited("1.5s")) == 1.5
@@ -86,6 +95,7 @@ def test_backoff_uses_the_server_hint_else_jittered_exponential():
         assert 0.75 * base <= wait <= 1.25 * base
 
 
+@needs_sdk
 def test_transient_error_is_retried_within_budget(client):
     c = client([_overloaded(), "  Dạ cháu sốt\n ba ngày ạ. "])
     slept: list[float] = []
@@ -94,6 +104,7 @@ def test_transient_error_is_retried_within_budget(client):
     assert c.calls == 2 and len(slept) == 1
 
 
+@needs_sdk
 def test_long_server_hint_skips_the_wait_and_raises(client):
     c = client([_rate_limited("30s"), "never reached"])
     slept: list[float] = []
@@ -103,6 +114,7 @@ def test_long_server_hint_skips_the_wait_and_raises(client):
     assert c.calls == 1 and slept == []  # no point waiting 30 s with a student on the line
 
 
+@needs_sdk
 def test_config_errors_are_not_retried(client):
     c = client([genai_errors.ClientError(404, {"error": {"code": 404, "message": "gone"}}), "x"])
     p = GeminiProvider("k", "m", sleep=lambda s: None)
