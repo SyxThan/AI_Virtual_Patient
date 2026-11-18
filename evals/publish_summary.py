@@ -94,7 +94,9 @@ def repeatability(results: Path) -> dict | None:
 def _case_title(case_id: str) -> str:
     """Vietnamese case title from data/cases/<id>.json; the id itself if unreadable."""
     try:
-        data = json.loads((common.REPO_ROOT / "data" / "cases" / f"{case_id}.json").read_text("utf-8"))
+        data = json.loads(
+            (common.REPO_ROOT / "data" / "cases" / f"{case_id}.json").read_text("utf-8")
+        )
         return data["title"]["vi"]
     except (OSError, ValueError, KeyError, TypeError):
         return case_id

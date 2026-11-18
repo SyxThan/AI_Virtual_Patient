@@ -116,7 +116,11 @@ def test_redteam_sums_the_latest_real_run_of_each_case(tmp_path: Path) -> None:
     _write(tmp_path, "redteam-case-a-1.json", _redteam("case-a", "2026-11-16T01:00:00+00:00", 2))
     _write(tmp_path, "redteam-case-a-2.json", _redteam("case-a", "2026-11-16T05:00:00+00:00", 9))
     _write(tmp_path, "redteam-case-b-1.json", _redteam("case-b", "2026-11-16T03:00:00+00:00", 7))
-    _write(tmp_path, "redteam-case-c-1.json", _redteam("case-c", "2026-11-16T09:00:00+00:00", 0, fake=True))
+    _write(
+        tmp_path,
+        "redteam-case-c-1.json",
+        _redteam("case-c", "2026-11-16T09:00:00+00:00", 0, fake=True),
+    )
     r = pub.build(tmp_path)["redteam"]
     assert [c["case_id"] for c in r["cases"]] == ["case-a", "case-b"]  # fake run never counts
     assert r["completed"] == 20 and r["passed"] == 16 and r["pass_rate"] == 0.8
