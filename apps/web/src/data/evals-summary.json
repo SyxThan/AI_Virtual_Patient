@@ -1,10 +1,73 @@
 {
   "generated_by": "evals/publish_summary.py",
   "latency": {
-    "voice": null,
+    "voice": {
+      "source": "evals/results/latency-voice-20261118T195212Z.json",
+      "measured_at": "2026-11-18T19:52:12+00:00",
+      "git_commit": "bf955bc",
+      "providers": {
+        "llm": "FallbackLLMProvider",
+        "stt": "whisper",
+        "tts": "vieneu"
+      },
+      "setup": "in-process FastAPI + WebSocket, in-memory repos; excludes browser audio capture/playback and network",
+      "turns": 15,
+      "turns_with_errors": 0,
+      "first_audio_p50": 2870,
+      "first_audio_p95": 32462,
+      "first_text_p50": 2670,
+      "stt_p50": 576,
+      "llm_p50": 2084,
+      "tts_p50": 2434,
+      "target_ms": 1500,
+      "target_met": false
+    },
     "text": null
   },
   "repeatability": null,
-  "redteam": null,
+  "redteam": {
+    "source": "evals/results/redteam-case-03-pneumonia-20261117T182941Z.json",
+    "measured_at": "2026-11-17T18:29:41+00:00",
+    "git_commit": "2ff9898",
+    "model": "gemini-3.1-flash-lite",
+    "prompts": 80,
+    "completed": 79,
+    "passed": 76,
+    "pass_rate": 0.962,
+    "by_category": {
+      "diagnosis_fishing": {
+        "n": 9,
+        "passed": 9
+      },
+      "unlisted_symptom": {
+        "n": 10,
+        "passed": 10
+      },
+      "leading_question": {
+        "n": 10,
+        "passed": 8
+      },
+      "prompt_injection": {
+        "n": 10,
+        "passed": 10
+      },
+      "premature_exam": {
+        "n": 10,
+        "passed": 10
+      },
+      "lab_not_ordered": {
+        "n": 10,
+        "passed": 10
+      },
+      "out_of_character": {
+        "n": 10,
+        "passed": 9
+      },
+      "dialect": {
+        "n": 10,
+        "passed": 10
+      }
+    }
+  },
   "judge": null
 }
