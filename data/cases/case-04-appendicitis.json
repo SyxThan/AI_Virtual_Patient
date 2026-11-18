@@ -37,13 +37,14 @@
       "Exam layout: the pack's 'Dấu hiệu' row is one hotspot (e-abd-signs, Blumberg, Rovsing, psoas, obturator, pain on coughing). Palpation keeps four quadrant exam entries; 'không sờ thấy khối' (pack: no mass) is repeated in each quadrant. Patient's right is on the viewer's left of the cover.",
       "management[] has no antibiotic or analgesic drug or dose on purpose (pack: the case does not teach antibiotic doses). The patient-reported paracetamol 500 mg tablet is history, not a recommendation.",
       "source.case_number is omitted: this case is not in the team's 53-disease table (infectious-disease protocols); the schema makes the field optional (PR #67).",
-      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays are illustrative, TODO(clinician) review. AVP-163 mapping (collider -> exam region): abdomen_rlq -> abdomen_rlq (e-palp-rlq); abdomen_other -> abdomen_other (e-palp-ruq, e-palp-luq, e-palp-llq re-tagged from abdomen_ruq/luq/llq, findings unchanged and joined); flank_lumbar -> flank; tongue_mouth -> mouth; right_hip -> abdomen_signs (psoas and obturator signs live in e-abd-signs; no separate exam entry added so the finding text is not duplicated); groin -> groin_scrotum. Exam regions without a collider stay as list entries: general, vitals, abdomen_inspect, abdomen_percussion, abdomen_signs. The demo's 'rectal' item has no exam entry (draft.md leaves it to [BS]), so the app answers 'no record'. Findings, labels and methods in the pack's demo/case.json are NOT used; findings come only from exam[]. Cover kept as the SVG: preview.png shows the patient lying with one knee flexed, which matches the exam finding 'nằm co chân phải'."
+      "3D scene (avp-case-scene/1) from the team's pack 2026-11-18; overlays are illustrative, TODO(clinician) review. AVP-163 mapping (collider -> exam region): abdomen_rlq -> abdomen_rlq (e-palp-rlq); abdomen_other -> abdomen_other (e-palp-ruq, e-palp-luq, e-palp-llq re-tagged from abdomen_ruq/luq/llq, findings unchanged and joined); flank_lumbar -> flank; tongue_mouth -> mouth; right_hip -> abdomen_signs (psoas and obturator signs live in e-abd-signs; no separate exam entry added so the finding text is not duplicated); groin -> groin_scrotum. Exam regions without a collider stay as list entries: general, vitals, abdomen_inspect, abdomen_percussion, abdomen_signs. The demo's 'rectal' item has no exam entry (draft.md leaves it to [BS]), so the app answers 'no record'. Findings, labels and methods in the pack's demo/case.json are NOT used; findings come only from exam[]. Cover kept as the SVG: preview.png shows the patient lying with one knee flexed, which matches the exam finding 'nằm co chân phải'.",
+      "AVP-166: the cover is now /cases/appendicitis-cover.webp, rendered from the case's own 3D scene (overview camera, no illustrative overlays). The Product Owner chose this on 2026-11-18 knowing the full scene shows the patient lying with the right knee flexed, so the card hints at that exam finding. The SVG stays in public/cases."
     ]
   },
   "catalog": {
     "patient_group": "adult",
     "display_complaint": "Em bị đau bụng từ tối qua, giờ đau dồn xuống bụng dưới bên phải, đi lại đau lắm.",
-    "cover": "/cases/appendicitis-cover.svg",
+    "cover": "/cases/appendicitis-cover.webp",
     "exam_mode": "3d",
     "exam_regions": [
       {

@@ -1,26 +1,116 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" role="img" aria-label="Hình minh hoạ giản lược một người phụ nữ lớn tuổi để chọn vùng khám">
-  <!-- Neutral illustration for case-06-heart-failure (AVP-156). Not a clinical image: it shows no finding. -->
-  <rect width="300" height="400" fill="#f3f0ea"/>
-  <g fill="#d9e4ea" stroke="#7a8f9a" stroke-width="3" stroke-linejoin="round">
-    <circle cx="150" cy="52" r="40"/>
-    <rect x="138" y="90" width="24" height="16" rx="6"/>
-    <path d="M100 108 Q150 98 200 108 L208 222 Q150 234 92 222 Z"/>
-    <path d="M100 112 L56 206 L64 214 L110 142 Z"/>
-    <path d="M200 112 L244 206 L236 214 L190 142 Z"/>
-    <circle cx="60" cy="216" r="12"/>
-    <circle cx="240" cy="216" r="12"/>
-    <path d="M102 220 L108 384 L138 384 L146 232 Z"/>
-    <path d="M198 220 L192 384 L162 384 L154 232 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" role="img" aria-label="Hình minh hoạ giản lược một người phụ nữ lớn tuổi đứng trong phòng khám để chọn vùng khám">
+  <!--
+    Neutral illustration for case-06-heart-failure (AVP-156, redrawn AVP-166 in the
+    clinic-room palette of the 3D covers). Not a clinical image: it shows no finding
+    (no swelling, no breathing posture). It is also the 2D exam image: the body parts
+    stay where catalog.exam_regions points (head 0.5/0.1, neck 0.5/0.245, lungs
+    0.41/0.34, heart 0.56/0.38, abdomen 0.44/0.5, hand 0.2/0.54, legs 0.4/0.82).
+  -->
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6ecdd"/>
+      <stop offset="1" stop-color="#efe3d0"/>
+    </linearGradient>
+    <linearGradient id="wainscot" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfe9da"/>
+      <stop offset="1" stop-color="#b9dcc8"/>
+    </linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6d6bd"/>
+      <stop offset="1" stop-color="#dccab0"/>
+    </linearGradient>
+    <linearGradient id="cardigan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3a39c"/>
+      <stop offset="1" stop-color="#cf8a84"/>
+    </linearGradient>
+    <linearGradient id="trousers" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6f86a8"/>
+      <stop offset="1" stop-color="#5b7194"/>
+    </linearGradient>
+    <radialGradient id="skin" cx="0.42" cy="0.38" r="0.7">
+      <stop offset="0" stop-color="#f6d7bb"/>
+      <stop offset="1" stop-color="#e8bc98"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Room -->
+  <rect width="300" height="400" fill="url(#wall)"/>
+  <rect y="250" width="300" height="96" fill="url(#wainscot)"/>
+  <rect y="246" width="300" height="6" fill="#f4f1ea"/>
+  <rect y="346" width="300" height="54" fill="url(#floor)"/>
+  <rect y="344" width="300" height="4" fill="#cdbb9f"/>
+
+  <!-- Window, cabinet, chart: kept away from the body hotspots -->
+  <g opacity="0.95">
+    <rect x="16" y="34" width="62" height="70" rx="4" fill="#d9d4cc"/>
+    <rect x="21" y="39" width="25" height="28" rx="2" fill="#cfe6f4"/>
+    <rect x="48" y="39" width="25" height="28" rx="2" fill="#cfe6f4"/>
+    <rect x="21" y="70" width="25" height="29" rx="2" fill="#cfe6f4"/>
+    <rect x="48" y="70" width="25" height="29" rx="2" fill="#cfe6f4"/>
+    <rect x="226" y="30" width="60" height="52" rx="5" fill="#f3efe8" stroke="#ddd6cb" stroke-width="1.5"/>
+    <line x1="256" y1="32" x2="256" y2="80" stroke="#ddd6cb" stroke-width="1.5"/>
+    <rect x="263" y="44" width="14" height="5" rx="1.5" fill="#e0675c"/>
+    <rect x="267.5" y="39.5" width="5" height="14" rx="1.5" fill="#e0675c"/>
+    <circle cx="249" cy="56" r="1.8" fill="#8a8f93"/>
+    <circle cx="263" cy="56" r="1.8" fill="#8a8f93"/>
   </g>
-  <g fill="#c9ced2" stroke="#7a8f9a" stroke-width="3" stroke-linejoin="round">
-    <circle cx="150" cy="14" r="10"/>
-    <path d="M110 46 Q112 12 150 12 Q188 12 190 46 Q172 28 150 28 Q128 28 110 46 Z"/>
+  <!-- Plant on the floor, right -->
+  <g>
+    <path d="M262 300 q-14 -30 -2 -52 q8 22 6 52z" fill="#8cc79f"/>
+    <path d="M268 300 q4 -36 20 -50 q2 28 -14 50z" fill="#79b98d"/>
+    <path d="M256 344 h28 l-4 -44 h-20z" fill="#efe9df" stroke="#d6cec2" stroke-width="1.5"/>
   </g>
-  <g fill="none" stroke="#7a8f9a" stroke-width="2.5" stroke-linecap="round">
-    <circle cx="136" cy="52" r="8"/>
-    <circle cx="164" cy="52" r="8"/>
-    <path d="M144 52 h12"/>
-    <path d="M140 72 Q150 77 160 72"/>
+
+  <!-- Floor shadow -->
+  <ellipse cx="150" cy="384" rx="62" ry="8" fill="#000" opacity="0.08"/>
+
+  <!-- Legs (trousers) and shoes -->
+  <path d="M110 226 h38 l-6 146 h-24 z" fill="url(#trousers)"/>
+  <path d="M152 226 h38 l-8 146 h-24 z" fill="url(#trousers)"/>
+  <path d="M112 370 h36 q4 12 -6 14 h-32 q-6 -2 2 -14z" fill="#5a4a42"/>
+  <path d="M154 370 h34 q8 12 -2 14 h-32 q-6 -2 0 -14z" fill="#5a4a42"/>
+
+  <!-- Arms: cardigan sleeves angled down and out, hands at the wrists -->
+  <path d="M108 116 L66 202" stroke="url(#cardigan)" stroke-width="26" stroke-linecap="round"/>
+  <path d="M192 116 L234 202" stroke="url(#cardigan)" stroke-width="26" stroke-linecap="round"/>
+  <path d="M70 196 L64 206" stroke="#f1e8da" stroke-width="22" stroke-linecap="round"/>
+  <path d="M230 196 L236 206" stroke="#f1e8da" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="60" cy="217" r="12" fill="url(#skin)"/>
+  <circle cx="240" cy="217" r="12" fill="url(#skin)"/>
+
+  <!-- Torso: cardigan over a cream blouse -->
+  <path d="M100 112 Q150 100 200 112 L206 232 Q150 242 94 232 Z" fill="url(#cardigan)"/>
+  <path d="M136 106 L150 150 L164 106 Q150 102 136 106 Z" fill="#f4ede0"/>
+  <path d="M150 150 L150 236" stroke="#b97571" stroke-width="2" opacity="0.7"/>
+  <circle cx="156" cy="170" r="2.6" fill="#f4ede0"/>
+  <circle cx="156" cy="192" r="2.6" fill="#f4ede0"/>
+  <circle cx="156" cy="214" r="2.6" fill="#f4ede0"/>
+  <rect x="110" y="186" width="22" height="14" rx="2" fill="#c47f7a" opacity="0.55"/>
+
+  <!-- Neck -->
+  <rect x="139" y="86" width="22" height="22" rx="8" fill="url(#skin)"/>
+
+  <!-- Head -->
+  <ellipse cx="150" cy="44" rx="40" ry="38" fill="#c8c4bf"/>
+  <circle cx="150" cy="12" r="13" fill="#bdb8b2"/>
+  <ellipse cx="114" cy="60" rx="7" ry="9" fill="#ecc3a2"/>
+  <ellipse cx="186" cy="60" rx="7" ry="9" fill="#ecc3a2"/>
+  <ellipse cx="150" cy="58" rx="34" ry="35" fill="url(#skin)"/>
+  <path d="M116 52 Q118 22 150 22 Q182 22 184 52 Q170 34 150 34 Q128 34 116 52 Z" fill="#d6d2cd"/>
+  <path d="M126 36 Q140 30 150 34" stroke="#bdb8b2" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Face: calm, neutral -->
+  <g fill="none" stroke="#6b5a52" stroke-width="2.2" stroke-linecap="round">
+    <circle cx="136" cy="60" r="9"/>
+    <circle cx="164" cy="60" r="9"/>
+    <path d="M145 60 h10"/>
   </g>
-  <text x="150" y="396" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b7b82">Hình minh hoạ, không phải ảnh lâm sàng</text>
+  <circle cx="136" cy="61" r="3" fill="#3d322d"/>
+  <circle cx="164" cy="61" r="3" fill="#3d322d"/>
+  <circle cx="137.2" cy="59.8" r="0.9" fill="#fff"/>
+  <circle cx="165.2" cy="59.8" r="0.9" fill="#fff"/>
+  <ellipse cx="128" cy="74" rx="6" ry="3.5" fill="#e79a8f" opacity="0.45"/>
+  <ellipse cx="172" cy="74" rx="6" ry="3.5" fill="#e79a8f" opacity="0.45"/>
+  <path d="M141 80 Q150 85 159 80" stroke="#b4655c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+
+  <text x="150" y="396" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#6b5f52">Hình minh hoạ, không phải ảnh lâm sàng</text>
 </svg>

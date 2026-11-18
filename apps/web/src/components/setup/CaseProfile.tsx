@@ -33,7 +33,8 @@ export default function CaseProfile({ data }: { data: CaseSummary }) {
             fill
             priority
             sizes="(min-width: 1024px) 55vw, 100vw"
-            className="setup-breathe object-cover object-[50%_30%]"
+            // 2D covers are portrait exam figures: anchor the top so the face stays in frame.
+            className={`setup-breathe object-cover ${examModeOf(data) === "2d" ? "object-top" : "object-[50%_30%]"}`}
           />
         ) : (
           <div className="absolute inset-0 grid place-items-center p-6 text-center text-sm font-semibold text-sand-ink">
