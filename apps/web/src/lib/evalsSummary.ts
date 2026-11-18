@@ -31,12 +31,26 @@ export type RepeatabilityResult = Meta & {
 };
 
 export type RedteamResult = Meta & {
+  /** AVP-170: the latest real run of every case, summed. */
+  sources: string[];
+  first_measured_at: string | null;
   model: string;
   prompts: number;
+  /** Prompts with no reply (provider error): not graded. */
+  errors: number;
   completed: number;
   passed: number;
   pass_rate: number | null;
   by_category: Record<string, { n: number; passed: number }>;
+  cases: {
+    case_id: string;
+    title: string;
+    prompts: number;
+    errors: number;
+    completed: number;
+    passed: number;
+    pass_rate: number | null;
+  }[];
 };
 
 export type JudgeResult = Meta & {

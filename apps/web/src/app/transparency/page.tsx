@@ -4,15 +4,8 @@ import vi from "../../../messages/vi.json";
 import MetricTile from "@/components/transparency/MetricTile";
 import Badge from "@/components/ui/Badge";
 import { buttonClass } from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import PageShell, { PAGE_TITLE } from "@/components/ui/PageShell";
-import {
-  evalsSummary,
-  fill,
-  formatMs,
-  formatNumber,
-  formatRate,
-} from "@/lib/evalsSummary";
+import { evalsSummary, fill, formatMs, formatNumber, formatRate } from "@/lib/evalsSummary";
 
 // Every number here comes from src/data/evals-summary.json, written by
 // evals/publish_summary.py from real (non-fake) results in evals/results/
@@ -20,12 +13,10 @@ import {
 export const metadata: Metadata = { title: vi.transparency.title };
 
 const T = vi.transparency;
-const CATEGORIES = T.redteam.categories as Record<string, string>;
 
 export default function TransparencyPage() {
   const { latency, repeatability: rep, redteam: rt, judge } = evalsSummary;
   const lat = latency.voice ?? latency.text;
-  const latMode = latency.voice ? T.latency.modeVoice : T.latency.modeText;
 
   return (
     <PageShell width="default">
@@ -39,36 +30,23 @@ export default function TransparencyPage() {
         <MetricTile
           tone="mint"
           title={T.latency.title}
-          what={T.latency.what}
-          limits={T.latency.limits}
-          command={T.latency.command}
-          provenance={
-            lat && {
-              source: lat.source,
-              measured_at: lat.measured_at,
-              git_commit: lat.git_commit,
-              model: Object.values(lat.providers).join(", "),
-            }
-          }
-          headline={fill(T.latency.headline, { mode: latMode })}
+          note={T.latency.note}
+          measured={!!lat}
+          measuredAt={lat?.measured_at}
+          headline={T.latency.headline}
           value={lat ? formatMs(lat.first_audio_p50) : undefined}
         >
           {lat && (
             <>
               <p>{fill(T.latency.p95, { value: formatMs(lat.first_audio_p95) })}</p>
-              <p>{fill(T.latency.target, { value: formatMs(lat.target_ms) })}</p>
               {lat.target_met !== null && (
                 <p className="font-semibold">
-                  {lat.target_met ? T.latency.met : T.latency.notMet}
+                  {fill(T.latency.target, {
+                    value: formatMs(lat.target_ms),
+                    status: lat.target_met ? T.latency.met : T.latency.notMet,
+                  })}
                 </p>
               )}
-              <p>
-                {fill(T.latency.parts, {
-                  stt: formatMs(lat.stt_p50),
-                  llm: formatMs(lat.llm_p50),
-                  tts: formatMs(lat.tts_p50),
-                })}
-              </p>
               <p>{fill(T.latency.turns, { n: lat.turns, errors: lat.turns_with_errors })}</p>
             </>
           )}
@@ -77,33 +55,17 @@ export default function TransparencyPage() {
         <MetricTile
           tone="sky"
           title={T.repeatability.title}
-          what={T.repeatability.what}
-          limits={T.repeatability.limits}
-          command={T.repeatability.command}
-          provenance={
-            rep && {
-              source: rep.source,
-              measured_at: rep.measured_at,
-              git_commit: rep.git_commit,
-              model: rep.models.join(", "),
-            }
-          }
+          note={T.repeatability.note}
+          measured={!!rep}
+          measuredAt={rep?.measured_at}
           headline={T.repeatability.headline}
           value={rep ? formatRate(rep.identical_all_runs_rate) : undefined}
         >
           {rep && (
             <>
+              <p>{fill(T.repeatability.range, { value: formatNumber(rep.max_total_score_range) })}</p>
               <p>
-                {fill(T.repeatability.agreement, { value: formatRate(rep.mean_modal_agreement) })}
-              </p>
-              <p>
-                {fill(T.repeatability.range, { value: formatNumber(rep.max_total_score_range) })}
-              </p>
-              <p>
-                {fill(T.repeatability.runs, {
-                  transcripts: rep.transcripts,
-                  runs: rep.runs_per_transcript,
-                })}
+                {fill(T.repeatability.runs, { transcripts: rep.transcripts, runs: rep.runs_per_transcript })}
               </p>
             </>
           )}
@@ -112,31 +74,27 @@ export default function TransparencyPage() {
         <MetricTile
           tone="sand"
           title={T.redteam.title}
-          what={T.redteam.what}
-          limits={T.redteam.limits}
-          command={T.redteam.command}
-          provenance={
-            rt && {
-              source: rt.source,
-              measured_at: rt.measured_at,
-              git_commit: rt.git_commit,
-              model: rt.model,
-            }
-          }
+          note={T.redteam.note}
+          measured={!!rt}
+          measuredAt={rt?.measured_at}
           headline={T.redteam.headline}
           value={rt ? formatRate(rt.pass_rate) : undefined}
         >
           {rt && (
             <>
               <p className="font-semibold">
-                {fill(T.redteam.count, { passed: rt.passed, n: rt.completed })}
+                {fill(T.redteam.total, { passed: rt.passed, n: rt.completed, cases: rt.cases.length })}
               </p>
+              {rt.errors > 0 && <p>{fill(T.redteam.errors, { n: rt.errors, total: rt.prompts })}</p>}
               <ul className="space-y-0.5">
-                {Object.entries(rt.by_category).map(([cat, v]) => (
-                  <li key={cat} className="flex justify-between gap-2">
-                    <span>{CATEGORIES[cat] ?? cat}</span>
+                {rt.cases.map((c) => (
+                  <li key={c.case_id} className="flex justify-between gap-2">
+                    <span className="min-w-0">{c.title}</span>
                     <span className="tabular shrink-0 whitespace-nowrap font-semibold">
-                      {fill(T.redteam.count, { passed: v.passed, n: v.n })}
+                      {fill(T.redteam.count, { passed: c.passed, n: c.completed })}
+                      {c.errors > 0 && (
+                        <span className="font-normal"> {fill(T.redteam.caseErrors, { n: c.errors })}</span>
+                      )}
                     </span>
                   </li>
                 ))}
@@ -147,46 +105,22 @@ export default function TransparencyPage() {
 
         <MetricTile
           title={T.judge.title}
-          what={T.judge.what}
-          limits={T.judge.limits}
-          command={T.judge.command}
-          provenance={
-            judge && {
-              source: judge.source,
-              measured_at: judge.measured_at,
-              git_commit: judge.git_commit,
-              model: `${judge.patient_model}, ${judge.judge_model}`,
-            }
-          }
+          note={T.judge.note}
+          measured={!!judge}
+          measuredAt={judge?.measured_at}
           headline={T.judge.headline}
           value={judge ? formatNumber(judge.unsupported_per_100) : undefined}
         >
           {judge && (
             <>
               <p>{fill(T.judge.leaks, { value: formatNumber(judge.gated_leaks_per_100) })}</p>
-              <p>{fill(T.judge.judged, { n: judge.judged })}</p>
-              <p>
-                {fill(T.judge.audit, {
-                  n: judge.audit_labelled,
-                  agreement: formatRate(judge.audit_agreement),
-                  missed: judge.audit_missed_unsupported,
-                })}
-              </p>
+              <p>{fill(T.judge.audit, { n: judge.audit_labelled, agreement: formatRate(judge.audit_agreement) })}</p>
             </>
           )}
         </MetricTile>
       </div>
 
-      <Card as="section" className="mt-6 space-y-3" aria-labelledby="targets-title">
-        <h2 id="targets-title" className="font-display text-xl font-bold tracking-tight text-ink">
-          {T.targetsTitle}
-        </h2>
-        <ul className="max-w-[68ch] list-disc space-y-2 pl-5 leading-relaxed text-ink marker:text-primary">
-          {T.targets.map((t) => (
-            <li key={t}>{t}</li>
-          ))}
-        </ul>
-      </Card>
+      <p className="mt-6 text-sm text-ink-muted">{T.practiceOnly}</p>
 
       <nav aria-label={T.title} className="mt-6">
         <Link href="/" className={buttonClass({ variant: "secondary" })}>

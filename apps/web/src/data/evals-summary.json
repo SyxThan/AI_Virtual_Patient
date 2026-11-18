@@ -2,72 +2,151 @@
   "generated_by": "evals/publish_summary.py",
   "latency": {
     "voice": {
-      "source": "evals/results/latency-voice-20261118T195212Z.json",
-      "measured_at": "2026-11-18T19:52:12+00:00",
-      "git_commit": "bf955bc",
+      "source": "evals/results/latency-voice-20261118T212313Z.json",
+      "measured_at": "2026-11-18T21:23:13+00:00",
+      "git_commit": "ec79e06",
       "providers": {
         "llm": "FallbackLLMProvider",
         "stt": "whisper",
         "tts": "vieneu"
       },
       "setup": "in-process FastAPI + WebSocket, in-memory repos; excludes browser audio capture/playback and network",
-      "turns": 15,
+      "turns": 23,
       "turns_with_errors": 0,
-      "first_audio_p50": 2870,
-      "first_audio_p95": 32462,
-      "first_text_p50": 2670,
-      "stt_p50": 576,
-      "llm_p50": 2084,
-      "tts_p50": 2434,
+      "first_audio_p50": 5880,
+      "first_audio_p95": 7793,
+      "first_text_p50": 5175,
+      "stt_p50": 3550,
+      "llm_p50": 1798,
+      "tts_p50": 5849,
       "target_ms": 1500,
       "target_met": false
     },
     "text": null
   },
-  "repeatability": null,
+  "repeatability": {
+    "source": "evals/results/repeatability-20261118T205426Z.json",
+    "measured_at": "2026-11-18T20:54:26+00:00",
+    "git_commit": "ec79e06",
+    "models": [
+      "gemini-3.1-flash-lite"
+    ],
+    "runs_per_transcript": 5,
+    "transcripts": 3,
+    "criterion_cells": 24,
+    "identical_all_runs_rate": 0.958,
+    "mean_modal_agreement": 0.992,
+    "max_total_score_range": 3.569999999999993
+  },
   "redteam": {
-    "source": "evals/results/redteam-case-03-pneumonia-20261117T182941Z.json",
-    "measured_at": "2026-11-17T18:29:41+00:00",
-    "git_commit": "2ff9898",
+    "source": "evals/results/redteam-case-01-hfmd-20261118T211812Z.json",
+    "measured_at": "2026-11-18T21:18:11+00:00",
+    "git_commit": "ec79e06",
+    "sources": [
+      "evals/results/redteam-case-01-hfmd-20261118T211812Z.json",
+      "evals/results/redteam-case-02-dengue-20261118T210355Z.json",
+      "evals/results/redteam-case-03-pneumonia-20261118T210644Z.json",
+      "evals/results/redteam-case-04-appendicitis-20261118T210910Z.json",
+      "evals/results/redteam-case-05-hypertension-20261118T211150Z.json",
+      "evals/results/redteam-case-06-heart-failure-20261118T211451Z.json"
+    ],
+    "first_measured_at": "2026-11-18T21:03:54+00:00",
     "model": "gemini-3.1-flash-lite",
-    "prompts": 80,
-    "completed": 79,
-    "passed": 76,
-    "pass_rate": 0.962,
+    "prompts": 480,
+    "errors": 12,
+    "completed": 468,
+    "passed": 451,
+    "pass_rate": 0.964,
     "by_category": {
       "diagnosis_fishing": {
-        "n": 9,
-        "passed": 9
+        "n": 60,
+        "passed": 60
       },
       "unlisted_symptom": {
-        "n": 10,
-        "passed": 10
+        "n": 60,
+        "passed": 56
       },
       "leading_question": {
-        "n": 10,
-        "passed": 8
+        "n": 60,
+        "passed": 51
       },
       "prompt_injection": {
-        "n": 10,
-        "passed": 10
+        "n": 58,
+        "passed": 54
       },
       "premature_exam": {
-        "n": 10,
-        "passed": 10
+        "n": 58,
+        "passed": 58
       },
       "lab_not_ordered": {
-        "n": 10,
-        "passed": 10
+        "n": 60,
+        "passed": 60
       },
       "out_of_character": {
-        "n": 10,
-        "passed": 9
+        "n": 52,
+        "passed": 52
       },
       "dialect": {
-        "n": 10,
-        "passed": 10
+        "n": 60,
+        "passed": 60
       }
-    }
+    },
+    "cases": [
+      {
+        "case_id": "case-01-hfmd",
+        "title": "Bệnh Tay - Chân - Miệng",
+        "prompts": 80,
+        "errors": 12,
+        "completed": 68,
+        "passed": 68,
+        "pass_rate": 1.0
+      },
+      {
+        "case_id": "case-02-dengue",
+        "title": "Sốt xuất huyết Dengue (trẻ em)",
+        "prompts": 80,
+        "errors": 0,
+        "completed": 80,
+        "passed": 76,
+        "pass_rate": 0.95
+      },
+      {
+        "case_id": "case-03-pneumonia",
+        "title": "Viêm phổi trẻ em",
+        "prompts": 80,
+        "errors": 0,
+        "completed": 80,
+        "passed": 78,
+        "pass_rate": 0.975
+      },
+      {
+        "case_id": "case-04-appendicitis",
+        "title": "Viêm ruột thừa cấp (người lớn)",
+        "prompts": 80,
+        "errors": 0,
+        "completed": 80,
+        "passed": 76,
+        "pass_rate": 0.95
+      },
+      {
+        "case_id": "case-05-hypertension",
+        "title": "Tăng huyết áp (người lớn)",
+        "prompts": 80,
+        "errors": 0,
+        "completed": 80,
+        "passed": 73,
+        "pass_rate": 0.912
+      },
+      {
+        "case_id": "case-06-heart-failure",
+        "title": "Suy tim mạn mất bù cấp (người cao tuổi)",
+        "prompts": 80,
+        "errors": 0,
+        "completed": 80,
+        "passed": 80,
+        "pass_rate": 1.0
+      }
+    ]
   },
   "judge": null
 }
