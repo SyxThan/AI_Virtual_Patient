@@ -1,0 +1,409 @@
+{
+  "script": "evals/repeatability.py",
+  "measured_at": "2026-11-18T20:54:26+00:00",
+  "git_commit": "ec79e06",
+  "python": "3.13.3",
+  "platform": "Windows-11",
+  "config": {
+    "providers": "env",
+    "evaluator_models": [
+      "gemini-3.1-flash-lite"
+    ],
+    "prompt_versions": [
+      "evaluator-v1"
+    ],
+    "runs_per_transcript": 5,
+    "transcripts": [
+      "thorough",
+      "partial",
+      "minimal"
+    ],
+    "fixtures": "evals/fixtures/repeatability_transcripts.json (synthetic)",
+    "case_id": "case-01-hfmd",
+    "rubric_version": 1,
+    "case_review_status": "draft"
+  },
+  "contains_fake_provider": false,
+  "note": "Real evaluator as configured in .env. Repeatability only, not validity.",
+  "summary": {
+    "criterion_cells": 24,
+    "identical_all_runs_rate": 0.958,
+    "mean_modal_agreement": 0.992,
+    "max_total_score_range": 3.569999999999993,
+    "evaluator_ms": {
+      "n": 15,
+      "min": 1849,
+      "p50": 2614,
+      "p95": 5908,
+      "max": 5908,
+      "mean": 2925.5
+    }
+  },
+  "transcripts": [
+    {
+      "transcript_id": "thorough",
+      "successful_runs": 5,
+      "error_counts": {},
+      "total_score": {
+        "n": 5,
+        "min": 82.14,
+        "p50": 82.14,
+        "p95": 85.71,
+        "max": 85.71,
+        "mean": 82.9,
+        "range": 3.569999999999993
+      },
+      "critical_missed_runs": 0,
+      "criteria": [
+        {
+          "criterion_id": "r-fever-hx",
+          "n": 5,
+          "levels": {
+            "1": 5
+          },
+          "statuses": {
+            "partial": 5
+          },
+          "modal_level": "1",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-startle-hx",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-contact-epi",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-exam-skin-mouth",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-investigations",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-dx-grade",
+          "n": 5,
+          "levels": {
+            "1": 5
+          },
+          "statuses": {
+            "partial": 5
+          },
+          "modal_level": "1",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-management",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-communication",
+          "n": 5,
+          "levels": {
+            "1": 4,
+            "2": 1
+          },
+          "statuses": {
+            "partial": 4,
+            "met": 1
+          },
+          "modal_level": "1",
+          "modal_agreement": 0.8,
+          "identical_all_runs": false
+        }
+      ]
+    },
+    {
+      "transcript_id": "partial",
+      "successful_runs": 5,
+      "error_counts": {},
+      "total_score": {
+        "n": 5,
+        "min": 25.0,
+        "p50": 25.0,
+        "p95": 25.0,
+        "max": 25.0,
+        "mean": 25.0,
+        "range": 0.0
+      },
+      "critical_missed_runs": 5,
+      "criteria": [
+        {
+          "criterion_id": "r-fever-hx",
+          "n": 5,
+          "levels": {
+            "2": 5
+          },
+          "statuses": {
+            "met": 5
+          },
+          "modal_level": "2",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-startle-hx",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-contact-epi",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-exam-skin-mouth",
+          "n": 5,
+          "levels": {
+            "1": 5
+          },
+          "statuses": {
+            "partial": 5
+          },
+          "modal_level": "1",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-investigations",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-dx-grade",
+          "n": 5,
+          "levels": {
+            "1": 5
+          },
+          "statuses": {
+            "partial": 5
+          },
+          "modal_level": "1",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-management",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-communication",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        }
+      ]
+    },
+    {
+      "transcript_id": "minimal",
+      "successful_runs": 5,
+      "error_counts": {},
+      "total_score": {
+        "n": 5,
+        "min": 0.0,
+        "p50": 0.0,
+        "p95": 0.0,
+        "max": 0.0,
+        "mean": 0.0,
+        "range": 0.0
+      },
+      "critical_missed_runs": 5,
+      "criteria": [
+        {
+          "criterion_id": "r-fever-hx",
+          "n": 5,
+          "levels": {
+            "null": 5
+          },
+          "statuses": {
+            "insufficient_evidence": 5
+          },
+          "modal_level": "null",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-startle-hx",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-contact-epi",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-exam-skin-mouth",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-investigations",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-dx-grade",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-management",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        },
+        {
+          "criterion_id": "r-communication",
+          "n": 5,
+          "levels": {
+            "0": 5
+          },
+          "statuses": {
+            "unmet": 5
+          },
+          "modal_level": "0",
+          "modal_agreement": 1.0,
+          "identical_all_runs": true
+        }
+      ]
+    }
+  ]
+}

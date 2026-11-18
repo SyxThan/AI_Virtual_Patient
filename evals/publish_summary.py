@@ -91,23 +91,62 @@ def repeatability(results: Path) -> dict | None:
     }
 
 
+def _case_title(case_id: str) -> str:
+    """Vietnamese case title from data/cases/<id>.json; the id itself if unreadable."""
+    try:
+        data = json.loads(
+            (common.REPO_ROOT / "data" / "cases" / f"{case_id}.json").read_text("utf-8")
+        )
+        return data["title"]["vi"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return case_id
+
+
 def redteam(results: Path) -> dict | None:
-    hit = _latest(_load(results, "redteam-case-"))
-    if not hit:
+    """All cases: the latest real run per case, summed (AVP-170)."""
+    per_case: dict[str, tuple[Path, dict]] = {}
+    for p, d in _load(results, "redteam-case-"):
+        cid = d.get("config", {}).get("case_id") or p.stem
+        if cid not in per_case or (d.get("measured_at") or "") > (
+            per_case[cid][1].get("measured_at") or ""
+        ):
+            per_case[cid] = (p, d)
+    if not per_case:
         return None
-    path, d = hit
-    s = d["summary"]
+    runs = [per_case[k] for k in sorted(per_case)]
+    newest_path, newest = max(runs, key=lambda x: x[1].get("measured_at") or "")
+    by_category: dict[str, dict[str, int]] = {}
+    for _, d in runs:
+        for cat, v in d["by_category"].items():
+            agg = by_category.setdefault(cat, {"n": 0, "passed": 0})
+            agg["n"] += v["n"] - v["errors"]
+            agg["passed"] += v["passed"]
+    completed = sum(d["summary"]["completed"] for _, d in runs)
+    passed = sum(d["summary"]["passed"] for _, d in runs)
     return {
-        **_meta(path, d),
-        "model": d["config"]["patient_model"],
-        "prompts": s["prompts"],
-        "completed": s["completed"],
-        "passed": s["passed"],
-        "pass_rate": s["pass_rate"],
-        "by_category": {
-            cat: {"n": v["n"] - v["errors"], "passed": v["passed"]}
-            for cat, v in d["by_category"].items()
-        },
+        **_meta(newest_path, newest),
+        "sources": [f"evals/results/{p.name}" for p, _ in runs],
+        "first_measured_at": min((d.get("measured_at") or "") for _, d in runs) or None,
+        "model": ", ".join(sorted({d["config"]["patient_model"] for _, d in runs})),
+        "prompts": sum(d["summary"]["prompts"] for _, d in runs),
+        # Prompts with no reply (provider error, e.g. rate limit): not graded, shown on the page.
+        "errors": sum(d["summary"]["prompts"] - d["summary"]["completed"] for _, d in runs),
+        "completed": completed,
+        "passed": passed,
+        "pass_rate": round(passed / completed, 3) if completed else None,
+        "by_category": by_category,
+        "cases": [
+            {
+                "case_id": d["config"]["case_id"],
+                "title": _case_title(d["config"]["case_id"]),
+                "prompts": d["summary"]["prompts"],
+                "errors": d["summary"]["prompts"] - d["summary"]["completed"],
+                "completed": d["summary"]["completed"],
+                "passed": d["summary"]["passed"],
+                "pass_rate": d["summary"]["pass_rate"],
+            }
+            for _, d in runs
+        ],
     }
 
 

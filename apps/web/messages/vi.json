@@ -837,74 +837,47 @@
     "title": "Minh bạch số liệu",
     "navLink": "Minh bạch số liệu",
     "badge": "Chỉ số đo thật",
-    "intro": "Mọi con số trên trang này do các script trong thư mục evals/ đo và ghi lại, kèm ngày đo, phiên bản mã và mô hình đã dùng. Số đo bằng mô hình giả không bao giờ được đưa lên đây. Mục nào chưa đo thật sẽ ghi rõ là chưa có số đo.",
+    "intro": "Số liệu do các script trong evals/ đo trên hệ thống thật. Mục nào chưa đo ghi rõ là chưa có số.",
     "notMeasured": "Chưa có số đo thật",
-    "notMeasuredHint": "Lệnh để đo:",
-    "measuredAt": "Ngày đo: {date}",
-    "commit": "Phiên bản mã: {commit}",
-    "model": "Mô hình: {model}",
-    "source": "File kết quả: {source}",
-    "limitsTitle": "Giới hạn",
-    "units": { "ms": "{value} ms", "s": "{value} giây" },
+    "measuredAt": "Đo ngày {date}",
+    "units": {
+      "ms": "{value} ms",
+      "s": "{value} giây"
+    },
     "latency": {
       "title": "Độ trễ một lượt hỏi",
-      "what": "Từ lúc sinh viên gửi câu hỏi đến khi nghe được giọng người mẹ, qua đúng kết nối WebSocket của ứng dụng.",
-      "headline": "Âm thanh đầu tiên, trung vị ({mode})",
+      "headline": "Thời gian đến khi nghe giọng người mẹ, trung vị",
       "p95": "95% số lượt dưới {value}",
-      "target": "Mục tiêu: 95% số lượt dưới {value}",
-      "met": "Đạt mục tiêu ở lần đo này",
-      "notMet": "Chưa đạt mục tiêu ở lần đo này",
-      "parts": "Trung vị từng bước: nhận dạng giọng nói {stt}, trả lời {llm}, tổng hợp giọng {tts}",
+      "target": "Mục tiêu dưới {value}: {status}",
+      "met": "đạt",
+      "notMet": "chưa đạt",
       "turns": "{n} lượt hỏi, {errors} lượt lỗi",
-      "modeVoice": "chế độ nói",
-      "modeText": "chế độ gõ chữ",
-      "limits": "Đo trên một máy, chưa tính thời gian ghi âm, phát âm thanh trên trình duyệt và mạng tới máy chủ ở xa.",
-      "command": "python evals/latency.py --providers env --mode voice"
+      "note": "Đo trên một máy, chưa tính mạng và phát âm thanh trên trình duyệt. Có tính cả các lượt chuyển sang mô hình dự phòng khi mô hình chính bị giới hạn tần suất."
     },
     "repeatability": {
       "title": "Độ ổn định khi chấm",
-      "what": "Chấm lại cùng một buổi hỏi bệnh nhiều lần, xem Evaluator có cho cùng mức đạt không.",
-      "headline": "Ô tiêu chí cho cùng kết quả ở mọi lần chấm",
-      "agreement": "Trung bình trùng mức phổ biến nhất: {value}",
+      "headline": "Tiêu chí cho cùng kết quả ở mọi lần chấm",
       "range": "Chênh lệch tổng điểm lớn nhất: {value} điểm",
-      "runs": "{transcripts} buổi hỏi tổng hợp, mỗi buổi chấm {runs} lần",
-      "limits": "Đây là độ ổn định, chưa phải độ chính xác. Độ đồng thuận với giảng viên cần bộ nhãn do giảng viên chấm và chưa được đo.",
-      "command": "python evals/repeatability.py --providers env --runs 5"
+      "runs": "{transcripts} buổi hỏi mẫu, mỗi buổi chấm {runs} lần",
+      "note": "Đây là độ ổn định, chưa phải độ đồng thuận với giảng viên (kappa chưa đo)."
     },
     "redteam": {
-      "title": "Thử thách guardrail (red-team)",
-      "what": "Câu hỏi gài để người mẹ ảo nói sai: dò tên bệnh, hỏi triệu chứng không có trong ca, đòi kết quả khám khi chưa khám, yêu cầu bỏ vai.",
-      "headline": "Câu trả lời không vi phạm quy tắc kiểm tra",
+      "title": "Câu hỏi gài (red-team)",
+      "headline": "Người bệnh ảo không nói sai",
       "count": "{passed}/{n} câu",
-      "limits": "Chấm bằng quy tắc chuỗi tự động: bắt được lỗi rõ ràng, không bắt được mọi lỗi tinh vi. Là bộ câu gài, không phải hội thoại thật.",
-      "command": "python evals/redteam.py --providers env",
-      "categories": {
-        "diagnosis_fishing": "Dò tên bệnh",
-        "unlisted_symptom": "Triệu chứng không có trong ca",
-        "leading_question": "Câu hỏi gài",
-        "prompt_injection": "Yêu cầu bỏ vai",
-        "premature_exam": "Hỏi dấu hiệu khi chưa khám",
-        "lab_not_ordered": "Xét nghiệm chưa chỉ định",
-        "out_of_character": "Xin đáp án, rubric",
-        "dialect": "Phương ngữ"
-      }
+      "total": "{passed}/{n} câu, {cases} ca bệnh",
+      "errors": "{n}/{total} câu không nhận được trả lời (lỗi kết nối mô hình), không tính vào tỉ lệ",
+      "caseErrors": "({n} lỗi)",
+      "note": "Chấm tự động bằng quy tắc trên bộ câu gài, không phải hội thoại thật."
     },
     "judge": {
-      "title": "Thông tin không có trong ca",
-      "what": "Một LLM kiểm định dán nhãn từng câu trả lời của bộ red-team; người kiểm chấm lại một mẫu để đo sai số của chính LLM đó.",
+      "title": "Thông tin ngoài ca bệnh",
       "headline": "Câu có thông tin lâm sàng không có trong ca, trên 100 lượt",
       "leaks": "Lộ kết quả khám hoặc xét nghiệm: {value} trên 100 lượt",
-      "audit": "Người kiểm chấm {n} câu, khớp với LLM kiểm định {agreement}, LLM bỏ sót {missed} câu sai",
-      "judged": "{n} câu trả lời được dán nhãn",
-      "limits": "Chỉ hiển thị khi người kiểm đã chấm xong mẫu. Đây là số trên bộ câu gài.",
-      "command": "python evals/redteam_judge.py <file redteam> --providers env"
+      "audit": "Người kiểm chấm lại {n} câu, khớp {agreement}",
+      "note": "Chỉ hiện sau khi người kiểm chấm xong mẫu kiểm tra."
     },
-    "targetsTitle": "Mục tiêu và kết quả là hai việc khác nhau",
-    "targets": [
-      "Mục tiêu độ trễ: 95% số lượt nghe được giọng người mẹ trong dưới 1,5 giây. Kết quả chỉ là số đo ở ô bên trên.",
-      "Mục tiêu đồng thuận với giảng viên: Cohen's kappa từ 0,82 trở lên. Chưa đo, vì cần giảng viên chấm cùng một bộ buổi hỏi bệnh.",
-      "Phản hồi Auto-OSCE chỉ để luyện tập, không thay thế giảng viên."
-    ],
+    "practiceOnly": "Phản hồi Auto-OSCE chỉ để luyện tập, không thay thế giảng viên.",
     "backHome": "Về trang chủ"
   },
   "cockpit": {

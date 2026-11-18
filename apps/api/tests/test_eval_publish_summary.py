@@ -101,6 +101,44 @@ def test_judge_needs_a_complete_human_audit(tmp_path: Path) -> None:
     assert j["audit_agreement"] == 0.96 and j["judge_model"] == "j"
 
 
+def _redteam(case_id: str, measured_at: str, passed: int, fake: bool = False) -> dict:
+    return {
+        "measured_at": measured_at,
+        "git_commit": "abc1234",
+        "contains_fake_provider": fake,
+        "config": {"patient_model": "m", "case_id": case_id},
+        "summary": {"prompts": 10, "completed": 10, "passed": passed, "pass_rate": passed / 10},
+        "by_category": {"dialect": {"n": 10, "errors": 0, "passed": passed}},
+    }
+
+
+def test_redteam_sums_the_latest_real_run_of_each_case(tmp_path: Path) -> None:
+    _write(tmp_path, "redteam-case-a-1.json", _redteam("case-a", "2026-11-16T01:00:00+00:00", 2))
+    _write(tmp_path, "redteam-case-a-2.json", _redteam("case-a", "2026-11-16T05:00:00+00:00", 9))
+    _write(tmp_path, "redteam-case-b-1.json", _redteam("case-b", "2026-11-16T03:00:00+00:00", 7))
+    _write(
+        tmp_path,
+        "redteam-case-c-1.json",
+        _redteam("case-c", "2026-11-16T09:00:00+00:00", 0, fake=True),
+    )
+    r = pub.build(tmp_path)["redteam"]
+    assert [c["case_id"] for c in r["cases"]] == ["case-a", "case-b"]  # fake run never counts
+    assert r["completed"] == 20 and r["passed"] == 16 and r["pass_rate"] == 0.8
+    assert r["by_category"] == {"dialect": {"n": 20, "passed": 16}}
+    assert r["measured_at"] == "2026-11-16T05:00:00+00:00"
+    assert r["first_measured_at"] == "2026-11-16T03:00:00+00:00"
+    assert r["cases"][0]["title"] == "case-a"  # no case file: falls back to the id
+    assert r["errors"] == 0 and r["cases"][1]["errors"] == 0
+
+
+def test_redteam_reports_prompts_without_a_reply(tmp_path: Path) -> None:
+    run = _redteam("case-a", "2026-11-16T01:00:00+00:00", 7)
+    run["summary"].update(completed=8, passed=7)  # 2 of 10 prompts errored
+    _write(tmp_path, "redteam-case-a-1.json", run)
+    r = pub.build(tmp_path)["redteam"]
+    assert r["errors"] == 2 and r["cases"][0]["errors"] == 2 and r["completed"] == 8
+
+
 def test_real_eval_outputs_round_trip(tmp_path: Path, monkeypatch) -> None:
     """Feed the real scripts' output (relabelled as real) through publish."""
     for name in ("latency", "repeatability", "redteam"):
