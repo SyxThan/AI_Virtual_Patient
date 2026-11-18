@@ -5,22 +5,22 @@ import vi from "../../../messages/vi.json";
 import Badge from "@/components/ui/Badge";
 import Tile from "@/components/ui/Tile";
 import { FOCUS_RING } from "@/components/ui/focus";
-import type { Debrief } from "@/hooks/useDebriefData";
 import { fmt } from "@/lib/sessionAuth";
+import type { Claim } from "./debriefHelpers";
 
-type Claim = NonNullable<Debrief["items"]>[number];
 type Citation = NonNullable<Claim["citations"]>[number];
 
 function sourceLabel(c: Citation): string {
   return (vi.debrief.sourceLabels as Record<string, string>)[c.source_id] ?? c.document_title;
 }
 
-function ClaimRow({ claim }: { claim: Claim }) {
+/** One debrief claim with its source chips; a chip opens the cited excerpt below. */
+export function ClaimRow({ claim, className = "" }: { claim: Claim; className?: string }) {
   const [open, setOpen] = useState<string | null>(null);
   const citations = claim.citations ?? [];
   const active = citations.find((c) => c.chunk_id === open);
   return (
-    <li className="rounded-card border border-line p-4">
+    <li className={`rounded-card border border-line bg-surface p-4 ${className}`}>
       <p className="text-sm leading-relaxed text-ink">{claim.text}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {claim.verified ? (
@@ -73,21 +73,15 @@ function ClaimRow({ claim }: { claim: Claim }) {
   );
 }
 
+/** Claims not tied to a rubric criterion (the others sit under their criterion). */
 export default function CitedClaimsSection({ items }: { items: Claim[] }) {
   return (
-    <Tile as="section" tone="surface" aria-labelledby="claims-title">
-      <h2 id="claims-title" className="font-display text-2xl font-bold tracking-tight">
-        {vi.debrief.claims.title}
-      </h2>
-      {items.length === 0 ? (
-        <p className="mt-3 text-sm italic text-ink-muted">{vi.debrief.claims.empty}</p>
-      ) : (
-        <ul className="mt-5 space-y-3">
-          {items.map((c, i) => (
-            <ClaimRow key={`${c.criterion_id ?? "x"}-${i}`} claim={c} />
-          ))}
-        </ul>
-      )}
+    <Tile>
+      <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        {items.map((c, i) => (
+          <ClaimRow key={`${c.criterion_id ?? "x"}-${i}`} claim={c} />
+        ))}
+      </ul>
     </Tile>
   );
 }
