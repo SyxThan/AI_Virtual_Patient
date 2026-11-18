@@ -93,14 +93,31 @@ clone a real person's voice (model card terms).
    TTS_PROVIDER=vieneu
    TTS_BASE_URL=http://127.0.0.1:8880
    TTS_VOICE_ID=           # a built-in voice name; blank = server default
-   TTS_TIMEOUT_S=30        # CPU synthesizes the whole reply first
+   TTS_TIMEOUT_S=30        # deadline for the whole reply (the last part)
    VIENEU_DIR=D:\VieNeu-TTS
    VIENEU_HF_HOME=D:\VieNeu-TTS\hf-home
+   VIENEU_BACKEND=onnx     # or pytorch (GPU); see "Streaming and backend" below
    ```
    No quotes around values. Port 8880 (not 8000, which is this API); change both
    `TTS_BASE_URL` and `set VIENEU_PORT=...` together.
 3. Run `run.bat`. List the voices (name, gender, region) once the VieNeu window
    says it is ready: `curl http://127.0.0.1:8880/v1/voices`.
+
+**Streaming and backend (AVP-167).** Voice turns stream the reply: the API reads
+VieNeu's PCM while it is being synthesized and sends it in parts, and the browser
+plays the first part at once and the rest back to back (lip-sync follows). Only the
+final reply that passed the Patient guardrails is spoken. Repeated lines come from
+an in-process cache. Choose the VieNeu backend with `VIENEU_BACKEND` in
+`apps/api/.env` (`run.bat` passes it on):
+- `onnx` (CPU, recommended when Whisper uses the GPU): stays faster than real time
+  and leaves the GPU to Whisper.
+- `pytorch` (GPU, after `uv sync --extra cuda`): starts its first chunk a little
+  sooner, but on the 6 GB test laptop a whole reply was not faster than ONNX and
+  slowed down over a longer session, so it is not the default here.
+- blank: VieNeu chooses (pytorch when the CUDA extra is installed).
+
+`evals/latency.py` reports `tts_first_ms` (TTS start to the first part) and
+`first_audio_ms` (question sent to the first part): compare backends with it.
 
 Without `TTS_PROVIDER=vieneu`, nothing changes: voice turns use the offline fake
 (a beep) and typed turns stay text only. Microphone input (STT) is separate: see
@@ -136,10 +153,27 @@ virtualenv, outside `apps/api`, and speaks the OpenAI-compatible
 3. Run `run.bat`: it opens an "AVP STT" window. When it prints `ready`, check it:
    `curl http://127.0.0.1:8890/health`.
 
-Tested only on CPU (`int8`). An NVIDIA GPU may work with `set WHISPER_DEVICE=cuda`
-and `set WHISPER_COMPUTE_TYPE=float16` before `run.bat`, but it also needs the CUDA
-12 cuBLAS and cuDNN 9 libraries (see the faster-whisper README); this is not tested here.
-Without `STT_PROVIDER=whisper`, nothing changes.
+**NVIDIA GPU (AVP-167, tested on a 6 GB laptop GPU).** Install the CUDA 12 cuBLAS
+and cuDNN 9 wheels into the same virtualenv (`server.py` puts their DLL folders on
+`PATH` itself, no CUDA toolkit needed):
+```powershell
+uv pip install --python D:\avp-stt\.venv\Scripts\python.exe nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*"
+```
+then in `apps/api/.env` (`run.bat` passes them to the server as `WHISPER_*`):
+```
+STT_MODEL=large-v3-turbo
+STT_DEVICE=cuda
+STT_COMPUTE_TYPE=int8_float16
+STT_BEAM_SIZE=1
+STT_TIMEOUT_S=8
+```
+The server runs one warm-up transcription at start-up, so the first question is not
+slow. `large-v3-turbo` on the GPU was both faster and more accurate than `small` on
+the CPU here; Whisper and VieNeu together fit on a 6 GB card. Measure your machine
+with `cd apps/api; python ../../evals/latency.py --providers env --mode voice` (it
+writes `evals/results/latency-voice-*.json`; quote only those numbers). Blank
+`STT_DEVICE` = CPU `int8`, beam 5 (as before). Without `STT_PROVIDER=whisper`,
+nothing changes.
 
 Windows equivalents (no make):
 ```powershell

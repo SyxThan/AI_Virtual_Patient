@@ -435,6 +435,14 @@ x-websocket:
       First message after connecting (never in the URL): {"type":"auth","access_token":"<JWT>"}
       when signed in, or {"type":"auth","token":"<guest token>"} for a guest session.
     note: A bad token or a session the caller does not own closes the socket with 1008.
+    server_messages: >
+      {"type":"ready"}; {"type":"transcript","speaker","text","turn_idx"?};
+      {"type":"audio","data":"<base64>","mime","part"} one or more per reply, in play
+      order (AVP-167: part 0 starts a new reply, a message without part is a whole
+      reply); {"type":"timing","stt_ms","llm_ms","tts_ms","tts_first_ms","audio_parts"}
+      closes the turn (measured; tts_ms null if the audio stream failed);
+      {"type":"error","code","message"} (socket stays open). Full list in
+      apps/api/avp_api/routers/websocket.py.
 
 components:
   securitySchemes:

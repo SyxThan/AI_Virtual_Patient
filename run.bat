@@ -50,6 +50,10 @@ if exist "apps\api\.env" findstr /B /I /C:"TTS_PROVIDER=vieneu" "apps\api\.env" 
 if not defined VIENEU_ON goto after_vieneu
 if not defined VIENEU_DIR for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"VIENEU_DIR=" "apps\api\.env"`) do set "VIENEU_DIR=%%B"
 if not defined VIENEU_HF_HOME for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"VIENEU_HF_HOME=" "apps\api\.env"`) do set "VIENEU_HF_HOME=%%B"
+REM AVP-167: VIENEU_BACKEND=onnx (CPU, de GPU cho Whisper) hoac pytorch (GPU); trong = auto.
+if not defined VIENEU_BACKEND for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"VIENEU_BACKEND=" "apps\api\.env"`) do set "VIENEU_BACKEND=%%B"
+set "VIENEU_ENV=set HOST=127.0.0.1&& set PORT=%VIENEU_PORT%"
+if defined VIENEU_BACKEND set "VIENEU_ENV=%VIENEU_ENV%&& set VIENEU_BACKEND=%VIENEU_BACKEND%"
 if not defined VIENEU_DIR goto vieneu_no_dir
 if not exist "%VIENEU_DIR%\apps\openai_speech.py" goto vieneu_bad_dir
 where uv >nul 2>&1 || goto vieneu_no_uv
@@ -57,7 +61,7 @@ netstat -ano | findstr /R /C:":%VIENEU_PORT% .*LISTENING" >nul && goto vieneu_bu
 REM Model VieNeu (khoang 600 MB) tai ve HF_HOME; dat VIENEU_HF_HOME neu o C it cho trong.
 if defined VIENEU_HF_HOME set "HF_HOME=%VIENEU_HF_HOME%"
 echo Khoi dong VieNeu-TTS tai http://127.0.0.1:%VIENEU_PORT% (lan dau co the phai tai model)...
-%LAUNCH% "AVP VieNeu :%VIENEU_PORT%" /D "%VIENEU_DIR%" cmd /k "set HOST=127.0.0.1&& set PORT=%VIENEU_PORT%&& uv run --no-sync python -m apps.openai_speech"
+%LAUNCH% "AVP VieNeu :%VIENEU_PORT%" /D "%VIENEU_DIR%" cmd /k "%VIENEU_ENV%&& uv run --no-sync python -m apps.openai_speech"
 set "VIENEU_STARTED=1"
 goto after_vieneu
 :vieneu_no_dir
