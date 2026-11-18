@@ -89,7 +89,8 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-164** | **Slice 20** | Ca tăng huyết áp khám trên cảnh 3D | **P1** | ✅ Merged (PR #74; minh hoạ, chờ bác sĩ duyệt) |
 | **AVP-166** | **Slice 20** | Ảnh bìa thư viện ca: ca viêm ruột thừa dùng ảnh dựng từ cảnh 3D của ca (toàn cảnh, PO đồng ý dù lộ tư thế co chân phải), vẽ lại ảnh 2D ca suy tim (giữ toạ độ vùng khám), ảnh 2D neo mép trên trên thẻ và trang Chuẩn bị | **P1** | 🟡 PR mở |
 | **AVP-167** | **Slice 6/16/17** | Demo mượt: Whisper chạy GPU, phát giọng người mẹ theo từng đoạn (streaming TTS), cache TTS và embedding truy vấn debrief, Gemini có ngân sách retry, hạn chờ ngắn và model dự phòng cho Patient | **P1** | 🟡 PR mở |
-| **AVP-168** | **Slice 16** | Màn Debrief: thẻ điểm Auto-OSCE dính (sticky) chỉ trong hàng của danh sách tiêu chí, không trượt đè lên thẻ phản hồi và trích dẫn bên dưới | **P1** | 🟡 PR mở |
+| **AVP-168** | **Slice 16** | Màn Debrief: thẻ điểm Auto-OSCE dính (sticky) chỉ trong hàng của danh sách tiêu chí, không trượt đè lên thẻ phản hồi và trích dẫn bên dưới | **P1** | ✅ Merged (PR #78) |
+| **AVP-169** | **Slice 16** | Thiết kế lại màn Debrief theo trình tự đọc: 1 Tổng quan (cảnh báo trọng yếu lấy từ dữ liệu ca, điểm, kết quả theo nhóm kỹ năng), 2 Phản hồi sư phạm, 3 Bảng kiểm lọc theo kết quả và nhóm theo kỹ năng, trích dẫn nằm dưới đúng tiêu chí, 4 Nhận xét chung, 5 Tiếp theo | **P1** | 🟡 PR mở |
 
 ---
 

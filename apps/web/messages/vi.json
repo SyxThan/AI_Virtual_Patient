@@ -284,7 +284,36 @@
   },
   "debrief": {
     "redFlagTitle": "Cảnh báo dấu hiệu nguy hiểm",
-    "redFlagBody": "Bạn đã bỏ sót hoặc chưa đạt tiêu chí tối quan trọng (Giật mình chới với / Phân độ Tay chân miệng).",
+    "redFlagBody": "Bạn đã bỏ sót hoặc chưa đạt tiêu chí trọng yếu của ca này. Hãy xem lại các tiêu chí dưới đây trước tiên.",
+    "redFlagListLabel": "Tiêu chí trọng yếu cần xem lại",
+    "sections": {
+      "overview": "Tổng quan kết quả",
+      "feedback": "Phản hồi sư phạm",
+      "checklist": "Bảng kiểm chi tiết",
+      "general": "Nhận xét chung có trích dẫn",
+      "next": "Tiếp theo",
+      "stepLabel": "Bước {n}"
+    },
+    "domainTitle": "Kết quả theo nhóm kỹ năng",
+    "domainCount": "{met}/{total} đạt",
+    "domainLegend": "Mỗi ô là một tiêu chí, theo thứ tự bảng kiểm.",
+    "domains": {
+      "history": "Bệnh sử",
+      "epidemiology": "Dịch tễ",
+      "physical_exam": "Khám thực thể",
+      "investigations": "Cận lâm sàng",
+      "diagnosis": "Chẩn đoán",
+      "management": "Xử trí",
+      "communication": "Giao tiếp",
+      "other": "Khác"
+    },
+    "filters": {
+      "label": "Lọc theo kết quả",
+      "missed": "Cần cải thiện",
+      "all": "Tất cả",
+      "met": "Đã đạt",
+      "empty": "Không có tiêu chí nào ở mục này."
+    },
     "scoreNoValue": "—",
     "scoreCountsTitle": "Kết quả theo tiêu chí",
     "versionsTitle": "Phiên bản chấm",
@@ -340,7 +369,10 @@
       "evidence": "Bằng chứng nguyên văn",
       "noEvidence": "Không có bằng chứng trong transcript.",
       "turn": "Lượt #{idx}",
-      "openTranscript": "Xem trong transcript"
+      "openTranscript": "Xem trong transcript",
+      "related": "Nhận xét có trích dẫn",
+      "showDetail": "Xem chi tiết",
+      "hideDetail": "Thu gọn"
     },
     "transcript": {
       "title": "Transcript buổi khám",

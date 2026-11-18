@@ -2,16 +2,20 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useState } from "react";
+import { use, useCallback, useMemo, useState } from "react";
 import vi from "../../../../messages/vi.json";
 import CitedClaimsSection from "@/components/debrief/CitedClaimsSection";
+import DomainBreakdown from "@/components/debrief/DomainBreakdown";
 import ExportPdfButton from "@/components/debrief/ExportPdfButton";
 import PedagogicalDebriefPanel from "@/components/debrief/PedagogicalDebriefPanel";
 import PracticeNoticeBanner from "@/components/debrief/PracticeNoticeBanner";
 import RedFlagAlertBanner from "@/components/debrief/RedFlagAlertBanner";
 import RubricEvidenceList from "@/components/debrief/RubricEvidenceList";
 import ScoreSummaryCard from "@/components/debrief/ScoreSummaryCard";
+import StepHeading from "@/components/debrief/StepHeading";
 import TranscriptDrawer from "@/components/debrief/TranscriptDrawer";
+import { isCriticalMiss, splitClaims } from "@/components/debrief/debriefHelpers";
+import { fmt } from "@/lib/sessionAuth";
 import { caseVoiceOf, speakerText } from "@/components/workspace/caseVoice";
 import Button, { buttonClass } from "@/components/ui/Button";
 import PageShell from "@/components/ui/PageShell";
@@ -37,19 +41,15 @@ function Skeleton({ message, compact = false }: { message: string; compact?: boo
         {message}
       </p>
       {compact ? (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-          <div className="h-48 animate-pulse rounded-tile bg-surface motion-reduce:animate-none lg:col-span-7" />
-          <div className="h-48 animate-pulse rounded-tile bg-surface motion-reduce:animate-none lg:col-span-5" />
-        </div>
+        <div className="h-56 animate-pulse rounded-tile bg-surface motion-reduce:animate-none" />
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-          <div className="h-72 animate-pulse rounded-tile bg-ink/10 motion-reduce:animate-none lg:col-span-4" />
-          <div className="space-y-3 lg:col-span-8">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-28 animate-pulse rounded-card bg-surface motion-reduce:animate-none" />
-            ))}
+        <>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="h-80 animate-pulse rounded-tile bg-ink/10 motion-reduce:animate-none lg:col-span-5 xl:col-span-4" />
+            <div className="h-80 animate-pulse rounded-tile bg-surface motion-reduce:animate-none lg:col-span-7 xl:col-span-8" />
           </div>
-        </div>
+          <div className="h-56 animate-pulse rounded-tile bg-surface motion-reduce:animate-none" />
+        </>
       )}
     </div>
   );
@@ -120,6 +120,12 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
   const evFailed = evaluation.state === "ready" && ev?.status === "failed";
   const dbDone = debrief.state === "ready" && db?.status === "done";
   const signedIn = auth.status === "signedIn";
+  const criteria = useMemo(() => (evDone ? (ev?.criteria ?? []) : []), [evDone, ev]);
+  // Claims about a criterion sit under it in the checklist; the rest form step 4.
+  const claims = useMemo(
+    () => splitClaims(dbDone ? (db?.items ?? []) : [], criteria.map((c) => c.criterion_id)),
+    [dbDone, db, criteria],
+  );
 
   async function onRetry() {
     setRetrying(true);
@@ -174,44 +180,58 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
       </Notice>
     );
   } else if (evDone) {
+    // Reading order (AVP-169): how did I do, what to learn, the detail, general notes.
+    const hasGeneral = claims.general.length > 0;
     body = (
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        {ev.critical_missed && (
-          <div className="lg:col-span-12">
-            <RedFlagAlertBanner />
+      <>
+        <section aria-labelledby="sec-overview" className="space-y-4">
+          <StepHeading n={1} id="sec-overview" title={vi.debrief.sections.overview} />
+          {ev.critical_missed && <RedFlagAlertBanner missed={criteria.filter(isCriticalMiss)} />}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+            <div className="lg:col-span-5 xl:col-span-4">
+              <ScoreSummaryCard evaluation={ev} />
+            </div>
+            {criteria.length > 0 && (
+              <div className="min-w-0 lg:col-span-7 xl:col-span-8">
+                <DomainBreakdown evaluation={ev} />
+              </div>
+            )}
           </div>
-        )}
-        {/* Own row so the sticky score card is bounded by the rubric list and
-            never slides over the debrief rows below it. */}
-        <div className="grid grid-cols-1 gap-4 lg:col-span-12 lg:grid-cols-12">
-          <div className="lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
-            <ScoreSummaryCard evaluation={ev} />
-          </div>
-          <div className="min-w-0 lg:col-span-8">
-            <RubricEvidenceList evaluation={ev} onOpenTurn={setFocusTurn} />
-          </div>
-        </div>
-        {debrief.state === "pending" || debrief.state === "loading" ? (
-          <div className="lg:col-span-12">
+        </section>
+
+        <section aria-labelledby="sec-feedback" className="space-y-4">
+          <StepHeading n={2} id="sec-feedback" title={vi.debrief.sections.feedback} />
+          {debrief.state === "pending" || debrief.state === "loading" ? (
             <Skeleton message={vi.debrief.debriefPending} compact />
-          </div>
-        ) : dbDone && db.summary ? (
-          <>
-            <div className="min-w-0 lg:col-span-7">
-              <PedagogicalDebriefPanel summary={db.summary} />
-            </div>
-            <div className="min-w-0 lg:col-span-5">
-              <CitedClaimsSection items={db.items ?? []} />
-            </div>
-          </>
-        ) : (
-          <div className="lg:col-span-12">
+          ) : dbDone && db.summary ? (
+            <PedagogicalDebriefPanel summary={db.summary} />
+          ) : (
             <Notice tone="info">{db?.error ? errorText(db.error) : vi.debrief.debriefFailed}</Notice>
-          </div>
+          )}
+        </section>
+
+        <section aria-labelledby="sec-checklist" className="space-y-4">
+          <StepHeading
+            n={3}
+            id="sec-checklist"
+            title={vi.debrief.sections.checklist}
+            aside={
+              <p className="tabular text-sm text-ink-muted">{fmt(vi.debrief.rubricCount, { count: criteria.length })}</p>
+            }
+          />
+          <RubricEvidenceList evaluation={ev} claimsByCriterion={claims.byCriterion} onOpenTurn={setFocusTurn} />
+        </section>
+
+        {hasGeneral && (
+          <section aria-labelledby="sec-general" className="space-y-4">
+            <StepHeading n={4} id="sec-general" title={vi.debrief.sections.general} />
+            <CitedClaimsSection items={claims.general} />
+          </section>
         )}
-      </div>
+      </>
     );
   }
+  const nextStep = evDone ? (claims.general.length > 0 ? 5 : 4) : undefined;
 
   return (
     <PageShell
@@ -222,34 +242,56 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
       }
       actions={<ExportPdfButton sessionId={id} disabled={!(evDone && dbDone)} />}
     >
-      <div className="space-y-4">
+      <div className="space-y-10">
         <PracticeNoticeBanner sourcesReviewed={dbDone ? (db?.sources_reviewed ?? false) : null} />
         {body}
-        <Tile as="footer" tone="surface" compact>
-          <h2 className="font-display text-xl font-bold tracking-tight">{vi.debriefUx.actionsTitle}</h2>
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-            <Link href="/cases" className={buttonClass({ variant: "secondary" })}>
-              {vi.debrief.actions.newCase}
-            </Link>
-            {/* A finished session redirects away from /session/{id}, so review the transcript here. */}
-            <Button
-              variant="secondary"
-              onClick={() => setFocusTurn(turns[0]?.turn_idx ?? 0)}
-              disabled={turns.length === 0}
-            >
-              {vi.debriefUx.reviewTranscript}
-            </Button>
-            <Link href={signedIn ? "/history" : "/"} className={buttonClass({ variant: "ghost" })}>
-              {signedIn ? vi.debriefUx.backToHistory : vi.debriefUx.backToHome}
-            </Link>
-            {/* Owner-only delete (Slice 13): afterwards every route of this session is 404. */}
-            <DeleteSessionButton
-              sessionId={id}
-              onDeleted={() => router.replace(signedIn ? "/history" : "/")}
-              className={DELETE_CLASS}
-            />
-          </div>
-        </Tile>
+        <footer aria-labelledby="sec-next" className="space-y-4">
+          <StepHeading n={nextStep} id="sec-next" title={vi.debrief.sections.next} />
+          <Tile compact>
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <Link href="/cases" className={buttonClass({ variant: "secondary" })}>
+                {vi.debrief.actions.newCase}
+              </Link>
+              {/* A finished session redirects away from /session/{id}, so review the transcript here. */}
+              <Button
+                variant="secondary"
+                onClick={() => setFocusTurn(turns[0]?.turn_idx ?? 0)}
+                disabled={turns.length === 0}
+              >
+                {vi.debriefUx.reviewTranscript}
+              </Button>
+              <Link href={signedIn ? "/history" : "/"} className={buttonClass({ variant: "ghost" })}>
+                {signedIn ? vi.debriefUx.backToHistory : vi.debriefUx.backToHome}
+              </Link>
+              {/* Owner-only delete (Slice 13): afterwards every route of this session is 404. */}
+              <DeleteSessionButton
+                sessionId={id}
+                onDeleted={() => router.replace(signedIn ? "/history" : "/")}
+                className={DELETE_CLASS}
+              />
+            </div>
+            {evDone && (
+              // Grading provenance (evaluation.md): kept for traceability, out of the student's way.
+              <div className="mt-5 border-t border-line pt-4 text-xs text-ink-muted">
+                <p className="font-semibold">{vi.debrief.versionsTitle}</p>
+                <dl className="mt-1.5 flex flex-wrap gap-x-6 gap-y-1">
+                  {(
+                    [
+                      [vi.debrief.versionRubric, ev?.rubric_version],
+                      [vi.debrief.versionScoring, ev?.scoring_version],
+                      [vi.debrief.versionModel, ev?.model],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <div key={label} className="flex gap-2">
+                      <dt>{label}</dt>
+                      <dd className="tabular break-all font-semibold text-ink">{value ?? vi.debrief.scoreNoValue}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </Tile>
+        </footer>
       </div>
       {focusTurn !== null && <TranscriptDrawer
           turns={turns}
