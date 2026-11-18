@@ -181,11 +181,15 @@ export default function DebriefPage({ params }: { params: Promise<{ id: string }
             <RedFlagAlertBanner />
           </div>
         )}
-        <div className="lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
-          <ScoreSummaryCard evaluation={ev} />
-        </div>
-        <div className="min-w-0 lg:col-span-8">
-          <RubricEvidenceList evaluation={ev} onOpenTurn={setFocusTurn} />
+        {/* Own row so the sticky score card is bounded by the rubric list and
+            never slides over the debrief rows below it. */}
+        <div className="grid grid-cols-1 gap-4 lg:col-span-12 lg:grid-cols-12">
+          <div className="lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
+            <ScoreSummaryCard evaluation={ev} />
+          </div>
+          <div className="min-w-0 lg:col-span-8">
+            <RubricEvidenceList evaluation={ev} onOpenTurn={setFocusTurn} />
+          </div>
         </div>
         {debrief.state === "pending" || debrief.state === "loading" ? (
           <div className="lg:col-span-12">
