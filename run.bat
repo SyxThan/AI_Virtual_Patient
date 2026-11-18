@@ -81,6 +81,10 @@ if not defined STT_ON goto after_stt
 if not defined WHISPER_MODEL for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_MODEL=" "apps\api\.env"`) do set "WHISPER_MODEL=%%B"
 if not defined STT_SERVER_PYTHON for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_SERVER_PYTHON=" "apps\api\.env"`) do set "STT_SERVER_PYTHON=%%B"
 if not defined STT_HF_HOME for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_HF_HOME=" "apps\api\.env"`) do set "STT_HF_HOME=%%B"
+REM GPU (AVP-167): STT_DEVICE=cuda, STT_COMPUTE_TYPE=int8_float16, STT_BEAM_SIZE=1 (xem README).
+if not defined WHISPER_DEVICE for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_DEVICE=" "apps\api\.env"`) do set "WHISPER_DEVICE=%%B"
+if not defined WHISPER_COMPUTE_TYPE for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_COMPUTE_TYPE=" "apps\api\.env"`) do set "WHISPER_COMPUTE_TYPE=%%B"
+if not defined WHISPER_BEAM_SIZE for /f "usebackq tokens=1,* delims==" %%A in (`findstr /B /C:"STT_BEAM_SIZE=" "apps\api\.env"`) do set "WHISPER_BEAM_SIZE=%%B"
 if not defined WHISPER_MODEL goto stt_no_model
 if not defined STT_SERVER_PYTHON goto stt_no_python
 if not exist "%STT_SERVER_PYTHON%" goto stt_bad_python
@@ -88,6 +92,9 @@ netstat -ano | findstr /R /C:":%STT_PORT% .*LISTENING" >nul && goto stt_busy
 REM HF_HOME chi dat trong cua so STT (khong anh huong VieNeu hay API).
 set "STT_ENV=set PYTHONUTF8=1&& set WHISPER_MODEL=%WHISPER_MODEL%&& set STT_SERVER_PORT=%STT_PORT%"
 if defined STT_HF_HOME set "STT_ENV=%STT_ENV%&& set HF_HOME=%STT_HF_HOME%"
+if defined WHISPER_DEVICE set "STT_ENV=%STT_ENV%&& set WHISPER_DEVICE=%WHISPER_DEVICE%"
+if defined WHISPER_COMPUTE_TYPE set "STT_ENV=%STT_ENV%&& set WHISPER_COMPUTE_TYPE=%WHISPER_COMPUTE_TYPE%"
+if defined WHISPER_BEAM_SIZE set "STT_ENV=%STT_ENV%&& set WHISPER_BEAM_SIZE=%WHISPER_BEAM_SIZE%"
 echo Khoi dong server STT (model %WHISPER_MODEL%) tai http://127.0.0.1:%STT_PORT% (lan dau co the phai tai model)...
 %LAUNCH% "AVP STT :%STT_PORT%" /D "%~dp0scripts\stt_server" cmd /k "%STT_ENV%&& "%STT_SERVER_PYTHON%" server.py"
 set "STT_STARTED=1"
