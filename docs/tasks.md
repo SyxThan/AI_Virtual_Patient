@@ -91,7 +91,7 @@ Trạng thái lấy theo `PROGRESS_TASK.md` (chỉ ghi ✅ khi đã merge và c�
 | **AVP-167** | **Slice 6/16/17** | Demo mượt: Whisper chạy GPU, phát giọng người mẹ theo từng đoạn (streaming TTS), cache TTS và embedding truy vấn debrief, Gemini có ngân sách retry, hạn chờ ngắn và model dự phòng cho Patient | **P1** | 🟡 PR mở |
 | **AVP-168** | **Slice 16** | Màn Debrief: thẻ điểm Auto-OSCE dính (sticky) chỉ trong hàng của danh sách tiêu chí, không trượt đè lên thẻ phản hồi và trích dẫn bên dưới | **P1** | ✅ Merged (PR #78) |
 | **AVP-169** | **Slice 16** | Thiết kế lại màn Debrief theo trình tự đọc: 1 Tổng quan (cảnh báo trọng yếu lấy từ dữ liệu ca, điểm, kết quả theo nhóm kỹ năng), 2 Phản hồi sư phạm, 3 Bảng kiểm lọc theo kết quả và nhóm theo kỹ năng, trích dẫn nằm dưới đúng tiêu chí, 4 Nhận xét chung, 5 Tiếp theo | **P1** | ✅ Merged (PR #79) |
-| **AVP-170** | **Slice 15** | Trang Minh bạch số liệu: chạy `evals/publish_summary.py` để đưa kết quả đo thật đã có (độ trễ giọng nói, red-team) lên trang; kappa/độ ổn định và judge vẫn ghi "chưa có số đo thật" | **P1** | 🟡 PR mở |
+| **AVP-170** | **Slice 15** | Trang Minh bạch số liệu: đo thật lại độ trễ giọng nói, độ ổn định khi chấm, red-team đủ 6 ca (gộp lần đo mới nhất mỗi ca, hiện số câu lỗi); rút gọn ô chỉ số. Judge chờ người kiểm chấm mẫu | **P1** | ✅ Merged |
 
 ---
 
